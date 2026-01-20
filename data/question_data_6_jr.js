@@ -3,7 +3,7 @@ if (typeof window.questionsDB === 'undefined') {
 }
 
 if (typeof window.questionsDB["p_qingyu"] === 'undefined') {
-    window.questionsDB["p_qingyuan"] = {};
+    window.questionsDB["p_qingyu"] = {};
 }
 
 window.questionsDB["p_qingyu"].title = "《青玉案·元夕》";
