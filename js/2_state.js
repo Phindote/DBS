@@ -43,7 +43,6 @@ let pokedexTimer = null;
 let pokedexSeconds = 0;
 let gamePlayTimer = null;
 
-// CRITICAL FIX: Changed save key to v3 to force reset for all users
 function saveGame() {
     if (window.godModeActive) return;
     const data = {
@@ -94,7 +93,6 @@ function applyGameData(parsed) {
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
 
-    // DOUBLE CHECK: If totalPlayTime is 0, ensure absolutely nothing is unlocked.
     if (gameState.stats.totalPlayTime === 0) {
         gameState.masteredChapters = [];
         gameState.solvedQuestionIds = [];

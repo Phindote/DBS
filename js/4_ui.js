@@ -2,6 +2,7 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
+    // Toggle Floating Shop Button Visibility: ONLY show on main menu
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
         if (id === 'screen-menu') {
@@ -11,19 +12,23 @@ function switchScreen(id) {
         }
     }
 
+    // Stop victory/defeat loops if leaving result screen
     if (id !== 'screen-result') {
         stopLongSFX();
     }
 
+    // --- MUSIC LOGIC ---
     if (id === 'screen-game') {
+        // Battle: Switch to battle music
         resizeCanvas();
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
+    } else if (id === 'screen-result') {
+        // Result: Handled by endGame() in game.js, don't force theme here
     } else {
-        // Keep theme playing for these screens
-        if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
-            playMusic('theme'); 
-        }
+        // ALL other screens (Menu, Shop, Pokedex, Achievements, LOGIN/Edit Profile)
+        // enforce Theme music. playMusic() handles "don't restart if already playing".
+        playMusic('theme'); 
         
         if (id === 'screen-menu') checkAchievements();
     }

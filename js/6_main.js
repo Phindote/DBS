@@ -46,19 +46,17 @@ function initDraggableMenu() {
     let initialY;
     let xOffset = 0;
     let yOffset = 0;
-    
-    // Set initial Position
-    xOffset = 0; 
-    yOffset = 0; 
+    let isDragging = false; // Flag to distinguish click from drag
 
     const mainBtn = document.getElementById("floatingMainBtn");
     const subMenu = document.getElementById("floatingSubMenu");
 
+    // Click handler: Only toggle if NOT dragging
     mainBtn.addEventListener("click", (e) => {
-        if(!dragItem.classList.contains("dragging")) {
-            // CSS handles row-reverse and visibility toggling
+        if (!isDragging) {
             subMenu.classList.toggle("visible");
         }
+        isDragging = false; // Reset
     });
 
     container.addEventListener("touchstart", dragStart, {passive: false});
@@ -69,7 +67,8 @@ function initDraggableMenu() {
     container.addEventListener("mousemove", drag);
 
     function dragStart(e) {
-        if (e.target === mainBtn || mainBtn.contains(e.target) || e.target === dragItem) {
+        // Only start drag if touching the main button
+        if (e.target === mainBtn || mainBtn.contains(e.target)) {
             if (e.type === "touchstart") {
                 initialX = e.touches[0].clientX - xOffset;
                 initialY = e.touches[0].clientY - yOffset;
@@ -77,9 +76,8 @@ function initDraggableMenu() {
                 initialX = e.clientX - xOffset;
                 initialY = e.clientY - yOffset;
             }
-            if (e.target === mainBtn || mainBtn.contains(e.target)) {
-                active = true;
-            }
+            active = true;
+            isDragging = false; // Assume click initially
         }
     }
 
@@ -88,52 +86,47 @@ function initDraggableMenu() {
         initialX = currentX;
         initialY = currentY;
         active = false;
-        dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK LOGIC (Always snap to Right edge) ---
-        // Force X to 0 (Right Edge, based on CSS right:20px)
+        // SNAP BACK LOGIC
+        // 1. Force X back to 0 (Right Edge)
         currentX = 0;
-        xOffset = 0; 
+        xOffset = 0;
 
-        // 2. Bound Y position
+        // 2. Bound Y position to keep it on screen
         const header = document.querySelector('.header-bar');
         const footer = document.querySelector('.footer-bar');
-        const profileCard = document.querySelector('.profile-card'); 
-        
         const headerHeight = header ? header.offsetHeight : 100;
         const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
         const dragItemRect = dragItem.getBoundingClientRect();
         
-        // Define Safe Zone Top
-        let safeTopY = headerHeight + 10; 
-        if (profileCard && profileCard.offsetParent !== null) { 
-             safeTopY = profileCard.getBoundingClientRect().top;
-        }
-        
-        // Calculate Translation Y limits
+        // Calculate safe Y bounds
         // Base screen Y (where translate Y=0 lands) = WindowHeight - 60 - Height
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
-        
-        const minTranslateY = safeTopY - baseScreenY;
+        const minTranslateY = headerHeight + 10 - baseScreenY;
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
 
-        // Clamp currentY
+        // Clamp Y
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
-        
-        if (minTranslateY > maxTranslateY) {
-             const fallbackMin = headerHeight + 10 - baseScreenY;
-             if (currentY < fallbackMin) currentY = fallbackMin;
-        }
+        // Fallback if window is too small
+        if (minTranslateY > maxTranslateY) currentY = minTranslateY;
 
         yOffset = currentY;
-        setTranslate(0, currentY, dragItem); 
+
+        // Apply Snap Animation
+        dragItem.style.transition = "transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+        setTranslate(0, currentY, dragItem);
+        
+        // Remove transition after animation finishes so dragging feels instant again
+        setTimeout(() => {
+            dragItem.style.transition = "";
+        }, 300);
     }
 
     function drag(e) {
         if (active) {
             e.preventDefault();
-            dragItem.classList.add("dragging");
+            
             if (e.type === "touchmove") {
                 currentX = e.touches[0].clientX - initialX;
                 currentY = e.touches[0].clientY - initialY;
@@ -141,6 +134,16 @@ function initDraggableMenu() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
             }
+
+            // Mark as dragging if moved significantly
+            if (Math.abs(currentX) > 5 || Math.abs(currentY) > 5) {
+                isDragging = true;
+                // If dragging, hide submenu immediately to avoid visual clutter
+                subMenu.classList.remove("visible");
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
 
             setTranslate(currentX, currentY, dragItem);
         }
@@ -190,6 +193,7 @@ window.onload = function() {
 document.addEventListener('click', function(e) {
     const floatContainer = document.getElementById("floatingMenuContainer");
     const subMenu = document.getElementById("floatingSubMenu");
+    // Close submenu if clicked outside
     if (floatContainer && subMenu && subMenu.classList.contains("visible")) {
         if (!floatContainer.contains(e.target)) {
             subMenu.classList.remove("visible");
