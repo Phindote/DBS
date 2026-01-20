@@ -281,8 +281,10 @@ function checkAnswer(userVal, uiElement) {
             overlay.style.opacity = 1;
             setTimeout(() => overlay.style.opacity = 0, 200);
             
-            // 觸發攻擊動畫，因為 CSS 有 !important，這裡會生效
-            triggerAnimation(bossImg, "dragon-attack");
+            // Animation Trigger Fix: Toggle class to restart animation
+            bossImg.classList.remove("dragon-attack");
+            void bossImg.offsetWidth; // Trigger reflow
+            bossImg.classList.add("dragon-attack");
             
             triggerAnimation(qBox, "shake-box");
             if(gameState.user.hp <= 0) {
