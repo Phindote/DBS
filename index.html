@@ -189,6 +189,16 @@
 <div class="pokedex-grid" id="sealContainer"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
+<div id="screen-shop" class="screen">
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">補給站</h2>
+<div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px; width:100%;">
+<button id="btnTabShop" class="btn-secondary" onclick="renderShop()">商店</button>
+<button id="btnTabInventory" class="btn-secondary" onclick="renderInventory()">背包</button>
+</div>
+<div id="coinDisplay" style="width:100%; text-align:right; color:#d35400; font-weight:bold; padding:0 10px;">金幣：0</div>
+<div class="pokedex-grid" id="shopContainer" style="margin-top:5px;"></div>
+<button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+</div>
 <div id="screen-difficulty" class="screen">
 <h2 style="color:var(--primary-blue);">請選擇難度級別</h2>
 <div style="text-align:center; margin-bottom:15px; color:#555;">
@@ -343,6 +353,9 @@
 </div>
 </div>
 </div>
+<button id="floatingShopBtn" onclick="showShop()">
+<img src="images/ui/icon_shop.PNG" alt="Shop" onerror="this.src='images/ui/btn_menu.PNG'">
+</button>
 <div id="floatingMenuContainer">
 <div id="floatingSubMenu" class="hidden">
 <button class="btn-control-float" onclick="showHelp()">
