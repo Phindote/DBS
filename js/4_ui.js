@@ -2,7 +2,7 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility
+    // Toggle Shop Button
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
         if (id === 'screen-menu') {
@@ -12,14 +12,15 @@ function switchScreen(id) {
         }
     }
 
-    // Music Logic based on Screen ID
     if (id === 'screen-game') {
         resizeCanvas();
-        // Battle music is triggered in initGame, so we don't play here
+        // Music handled in initGame
     } else if (id === 'screen-result') {
-        // Result music is triggered in endGame
+        // Music handled in endGame
     } else {
-        // Handle Menu & Sub-menus BGM
+        // Handle BGM for specific screens
+        // Because of the seamless check in playMusic, calling 'theme' when 'theme' is playing does nothing.
+        
         if (id === 'screen-shop') {
             playMusic('bgm_shop');
         } else if (id === 'screen-pokedex') {
@@ -27,10 +28,9 @@ function switchScreen(id) {
         } else if (id === 'screen-achievements') {
             playMusic('bgm_achievements');
         } else if (id === 'screen-menu' || id === 'screen-login') {
-            playMusic('theme'); // Main Theme
+            playMusic('theme'); 
         } else {
-            // Default fall back
-            playMusic('theme');
+            playMusic('theme'); // Fallback
         }
         
         if (id === 'screen-menu') checkAchievements();

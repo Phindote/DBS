@@ -1,16 +1,18 @@
 const audioFiles = {
+    // Main Theme
     theme: new Audio('audio/bgm/bgm_theme.mp3'),
-    // New BGMs for specific screens
+    
+    // Feature BGMs
     bgm_shop: new Audio('audio/bgm/bgm_shop.mp3'),
     bgm_pokedex: new Audio('audio/bgm/bgm_pokedex.mp3'),
     bgm_achievements: new Audio('audio/bgm/bgm_achievements.mp3'),
     
-    // Battle & Result BGMs
+    // Battle & Result BGMs (Moved to BGM category as requested)
     bgm_battle_jr: new Audio('audio/bgm/bgm_battle_jr.mp3'),
     bgm_battle_sr: new Audio('audio/bgm/bgm_battle_sr.mp3'),
-    bgm_victory: new Audio('audio/sfx/sfx_victory.mp3'), 
-    bgm_success: new Audio('audio/sfx/sfx_success.mp3'), 
-    bgm_defeat: new Audio('audio/sfx/sfx_defeat.mp3'),   
+    bgm_victory: new Audio('audio/bgm/bgm_victory.mp3'), 
+    bgm_success: new Audio('audio/bgm/bgm_success.mp3'), 
+    bgm_defeat: new Audio('audio/bgm/bgm_defeat.mp3'),   
     
     // SFX
     click: new Audio('audio/sfx/sfx_click.mp3'),
@@ -18,7 +20,7 @@ const audioFiles = {
     wrong: new Audio('audio/sfx/sfx_wrong.mp3')
 };
 
-// Set Loop for all BGMs
+// Loop settings
 audioFiles.theme.loop = true;
 audioFiles.bgm_shop.loop = true;
 audioFiles.bgm_pokedex.loop = true;
@@ -26,7 +28,7 @@ audioFiles.bgm_achievements.loop = true;
 audioFiles.bgm_battle_jr.loop = true;
 audioFiles.bgm_battle_sr.loop = true;
 
-// Result music usually plays once, but can loop if desired
+// Result music plays once (unless you want it to loop, set to true)
 audioFiles.bgm_victory.loop = false;
 audioFiles.bgm_success.loop = false;
 audioFiles.bgm_defeat.loop = false;
@@ -45,11 +47,13 @@ function toggleMusic() {
     
     if (isMusicOn) {
         btn.classList.remove('off');
+        // Resume if something is set
         if (currentBGM) {
             currentBGM.play().catch(e=>{});
         }
     } else {
         btn.classList.add('off');
+        // Pause current BGM
         if (currentBGM) currentBGM.pause();
     }
 }
@@ -65,7 +69,7 @@ function toggleSFX() {
 }
 
 function stopAllMusic() {
-    // FORCE STOP every single audio file defined in the object
+    // FORCE STOP every audio file to prevent overlapping
     Object.values(audioFiles).forEach(a => {
         a.pause();
         a.currentTime = 0;
@@ -75,7 +79,7 @@ function stopAllMusic() {
 function playMusic(type) {
     let target = null;
     
-    // Map string types to audio objects
+    // Map types
     if (type === 'theme') target = audioFiles.theme;
     else if (type === 'bgm_shop') target = audioFiles.bgm_shop;
     else if (type === 'bgm_pokedex') target = audioFiles.bgm_pokedex;
@@ -86,12 +90,12 @@ function playMusic(type) {
     else if (type === 'bgm_success') target = audioFiles.bgm_success;
     else if (type === 'bgm_defeat') target = audioFiles.bgm_defeat;
     
-    // If exact same track is already playing, do nothing (Seamless)
+    // SEAMLESS CHECK: If the target is ALREADY playing, DO NOTHING.
     if (currentBGM === target && !target.paused) {
         return; 
     }
     
-    // Stop EVERYTHING before playing new track
+    // Otherwise, stop everything and play new
     stopAllMusic();
     
     currentBGM = target;
@@ -107,12 +111,13 @@ function playMusic(type) {
 }
 
 function stopLongSFX() {
-    // Function kept for compatibility, but logic moved to stopAllMusic inside playMusic
+    // Deprecated logic, handled by stopAllMusic now
 }
 
 function playSFX(name) {
     if (!isSFXEnabled) return;
     
+    // Stop overlapping SFX
     if (name === 'correct') {
         if (audioFiles.wrong) { audioFiles.wrong.pause(); audioFiles.wrong.currentTime = 0; }
     }
