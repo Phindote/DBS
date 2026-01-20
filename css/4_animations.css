@@ -28,7 +28,8 @@
     50% { transform: translateY(50px) scale(1.2); }
     100% { transform: translateY(0) scale(1); }
 }
-.dragon-attack { animation: dragonCrash 0.4s ease-in-out forwards; }
+/* 強制覆蓋 float 動畫 */
+.dragon-attack { animation: dragonCrash 0.4s ease-in-out forwards !important; }
 
 @keyframes bossDamage {
     0% { transform: scale(1); filter: brightness(1); }
