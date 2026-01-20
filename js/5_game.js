@@ -4,7 +4,7 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
-    // Explicitly play music on user interaction to bypass browser autoplay policies
+    // FORCE PLAY MUSIC IMMEDIATELY
     playMusic('theme'); 
 
     const c = g + l;
