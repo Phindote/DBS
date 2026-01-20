@@ -4,7 +4,7 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
-    playMusic('theme');
+    playMusic('theme'); 
 
     const c = g + l;
     gameState.user.name = n;
@@ -61,7 +61,7 @@ function randomSelectMix() {
     for (let i = 0; i < count; i++) {
         allCheckboxes[i].checked = true;
     }
-    confirmMixMode();
+    confirmMixMode(); 
 }
 
 function confirmMixMode() {
@@ -90,7 +90,7 @@ function initGame(diff) {
         return;
     }
     gameState.user.energy -= cost;
-    gameState.stats.totalAttempts++;
+    gameState.stats.totalAttempts++; 
     saveGame();
     gameState.difficulty = diff;
     gameState.user.hp = 100;
@@ -181,7 +181,7 @@ function generateMC(q) {
     if (q.options && q.options.length > 0) {
         opts = [...q.options];
     } else {
-        opts = [q.answer];
+        opts = [q.answer]; 
     }
     opts.sort(() => Math.random() - 0.5);
     opts.forEach(opt => {
@@ -226,7 +226,7 @@ function checkAnswer(userVal, uiElement) {
 
     if(correctAnswers.includes(userVal)) {
         inputLock = true;
-        playSFX('correct');
+        playSFX('correct'); 
         triggerAnimation(uiElement, "correct-flash");
         triggerAnimation(qBox, "player-attack");
         setTimeout(() => {
@@ -246,7 +246,7 @@ function checkAnswer(userVal, uiElement) {
                 }
             }
             gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
-            updateLevel();
+            updateLevel(); 
             updateCrackStage();
             recordHistory(userVal, true);
             document.getElementById("msgBox").style.color = "var(--primary-blue)";
@@ -266,7 +266,7 @@ function checkAnswer(userVal, uiElement) {
         }
         const bossRect = bossImg.getBoundingClientRect();
         const startX = bossRect.left + bossRect.width / 2;
-        const startY = bossRect.bottom - 20;
+        const startY = bossRect.bottom - 20; 
         const end = getCenter(qBox);
         fireBeam(startX, startY, end.x, end.y, '#e74c3c');
         setTimeout(() => {
@@ -329,15 +329,20 @@ function endGame(win) {
         gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_PERFECT);
 
         const currentChapKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
-        if (currentChapKey !== 'mix') {
+        if (currentChapKey !== 'mix') { 
+            // 修正這裡的邏輯：使用 stats.lastPerfectChapter 和 stats.consecutivePerfect
             if (gameState.stats.lastPerfectChapter !== currentChapKey) {
-                gameState.consecutivePerfectCount++;
+                gameState.stats.consecutivePerfect++; 
                 gameState.stats.lastPerfectChapter = currentChapKey;
             } else {
-                gameState.consecutivePerfectCount = 0;
-                gameState.stats.lastPerfectChapter = "";
+                gameState.stats.consecutivePerfect = 0; 
+                gameState.stats.lastPerfectChapter = ""; 
             }
         }
+        
+        // 修正：確保 perfectChapterIds 存在
+        if (!gameState.stats.perfectChapterIds) gameState.stats.perfectChapterIds = [];
+        
         if (!gameState.stats.perfectChapterIds.includes(currentChapKey) && currentChapKey !== 'mix') {
             gameState.stats.perfectChapterIds.push(currentChapKey);
         }
@@ -348,19 +353,19 @@ function endGame(win) {
         document.getElementById("endTitle").innerText = "順利通關！";
         document.getElementById("endTitle").style.color = "#2ecc71";
         gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_SUCCESS);
-        gameState.consecutivePerfectCount = 0;
+        gameState.stats.consecutivePerfect = 0;
         gameState.stats.lastPerfectChapter = "";
     } else {
         playMusic('defeat');
         document.getElementById("resultImg").src = "images/results/img_defeat.PNG";
         document.getElementById("endTitle").innerText = "力竭戰敗...";
         document.getElementById("endTitle").style.color = "#e74c3c";
-        gameState.consecutivePerfectCount = 0;
+        gameState.stats.consecutivePerfect = 0;
         gameState.stats.lastPerfectChapter = "";
     }
 
     if(win && gameState.user.hp === 100 && !gameState.unlockedAchievements.includes("ach_7")) {
-        if(gameState.stats.perfectChapterIds.length >= 3) gameState.unlockedAchievements.push("ach_7");
+        if(gameState.stats.perfectChapterIds && gameState.stats.perfectChapterIds.length >= 3) gameState.unlockedAchievements.push("ach_7");
     }
     if(win && gameState.user.hp < 10 && !gameState.unlockedAchievements.includes("ach_8")) gameState.unlockedAchievements.push("ach_8");
     if(win && gameState.user.hp < 5 && !gameState.unlockedAchievements.includes("ach_9")) gameState.unlockedAchievements.push("ach_9");
