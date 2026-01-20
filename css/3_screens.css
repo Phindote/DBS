@@ -127,8 +127,9 @@
     margin-top: 5px;
     flex: 1;
     min-height: 0;
+    overflow-y: auto; /* Enable vertical scroll */
 }
-#singleChapterList, #mixChapterList {
+#singleChapterList, #mixChapterList, #shopContainer {
     flex: 1;
     max-height: 50vh;
     overflow-y: auto;
@@ -473,14 +474,14 @@
     color: var(--primary-red);
     font-weight: bold;
 }
-/* ----- FLOATING MENU: Row Reverse for LEFT expansion ----- */
+/* ----- FLOATING MENU UPDATED: Row-based, Left Expansion ----- */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row-reverse; /* Button on right, expands left */
+    flex-direction: row; /* Main button Right, Sub Left */
     align-items: center;
     gap: 15px; 
     touch-action: none;
@@ -496,6 +497,7 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
+    order: 2; /* Main button on the right */
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -504,13 +506,18 @@
     object-fit: contain;
 }
 #floatingSubMenu {
-    display: none; /* Default hidden */
-    flex-direction: row-reverse; /* Items ordered: Guide(Right) -> Music -> SFX(Left) */
+    display: none;
+    flex-direction: row; /* Items arranged normally: [Guide] [Music] [SFX] */
     gap: 10px;
+    order: 1; /* Submenu on the left */
 }
 #floatingSubMenu.visible {
     display: flex;
-    animation: fadeIn 0.3s ease;
+    animation: slideLeft 0.3s ease forwards;
+}
+@keyframes slideLeft {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 .btn-control-float {
     width: 40px;
