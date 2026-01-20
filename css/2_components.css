@@ -141,7 +141,7 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards - REVERTED TO ORIGINAL STYLE */
+/* Pokedex Grid & Cards - FIXED OVERFLOW */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -158,18 +158,21 @@ select.form-input {
     padding: 10px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 150px;
+    /* REMOVED fixed min-height to prevent gaps, added height: auto */
+    height: auto; 
     justify-content: center;
-    /* REMOVED z-index hover changes to prevent blocking text */
+    z-index: 1; 
 }
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
+    z-index: 100; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 .pokedex-img, .shop-img {
     width: 100%;
@@ -308,12 +311,11 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - FIX SQUASHED LAYOUT */
+/* Battle HUD - WIDENED LEFT COLUMN */
 .battle-hud {
     width: 100%;
     display: grid;
-    /* Widened the left column to prevent wrapping/squashing */
-    grid-template-columns: 110px 1fr; 
+    grid-template-columns: 120px 1fr; /* Widened from 80px to 120px */
     gap: 10px;
     padding: 8px 12px;
     background: #eee;
@@ -335,11 +337,9 @@ select.form-input {
 .battle-hud-left .profile-logo {
     width: 40px !important;
     height: 40px !important;
-    object-fit: contain;
 }
 .battle-hud-left div {
-    font-size: 0.85rem !important; /* Slightly larger for readability */
-    white-space: nowrap; /* Prevent text wrapping */
+    font-size: 0.8rem !important; 
 }
 .battle-hud-right {
     display: flex;
@@ -388,7 +388,6 @@ select.form-input {
     z-index: 10000;
     transition: transform 0.2s;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-    display: none; /* Default hidden, logic in JS handles it */
 }
 #floatingShopBtn:active { transform: scale(0.95); }
 #floatingShopBtn img { width: 100%; height: 100%; object-fit: contain; }
