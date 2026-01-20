@@ -155,6 +155,16 @@ if (target.classList.contains('btn-attack')) return;
 playSFX('click');
 }
 });
+document.addEventListener('contextmenu', e => {
+if (e.target.tagName === 'IMG') {
+e.preventDefault();
+}
+});
+document.addEventListener('dragstart', e => {
+if (e.target.tagName === 'IMG') {
+e.preventDefault();
+}
+});
 document.getElementById("answerInput").addEventListener("keypress", function(e) {
 if(e.key === "Enter") submitSeniorAnswer();
 });
