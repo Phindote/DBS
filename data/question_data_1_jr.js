@@ -1,20 +1,15 @@
-// question_data_1_jr.js
-// 篇章：月下獨酌 (初階 - 多項選擇題)
-// 題目數量：13
-
 if (typeof window.questionsDB === 'undefined') {
     window.questionsDB = {};
 }
 
-// 注意：這裡將 key 改為 p_yuexia 以符合內容，圖片設為 dragon_1.jpg 代表第1關
 if (typeof window.questionsDB["p_yuexia"] === 'undefined') {
     window.questionsDB["p_yuexia"] = {};
 }
 
 window.questionsDB["p_yuexia"].title = "《月下獨酌》";
-window.questionsDB["p_yuexia"].img = "dragon_1.jpg"; 
-window.questionsDB["p_yuexia"].content = `月下獨酌 (其一) 李白
- 
+window.questionsDB["p_yuexia"].img = "yuexia.jpg";
+window.questionsDB["p_yuexia"].content = `月下獨酌 李白
+
 花間一壺酒，獨酌無相親。
 舉杯邀明月，對影成三人。
 月既不解飲，影徒隨我身。
