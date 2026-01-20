@@ -2,13 +2,13 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility
+    // STRICT CHECK: Only show Shop Button on Main Menu
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
-        if (id === 'screen-login' || id === 'screen-loading') {
-            shopBtn.style.display = 'none';
-        } else {
+        if (id === 'screen-menu') {
             shopBtn.style.display = 'block';
+        } else {
+            shopBtn.style.display = 'none';
         }
     }
 
