@@ -9,9 +9,9 @@
     width: 100%;
     box-sizing: border-box;
     height: 100%;
-    /* CRITICAL FIX: Lock horizontal scroll on screen level */
-    overflow-x: hidden; 
-    overflow-y: hidden; /* Content scrolls inside containers, not screen */
+    /* CRITICAL FIX: Lock horizontal scroll globally */
+    overflow-x: hidden;
+    overflow-y: hidden; /* Only specific inner containers should scroll */
 }
 .screen.active {
     display: flex;
@@ -129,20 +129,19 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto; 
-    overflow-x: hidden; /* Fix horizontal scroll */
+    overflow-x: hidden; 
 }
-/* Fixed Container Logic applied to Pokedex, Shop, Achievements */
+/* FIXED CONTAINERS: Single, Mix, Shop, Pokedex, Achievements */
 #singleChapterList, #mixChapterList, #shopContainer, #pokedexContainer, #sealContainer {
     flex: 1;
-    max-height: 50vh; /* Adjust based on screen size, or use flex-grow */
-    /* Better approach: Use flex grow inside the flex column screen */
-    min-height: 0; /* Important for firefox flex scroll */
+    /* Use flex grow to fill available height */
+    min-height: 0; 
     overflow-y: auto;
     overflow-x: hidden;
     border: none;
     padding: 5px;
-    width: 100%; /* Ensure full width */
-    max-width: 100%; /* Prevent overflow */
+    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
 }
 #singleConfirmArea {
@@ -480,13 +479,14 @@
     color: var(--primary-red);
     font-weight: bold;
 }
+/* ----- FLOATING MENU UPDATED: ROW-REVERSE for Left Expansion ----- */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row-reverse; /* Button on right, expands left */
+    flex-direction: row-reverse; /* Main button on right, menu expands left */
     align-items: center;
     gap: 15px; 
     touch-action: none;
@@ -511,12 +511,12 @@
 }
 #floatingSubMenu {
     display: flex;
-    flex-direction: row-reverse; 
+    flex-direction: row-reverse; /* Items inside sub-menu also flow left */
     gap: 10px;
     transition: opacity 0.3s, transform 0.3s;
     opacity: 0;
     pointer-events: none;
-    transform: translateX(20px); 
+    transform: translateX(20px); /* Start slightly to the right */
 }
 #floatingSubMenu.visible {
     opacity: 1;
