@@ -2,20 +2,20 @@ if (typeof window.questionsDB === 'undefined') {
     window.questionsDB = {};
 }
 
-if (typeof window.questionsDB["p_qingyuan"] === 'undefined') {
+if (typeof window.questionsDB["p_qingyu"] === 'undefined') {
     window.questionsDB["p_qingyuan"] = {};
 }
 
-window.questionsDB["p_qingyuan"].title = "《青玉案·元夕》";
-window.questionsDB["p_qingyuan"].img = "dragon_6.jpg";
-window.questionsDB["p_qingyuan"].content = `青玉案·元夕 辛棄疾
+window.questionsDB["p_qingyu"].title = "《青玉案·元夕》";
+window.questionsDB["p_qingyu"].img = "dragon_6.jpg";
+window.questionsDB["p_qingyu"].content = `青玉案·元夕 辛棄疾
 
 東風夜放花千樹，更吹落，星如雨。
 寶馬雕車香滿路。鳳簫聲動，玉壺光轉，一夜魚龍舞。
 蛾兒雪柳黃金縷，笑語盈盈暗香去。
 眾裡尋他千百度，驀然回首，那人卻在，燈火闌珊處。`;
 
-window.questionsDB["p_qingyuan"].junior = [
+window.questionsDB["p_qingyu"].junior = [
     {
         id: "qing_jr_01",
         line: "「眾裡尋他千百度」",
