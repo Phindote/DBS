@@ -1,10 +1,11 @@
 let db = window.questionsDB || {};
+
 let gameState = {
     user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false },
     stats: {
         totalCorrect: 0,
         srCorrect: 0,
-        consecutivePerfect: 0,
+        consecutivePerfect: 0, // 連續完美通關次數
         mixWinCount: 0,
         mixWinCount5: 0,
         mixWinCount10: 0,
@@ -16,14 +17,16 @@ let gameState = {
         totalPlayTime: 0,
         tryCount: 0,
         wrongCountTotal: 0,
-        perfectHistory: []
+        perfectHistory: [],
+        perfectChapterIds: [], // 已完美通關的篇章ID列表
+        lastPerfectChapter: "" // 上一次完美通關的篇章Key
     },
-    mode: "",
-    difficulty: "",
+    mode: "", 
+    difficulty: "", 
     pool: [],
     currentIndex: 0,
     wrongCount: 0,
-    history: [],
+    history: [], 
     currentDragon: "",
     currentChapterKey: "",
     masteredChapters: [],
@@ -32,13 +35,15 @@ let gameState = {
     wrongGuesses: [],
     unlockedAchievements: []
 };
-let pendingSingleChapterKey = "";
+
+// Global State Variables
+let pendingSingleChapterKey = ""; 
 let inputLock = false;
 let particleCtx = null;
 let particles = [];
 let pokedexTimer = null;
 let pokedexSeconds = 0;
-let gamePlayTimer = null;
+let gamePlayTimer = null; 
 
 function saveGame() {
     if (window.godModeActive) return;
@@ -72,15 +77,20 @@ function applyGameData(parsed) {
     if (typeof gameState.user.energy === 'undefined') gameState.user.energy = 100;
     if (typeof gameState.user.unlockedReplayXP === 'undefined') gameState.user.unlockedReplayXP = false;
     
-    gameState.stats = parsed.stats || {
-        totalCorrect: 0, srCorrect: 0, consecutivePerfect: 0,
-        mixWinCount: 0, mixWinCount5: 0, mixWinCount10: 0, mixWinCount16: 0, mixPerfect16: 0,
-        randomWinCount: 0, totalStudyMins: 0, energyRecovered: 0, totalPlayTime: 0, tryCount: 0, wrongCountTotal: 0, perfectHistory: []
-    };
-    if(typeof gameState.stats.totalPlayTime === 'undefined') gameState.stats.totalPlayTime = 0;
-    if(typeof gameState.stats.tryCount === 'undefined') gameState.stats.tryCount = 0;
-    if(typeof gameState.stats.wrongCountTotal === 'undefined') gameState.stats.wrongCountTotal = 0;
+    // 初始化 stats，並確保所有欄位都存在
+    gameState.stats = parsed.stats || {};
+    
+    // 數值類防呆
+    ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5', 
+     'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins', 
+     'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
+        if (typeof gameState.stats[key] === 'undefined') gameState.stats[key] = 0;
+    });
+
+    // 陣列與字串類防呆 (這是之前導致崩潰的關鍵！)
     if(!Array.isArray(gameState.stats.perfectHistory)) gameState.stats.perfectHistory = [];
+    if(!Array.isArray(gameState.stats.perfectChapterIds)) gameState.stats.perfectChapterIds = [];
+    if(typeof gameState.stats.lastPerfectChapter === 'undefined') gameState.stats.lastPerfectChapter = "";
 
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
@@ -150,7 +160,6 @@ function checkAchievements() {
     check(s.energyRecovered >= 300, "ach_38");
     check(s.energyRecovered >= 600, "ach_39");
 
-    // Check ach_40 (All others)
     if(unlocked.length + newUnlock.length >= 39 && !unlocked.includes("ach_40") && !newUnlock.includes("ach_40")) {
         newUnlock.push("ach_40");
     }
