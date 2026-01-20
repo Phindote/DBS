@@ -56,23 +56,6 @@
 </div>
 <div id="damageOverlay"></div>
 
-<div id="floatingMenuContainer">
-    <div id="floatingSubMenu" class="hidden">
-        <button class="btn-control-float" onclick="showHelp()">
-            <img src="images/ui/btn_setting.PNG" alt="Setting">
-        </button>
-        <button class="btn-control-float" id="btnBGM" onclick="toggleMusic()">
-            <img src="images/ui/btn_music.PNG" alt="Music">
-        </button>
-        <button class="btn-control-float" id="btnSFX" onclick="toggleSFX()">
-            <img src="images/ui/btn_sound.PNG" alt="SFX">
-        </button>
-    </div>
-    <button id="floatingMainBtn">
-        <img src="images/ui/btn_menu.PNG" alt="Menu" onerror="this.src='images/ui/btn_setting.PNG'">
-    </button>
-</div>
-
 <div id="screen-loading" class="screen active">
     <img src="images/ui/school_logo.jpg" alt="Logo" class="loading-logo" onerror="this.style.display='none'">
     <h2 style="color: var(--primary-blue); margin-top: 10px;">資源載入中...</h2>
@@ -365,6 +348,23 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div id="floatingMenuContainer">
+        <div id="floatingSubMenu" class="hidden">
+            <button class="btn-control-float" onclick="showHelp()">
+                <img src="images/ui/btn_setting.PNG" alt="Setting">
+            </button>
+            <button class="btn-control-float" id="btnBGM" onclick="toggleMusic()">
+                <img src="images/ui/btn_music.PNG" alt="Music">
+            </button>
+            <button class="btn-control-float" id="btnSFX" onclick="toggleSFX()">
+                <img src="images/ui/btn_sound.PNG" alt="SFX">
+            </button>
+        </div>
+        <button id="floatingMainBtn">
+            <img src="images/ui/btn_menu.PNG" alt="Menu" onerror="this.src='images/ui/btn_setting.PNG'">
+        </button>
     </div>
 
     <div class="footer-bar" onclick="handleFooterClick()">© 2026 拔萃男書院 版權所有</div>
