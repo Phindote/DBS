@@ -147,6 +147,7 @@
 #screen-difficulty {
     justify-content: center;
 }
+/* Battle Screen */
 #screen-game {
     display: none; 
     flex-direction: column;
@@ -470,15 +471,14 @@
     color: var(--primary-red);
     font-weight: bold;
 }
-/* ----- FLOATING MENU UPDATED FOR LEFT EXPANSION ----- */
+/* ----- FLOATING MENU UPDATED: ROW-REVERSE for Left Expansion ----- */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
     right: 20px;
     z-index: 10000;
     display: flex;
-    /* row-reverse makes items flow from Right to Left: [Sub] [Main] */
-    flex-direction: row-reverse; 
+    flex-direction: row-reverse; /* Main button on right, menu expands left */
     align-items: center;
     gap: 15px; 
     touch-action: none;
@@ -503,12 +503,12 @@
 }
 #floatingSubMenu {
     display: flex;
-    flex-direction: row-reverse; /* Ensure inner buttons also flow correctly */
+    flex-direction: row-reverse; /* Guide is closest to button, then Music, then Sound */
     gap: 10px;
     transition: opacity 0.3s, transform 0.3s;
     opacity: 0;
     pointer-events: none;
-    transform: translateX(20px); /* Start hidden to right */
+    transform: translateX(20px); 
 }
 #floatingSubMenu.visible {
     opacity: 1;
