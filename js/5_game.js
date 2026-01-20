@@ -280,12 +280,7 @@ function checkAnswer(userVal, uiElement) {
             const overlay = document.getElementById("damageOverlay");
             overlay.style.opacity = 1;
             setTimeout(() => overlay.style.opacity = 0, 200);
-            
-            // Animation Trigger Fix: Toggle class to restart animation
-            bossImg.classList.remove("dragon-attack");
-            void bossImg.offsetWidth; // Trigger reflow
-            bossImg.classList.add("dragon-attack");
-            
+            triggerAnimation(bossImg, "dragon-attack");
             triggerAnimation(qBox, "shake-box");
             if(gameState.user.hp <= 0) {
                 inputLock = true;
