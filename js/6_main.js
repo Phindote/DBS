@@ -47,6 +47,7 @@ function initDraggableMenu() {
     let xOffset = 0;
     let yOffset = 0;
     
+    // Set initial Position
     xOffset = 0; 
     yOffset = 0; 
 
@@ -55,8 +56,7 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // Updated: always expand left (row-reverse)
-            dragItem.style.flexDirection = "row-reverse";
+            // Expansion direction logic is now handled by CSS row-reverse
             subMenu.classList.toggle("visible");
         }
     });
@@ -90,12 +90,57 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // Force Snap back to RIGHT (X = 0)
+        // --- SNAP BACK & BOUNDARY LOGIC (強制歸位與邊界) ---
+        // 1. Force X to 0 (Right Edge)
         currentX = 0;
         xOffset = 0; 
+
+        // 2. Bound Y position carefully
+        // Get limits dynamically
+        const header = document.querySelector('.header-bar');
+        const footer = document.querySelector('.footer-bar');
+        const profileCard = document.querySelector('.profile-card'); // Try to find profile card
         
-        // Ensure Y is within bounds one last time
-        // Note: drag() already constrains Y, but we ensure X resets here.
+        const headerHeight = header ? header.offsetHeight : 100;
+        const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
+        const dragItemRect = dragItem.getBoundingClientRect();
+        
+        // Define Safe Zone Top
+        // If profile card is visible, limit to its top. Else limit to header bottom.
+        let safeTopY = headerHeight + 10; 
+        if (profileCard && profileCard.offsetParent !== null) { // Check if visible
+             safeTopY = profileCard.getBoundingClientRect().top;
+        }
+        
+        // Calculate Translation Y required to reach Safe Top
+        // Initial position of button is bottom: 60px.
+        // Screen Y = (WindowHeight - 60 - ButtonHeight) + TranslateY
+        // We want Screen Y >= SafeTopY
+        // => TranslateY >= SafeTopY - (WindowHeight - 60 - ButtonHeight)
+        
+        const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
+        const minTranslateY = safeTopY - baseScreenY;
+        
+        // Define Safe Zone Bottom
+        // Must be above Footer
+        // Screen Y + Height <= FooterTop
+        // (BaseScreenY + TranslateY) + Height <= FooterTop
+        // TranslateY <= FooterTop - BaseScreenY - Height - 10 (buffer)
+        
+        const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
+
+        // Clamp currentY
+        if (currentY < minTranslateY) currentY = minTranslateY;
+        if (currentY > maxTranslateY) currentY = maxTranslateY;
+        
+        // If profile card logic causes weird jumps (e.g. negative infinity), fallback to header
+        if (minTranslateY > maxTranslateY) {
+             // Fallback: just keep it between header and footer
+             const fallbackMin = headerHeight + 10 - baseScreenY;
+             if (currentY < fallbackMin) currentY = fallbackMin;
+        }
+
+        yOffset = currentY;
         setTranslate(0, currentY, dragItem); 
     }
 
@@ -111,54 +156,8 @@ function initDraggableMenu() {
                 currentY = e.clientY - initialY;
             }
 
-            // --- SMART BOUNDARY LOGIC ---
-            // 1. Bottom limit: Banner (header-bar) bottom
-            // 2. Top limit: Footer top OR Profile Card top if visible
-            
-            const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
-            const footer = document.querySelector('.footer-bar');
-            const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
-            
-            // Check if profile card is visible
-            const profileCard = document.querySelector('.profile-card');
-            let topLimitY = headerHeight;
-            
-            if (profileCard && profileCard.offsetParent !== null) {
-                // If profile card is visible, limit is its top edge
-                topLimitY = profileCard.getBoundingClientRect().top;
-            }
-
-            const rect = dragItem.getBoundingClientRect();
-            
-            // Calculate min/max Y translate values
-            // Initial position is bottom: 60px.
-            // Translate Y moves relative to that.
-            
-            // Top Limit (Highest point):
-            // Visual Top = (WindowHeight - 60 - Height) + currentY
-            // We want Visual Top >= topLimitY
-            // => currentY >= topLimitY - (WindowHeight - 60 - Height)
-            const baseTop = window.innerHeight - 60 - rect.height;
-            const limitMinY = topLimitY - baseTop + 10; // +10 buffer
-
-            // Bottom Limit (Lowest point):
-            // Visual Bottom = (WindowHeight - 60) + currentY
-            // We want Visual Bottom <= FooterTop
-            // => currentY <= FooterTop - (WindowHeight - 60)
-            const baseBottom = window.innerHeight - 60;
-            const limitMaxY = footerTop - baseBottom - 10; 
-
-            if (currentY < limitMinY) currentY = limitMinY;
-            if (currentY > limitMaxY) currentY = limitMaxY;
-
-            // Constrain X to 0 (Right edge) during drag too?
-            // User said "Free drag" but "Return to right".
-            // Usually dragging allows X movement but snaps back.
-            // Let's allow X movement for feel, but restrict it from going off-screen right.
-            if (currentX > 0) currentX = 0; 
-            
-            xOffset = currentX;
-            yOffset = currentY;
+            // Only allow dragging, boundaries applied on End or partially here
+            // Let's apply loose boundaries here to prevent total disappearance
             setTranslate(currentX, currentY, dragItem);
         }
     }
@@ -245,7 +244,7 @@ function handleFooterClick() {
         if (footerClickCount >= 10) {
             footerClickCount = 0;
             const pwd = prompt("請輸入開發者密碼：");
-            if (pwd === null) return; // Fix: Cancel button does nothing
+            if (pwd === null) return; // FIX: Cancel does nothing
             if (pwd === "DBS_Chinese") {
                 activateGodMode();
             } else {
