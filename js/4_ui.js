@@ -5,25 +5,11 @@ function switchScreen(id) {
     // Toggle Floating Shop Button Visibility
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
-        // Hide in Login, Loading, AND Sub-menus (Single/Mix selection)
-        if (id === 'screen-login' || id === 'screen-loading') {
+        // HIDE on Login, Loading, AND Menu (Chapter Selection)
+        if (id === 'screen-login' || id === 'screen-loading' || id === 'screen-menu') {
             shopBtn.style.display = 'none';
         } else {
-            // Logic handled in showSubMenu/resetMenu for sub-menus, 
-            // but ensure it comes back on main menu
-            if (id === 'screen-menu') {
-                 // Check if sub-menu is active? No, resetMenu handles that.
-                 // Just default to block here if not in sub-state
-                 const subSingle = document.getElementById("subMenuSingle");
-                 const subMix = document.getElementById("subMenuMix");
-                 if (subSingle.style.display === 'flex' || subMix.style.display === 'flex') {
-                     shopBtn.style.display = 'none';
-                 } else {
-                     shopBtn.style.display = 'block';
-                 }
-            } else {
-                 shopBtn.style.display = 'block';
-            }
+            shopBtn.style.display = 'block';
         }
     }
 
@@ -95,10 +81,6 @@ function showSubMenu(type) {
     document.querySelector(".menu-layout").style.display = "none";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "none";
-    
-    // Hide Shop Button in sub-menu
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if(shopBtn) shopBtn.style.display = 'none';
 
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
@@ -115,10 +97,6 @@ function resetMenu() {
     document.querySelector(".menu-layout").style.display = "grid";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
-    
-    // Show Shop Button again
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if(shopBtn) shopBtn.style.display = 'block';
 
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
