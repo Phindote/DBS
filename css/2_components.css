@@ -141,7 +141,7 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards - FIXED OVERFLOW */
+/* Pokedex Grid & Cards (Fix for overflow) */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -155,7 +155,7 @@ select.form-input {
     background: #fff;
     border: none;
     border-radius: 12px;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
@@ -164,10 +164,11 @@ select.form-input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* REMOVED fixed min-height to prevent gaps, added height: auto */
-    height: auto; 
-    justify-content: center;
-    z-index: 1; 
+    justify-content: space-between; /* Ensures content is spaced out, stats pushed to bottom */
+    height: 100%; /* Fill the grid cell */
+    min-height: 180px; /* Ensure minimum height */
+    z-index: 1;
+    box-sizing: border-box; /* Include padding in height */
 }
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
@@ -178,24 +179,41 @@ select.form-input {
     width: 100%;
     height: 100px;
     object-fit: contain;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     border: none;
+    flex-shrink: 0;
 }
 .pokedex-img { filter: grayscale(100%); opacity: 0.7; }
 .unlocked .pokedex-img { filter: none; opacity: 1; }
 .pokedex-title, .shop-title {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     color: #555;
-    min-height: 36px;
+    min-height: 40px; /* Give title enough space */
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    line-height: 1.2;
 }
-.shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; }
-.pokedex-stats { display: flex; flex-direction: column; gap: 2px; width: 100%; }
-.stat-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
+.shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
+.pokedex-stats { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 4px; 
+    width: 100%; 
+    margin-top: auto; /* Pushes stats to the bottom */
+}
+.stat-badge { 
+    font-size: 0.75rem; 
+    padding: 4px 6px; 
+    border-radius: 8px; 
+    font-weight: bold;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
+}
 .stat-jr { color: #2980b9; background: #eaf6ff; }
 .stat-sr { color: #c0392b; background: #f9ebea; }
 
@@ -311,12 +329,12 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - WIDENED LEFT COLUMN */
+/* Battle HUD - Fix: WIDER Left Column */
 .battle-hud {
     width: 100%;
     display: grid;
-    grid-template-columns: 120px 1fr; /* Widened from 80px to 120px */
-    gap: 10px;
+    grid-template-columns: 140px 1fr; /* Increased from 80px to 140px */
+    gap: 15px;
     padding: 8px 12px;
     background: #eee;
     border-radius: 10px;
@@ -333,13 +351,18 @@ select.form-input {
     justify-content: center;
     text-align: center;
     gap: 2px;
+    overflow: hidden; /* Prevent spill */
 }
 .battle-hud-left .profile-logo {
-    width: 40px !important;
-    height: 40px !important;
+    width: 45px !important;
+    height: 45px !important;
 }
 .battle-hud-left div {
-    font-size: 0.8rem !important; 
+    font-size: 0.85rem !important; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 .battle-hud-right {
     display: flex;
