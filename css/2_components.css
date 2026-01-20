@@ -141,7 +141,7 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards */
+/* Pokedex Grid & Cards - REVERTED TO ORIGINAL STYLE */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -158,7 +158,7 @@ select.form-input {
     padding: 10px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s;
     cursor: pointer;
     position: relative;
     display: flex;
@@ -166,13 +166,10 @@ select.form-input {
     align-items: center;
     min-height: 150px;
     justify-content: center;
-    z-index: 1; /* Default z-index */
+    /* REMOVED z-index hover changes to prevent blocking text */
 }
-/* CRITICAL FIX: Higher z-index on hover to prevent text overlapping */
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
-    z-index: 100; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 .pokedex-img, .shop-img {
     width: 100%;
@@ -311,11 +308,12 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - Compact Version */
+/* Battle HUD - FIX SQUASHED LAYOUT */
 .battle-hud {
     width: 100%;
     display: grid;
-    grid-template-columns: 80px 1fr;
+    /* Widened the left column to prevent wrapping/squashing */
+    grid-template-columns: 110px 1fr; 
     gap: 10px;
     padding: 8px 12px;
     background: #eee;
@@ -337,9 +335,11 @@ select.form-input {
 .battle-hud-left .profile-logo {
     width: 40px !important;
     height: 40px !important;
+    object-fit: contain;
 }
 .battle-hud-left div {
-    font-size: 0.8rem !important; 
+    font-size: 0.85rem !important; /* Slightly larger for readability */
+    white-space: nowrap; /* Prevent text wrapping */
 }
 .battle-hud-right {
     display: flex;
@@ -388,6 +388,7 @@ select.form-input {
     z-index: 10000;
     transition: transform 0.2s;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    display: none; /* Default hidden, logic in JS handles it */
 }
 #floatingShopBtn:active { transform: scale(0.95); }
 #floatingShopBtn img { width: 100%; height: 100%; object-fit: contain; }
