@@ -147,21 +147,23 @@
 #screen-difficulty {
     justify-content: center;
 }
+
+/* --- BATTLE SCREEN FIXES --- */
 #screen-game {
     display: none;
     flex-direction: column;
     overflow: hidden;
     height: 100%;
     padding: 10px;
+    position: relative;
 }
 #screen-game.active {
     display: flex;
 }
 .boss-area {
     width: 100%;
-    flex: 1;
-    min-height: 0; 
-    max-height: 35vh; 
+    /* 強制高度為視窗的 30%，不多不少，避免圖片過大 */
+    flex: 0 0 30vh; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -169,13 +171,14 @@
     margin-bottom: 5px;
     position: relative;
     z-index: 10;
-    overflow: hidden;
+    overflow: visible; /* 讓動畫可以超出框框一點點 */
 }
 .boss-img {
-    width: auto;
+    /* 限制圖片最大高度，確保不會遮擋 */
     height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    width: auto;
+    max-height: 90%; 
+    max-width: 90%;
     object-fit: contain;
     animation: float 3s ease-in-out infinite;
     border: none;
@@ -213,9 +216,10 @@
     text-align: center;
     box-sizing: border-box;
     position: relative;
-    z-index: 20;
+    z-index: 20; /* 確保在龍之上 */
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
-    flex: 0 0 auto;
+    /* 自動填滿剩餘空間，確保不被壓縮 */
+    flex: 1; 
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
@@ -251,6 +255,7 @@
 .mc-btn:disabled { background: #e0e0e0; color: #aaa; border-color: #ccc; cursor: not-allowed; transform: none; }
 .error-msg { color: var(--primary-red); margin-top: 5px; font-weight: bold; min-height: 20px; font-size: 0.9rem; }
 .game-footer-btn { margin-top: auto; width: 100%; text-align: center; padding-top: 5px; flex-shrink: 0; }
+
 #resultImageContainer {
     width: 100%;
     display: flex;
@@ -306,8 +311,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.85); 
-    z-index: 20000; 
+    background: rgba(0,0,0,0.85);
+    z-index: 20000;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -316,7 +321,7 @@
 #unlockModal .modal-content {
     background: #fff;
     width: 100%;
-    max-width: 380px; 
+    max-width: 380px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -484,14 +489,10 @@
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: column-reverse; /* Default: expands up */
+    flex-direction: column-reverse;
     align-items: center;
     gap: 10px;
     touch-action: none;
-}
-/* When expanding down (smart logic) */
-#floatingMenuContainer.expand-down {
-    flex-direction: column;
 }
 #floatingMainBtn {
     width: 50px;
