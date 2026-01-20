@@ -4,7 +4,6 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
-    // FORCE PLAY MUSIC IMMEDIATELY
     playMusic('theme'); 
 
     const c = g + l;
@@ -265,13 +264,19 @@ function checkAnswer(userVal, uiElement) {
         } else {
             gameState.wrongGuesses.push(userVal);
         }
+        
+        // CRITICAL FIX: Robust particle coordinates
         const bossRect = bossImg.getBoundingClientRect();
         const startX = bossRect.left + bossRect.width / 2;
-        const startY = bossRect.bottom - 20; 
-        const end = getCenter(qBox);
-        fireBeam(startX, startY, end.x, end.y, '#e74c3c');
+        const startY = bossRect.bottom; // Start exactly from bottom of image
+        
+        const qBoxRect = qBox.getBoundingClientRect();
+        const endX = qBoxRect.left + qBoxRect.width / 2;
+        const endY = qBoxRect.top + qBoxRect.height / 2;
+
+        fireBeam(startX, startY, endX, endY, '#e74c3c');
         setTimeout(() => {
-            for(let i=0; i<10; i++) createParticle(end.x, end.y, '#e74c3c', 'spark');
+            for(let i=0; i<10; i++) createParticle(endX, endY, '#e74c3c', 'spark');
             gameState.wrongCount++;
             gameState.stats.totalWrong++;
             gameState.user.hp -= GAME_CONFIG.HP_PENALTY;

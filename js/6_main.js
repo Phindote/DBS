@@ -56,6 +56,7 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
+            // CSS handles row-reverse and visibility toggling
             subMenu.classList.toggle("visible");
         }
     });

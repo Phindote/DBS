@@ -2,7 +2,6 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility: ONLY show on main menu
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
         if (id === 'screen-menu') {
@@ -21,6 +20,7 @@ function switchScreen(id) {
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else {
+        // Keep theme playing for these screens
         if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
             playMusic('theme'); 
         }
