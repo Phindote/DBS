@@ -1,17 +1,24 @@
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    
+    // Only stop Victory/Defeat loops if leaving result screen
     if (id !== 'screen-result') {
-        stopLongSFX();
+        // We don't call stopLongSFX here because playMusic handles switching.
     }
+
     if (id === 'screen-game') {
         resizeCanvas();
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
-    } else if (id === 'screen-menu' || id === 'screen-pokedex' || id === 'screen-achievements' || id === 'screen-shop' || id === 'screen-login') {
-        // Keep theme music playing for all these screens, including login (edit profile)
-        playMusic('theme'); 
-        if(id === 'screen-menu') checkAchievements();
+    } else {
+        // For Menu, Pokedex, Shop, Achievements, AND LOGIN (Edit Profile), ensure Theme plays.
+        // playMusic internal logic prevents restart if already playing.
+        if (id === 'screen-menu' || id === 'screen-pokedex' || id === 'screen-achievements' || id === 'screen-shop' || id === 'screen-login') {
+            playMusic('theme'); 
+        }
+        
+        if (id === 'screen-menu') checkAchievements();
     }
 }
 
@@ -67,6 +74,7 @@ function showSubMenu(type) {
     document.querySelector(".menu-layout").style.display = "none";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "none";
+
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
         renderSingleList();
@@ -82,6 +90,7 @@ function resetMenu() {
     document.querySelector(".menu-layout").style.display = "grid";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
+
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
     pendingSingleChapterKey = "";
@@ -415,7 +424,6 @@ function drawRadarChartSVG() {
     const container = document.getElementById("radarContainer");
     container.innerHTML = "";
     
-    // Increased canvas size to fit text
     const width = 400;
     const height = 350;
     const cx = 200;
@@ -646,16 +654,18 @@ function renderInventory() {
     document.getElementById("btnTabInventory").classList.add("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
-    const grid = document.createElement("div");
-    grid.className = "inventory-grid";
-    
+    // Updated: Use card style for inventory slots too, matching Pokedex look but empty
     for(let i=0; i<100; i++) {
-        const slot = document.createElement("div");
-        slot.className = "inv-slot";
+        const card = document.createElement("div");
+        card.className = "pokedex-card"; // Reuse Pokedex card style for consistent big look
+        // Make it look empty or filled
         if(gameState.inventory[i]) {
-            // Future item render logic
+             card.innerHTML = `<div class="pokedex-title">${gameState.inventory[i].name}</div>`;
+        } else {
+             // Empty slot visual
+             card.style.opacity = "0.5";
+             card.innerHTML = `<div style="font-size:0.8rem; color:#ccc; margin-top:20px;">空</div>`;
         }
-        grid.appendChild(slot);
+        container.appendChild(card);
     }
-    container.appendChild(grid);
 }
