@@ -4,6 +4,7 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
+    // Explicitly play music on user interaction to bypass browser autoplay policies
     playMusic('theme'); 
 
     const c = g + l;
@@ -330,7 +331,6 @@ function endGame(win) {
 
         const currentChapKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
         if (currentChapKey !== 'mix') { 
-            // 修正這裡的邏輯：使用 stats.lastPerfectChapter 和 stats.consecutivePerfect
             if (gameState.stats.lastPerfectChapter !== currentChapKey) {
                 gameState.stats.consecutivePerfect++; 
                 gameState.stats.lastPerfectChapter = currentChapKey;
@@ -340,7 +340,6 @@ function endGame(win) {
             }
         }
         
-        // 修正：確保 perfectChapterIds 存在
         if (!gameState.stats.perfectChapterIds) gameState.stats.perfectChapterIds = [];
         
         if (!gameState.stats.perfectChapterIds.includes(currentChapKey) && currentChapKey !== 'mix') {
