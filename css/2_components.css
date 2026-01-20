@@ -141,37 +141,33 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards - PERFECT LAYOUT FIX */
+/* Pokedex Grid & Cards - REVERTED TO ORIGINAL */
 .pokedex-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
     width: 100%;
     max-height: 60vh;
     overflow-y: auto;
-    padding: 15px; /* Padding to avoid cutting off shadows */
-    box-sizing: border-box;
+    padding: 5px;
 }
 .pokedex-card, .shop-card {
     background: #fff;
     border: none;
     border-radius: 12px;
-    padding: 15px 10px;
+    padding: 10px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     position: relative;
-    /* Flex layout for internal spacing */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* This pushes content apart */
-    height: 100%; /* Stretch to fill grid cell */
-    min-height: 200px; /* Ensure minimum height */
-    box-sizing: border-box;
+    /* Removed all flex stretch/height hacks */
     z-index: 1;
 }
+/* Fix overlap issue only */
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
     z-index: 100;
@@ -181,43 +177,25 @@ select.form-input {
     width: 100%;
     height: 100px;
     object-fit: contain;
-    margin-bottom: 5px;
-    border: none;
-    flex-shrink: 0;
-}
-.pokedex-img { filter: grayscale(100%); opacity: 0.7; }
-.unlocked .pokedex-img { filter: none; opacity: 1; }
-
-.pokedex-title, .shop-title {
-    font-size: 0.9rem;
-    font-weight: bold;
     margin-bottom: 8px;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    border: none;
+}
+.unlocked .pokedex-img { filter: none; opacity: 1; }
+.pokedex-title, .shop-title {
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 5px;
     color: #555;
-    /* Perfect Title Layout */
-    width: 100%;
-    min-height: 2.6em; /* Space for 2 lines */
-    line-height: 1.3;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    word-break: break-word; /* Ensure wrapping */
 }
 .shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
-
-.pokedex-stats { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 4px; 
-    width: 100%; 
-    margin-top: auto; /* Push to bottom of card */
-}
-.stat-badge { 
-    font-size: 0.75rem; 
-    padding: 3px 0; 
-    border-radius: 8px; 
-    font-weight: bold; 
-    white-space: nowrap;
-}
+.pokedex-stats { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.stat-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
 .stat-jr { color: #2980b9; background: #eaf6ff; }
 .stat-sr { color: #c0392b; background: #f9ebea; }
 
@@ -333,14 +311,13 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - FIXED WIDTH */
+/* Battle HUD - Optimized for longer titles */
 .battle-hud {
     width: 100%;
     display: grid;
-    /* Expanded Left Column */
-    grid-template-columns: 140px 1fr; 
-    gap: 15px;
-    padding: 10px 15px;
+    grid-template-columns: 130px 1fr;
+    gap: 10px;
+    padding: 8px 12px;
     background: #eee;
     border-radius: 10px;
     margin-bottom: 5px;
@@ -355,15 +332,15 @@ select.form-input {
     align-items: center;
     justify-content: center;
     text-align: center;
-    gap: 4px;
-    overflow: hidden; /* Prevent spill */
+    gap: 2px;
+    width: 100%;
 }
 .battle-hud-left .profile-logo {
-    width: 50px !important;
-    height: 50px !important;
+    width: 45px !important;
+    height: 45px !important;
 }
 .battle-hud-left div {
-    font-size: 0.85rem !important;
+    font-size: 0.85rem !important; 
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -372,19 +349,19 @@ select.form-input {
 .battle-hud-right {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 .hud-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 .bar-container {
     width: 100%;
-    height: 10px;
+    height: 8px;
     background: #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
 }
@@ -416,7 +393,7 @@ select.form-input {
     z-index: 10000;
     transition: transform 0.2s;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
-    display: none;
+    display: none; 
 }
 #floatingShopBtn:active { transform: scale(0.95); }
 #floatingShopBtn img { width: 100%; height: 100%; object-fit: contain; }
