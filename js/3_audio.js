@@ -1,23 +1,32 @@
 const audioFiles = {
     theme: new Audio('audio/bgm/bgm_theme.mp3'),
-    // Renamed to BGM as requested, controlled by Music Toggle
+    // New BGMs for specific screens
+    bgm_shop: new Audio('audio/bgm/bgm_shop.mp3'),
+    bgm_pokedex: new Audio('audio/bgm/bgm_pokedex.mp3'),
+    bgm_achievements: new Audio('audio/bgm/bgm_achievements.mp3'),
+    
+    // Battle & Result BGMs
     bgm_battle_jr: new Audio('audio/bgm/bgm_battle_jr.mp3'),
     bgm_battle_sr: new Audio('audio/bgm/bgm_battle_sr.mp3'),
-    bgm_victory: new Audio('audio/sfx/sfx_victory.mp3'), // Logic treats as BGM now
-    bgm_success: new Audio('audio/sfx/sfx_success.mp3'), // Logic treats as BGM now
-    bgm_defeat: new Audio('audio/sfx/sfx_defeat.mp3'),   // Logic treats as BGM now
+    bgm_victory: new Audio('audio/sfx/sfx_victory.mp3'), 
+    bgm_success: new Audio('audio/sfx/sfx_success.mp3'), 
+    bgm_defeat: new Audio('audio/sfx/sfx_defeat.mp3'),   
     
-    // Pure SFX
+    // SFX
     click: new Audio('audio/sfx/sfx_click.mp3'),
     correct: new Audio('audio/sfx/sfx_correct.mp3'),
     wrong: new Audio('audio/sfx/sfx_wrong.mp3')
 };
 
-// Loop settings
+// Set Loop for all BGMs
 audioFiles.theme.loop = true;
+audioFiles.bgm_shop.loop = true;
+audioFiles.bgm_pokedex.loop = true;
+audioFiles.bgm_achievements.loop = true;
 audioFiles.bgm_battle_jr.loop = true;
 audioFiles.bgm_battle_sr.loop = true;
-// Result music usually doesn't loop, but can if desired. Defaulting to once.
+
+// Result music usually plays once, but can loop if desired
 audioFiles.bgm_victory.loop = false;
 audioFiles.bgm_success.loop = false;
 audioFiles.bgm_defeat.loop = false;
@@ -36,13 +45,11 @@ function toggleMusic() {
     
     if (isMusicOn) {
         btn.classList.remove('off');
-        // If there was a track supposed to be playing, resume it
         if (currentBGM) {
             currentBGM.play().catch(e=>{});
         }
     } else {
         btn.classList.add('off');
-        // Pause whatever BGM is playing (Theme, Battle, or Result)
         if (currentBGM) currentBGM.pause();
     }
 }
@@ -57,16 +64,9 @@ function toggleSFX() {
     }
 }
 
-function stopAllBGM() {
-    // Stop all tracks classified as BGM
-    [
-        audioFiles.theme, 
-        audioFiles.bgm_battle_jr, 
-        audioFiles.bgm_battle_sr, 
-        audioFiles.bgm_victory, 
-        audioFiles.bgm_success, 
-        audioFiles.bgm_defeat
-    ].forEach(a => {
+function stopAllMusic() {
+    // FORCE STOP every single audio file defined in the object
+    Object.values(audioFiles).forEach(a => {
         a.pause();
         a.currentTime = 0;
     });
@@ -77,25 +77,25 @@ function playMusic(type) {
     
     // Map string types to audio objects
     if (type === 'theme') target = audioFiles.theme;
+    else if (type === 'bgm_shop') target = audioFiles.bgm_shop;
+    else if (type === 'bgm_pokedex') target = audioFiles.bgm_pokedex;
+    else if (type === 'bgm_achievements') target = audioFiles.bgm_achievements;
     else if (type === 'bgm_battle_jr') target = audioFiles.bgm_battle_jr;
     else if (type === 'bgm_battle_sr') target = audioFiles.bgm_battle_sr;
     else if (type === 'bgm_victory') target = audioFiles.bgm_victory;
     else if (type === 'bgm_success') target = audioFiles.bgm_success;
     else if (type === 'bgm_defeat') target = audioFiles.bgm_defeat;
     
-    // CRITICAL LOGIC: Seamless Play
-    // If the target music is ALREADY the current BGM and is playing, DO NOT RESTART.
+    // If exact same track is already playing, do nothing (Seamless)
     if (currentBGM === target && !target.paused) {
         return; 
     }
     
-    // Stop any previous BGM
-    stopAllBGM();
+    // Stop EVERYTHING before playing new track
+    stopAllMusic();
     
-    // Set new BGM
     currentBGM = target;
     
-    // Play if switch is ON
     if (isMusicOn && currentBGM) {
         const playPromise = currentBGM.play();
         if (playPromise !== undefined) {
@@ -107,15 +107,12 @@ function playMusic(type) {
 }
 
 function stopLongSFX() {
-    // No longer needed for result music as they are now BGM, 
-    // but kept for compatibility if other long SFX exist.
-    // Currently empty as playMusic handles the switch.
+    // Function kept for compatibility, but logic moved to stopAllMusic inside playMusic
 }
 
 function playSFX(name) {
     if (!isSFXEnabled) return;
     
-    // Stop overlapping SFX for clarity
     if (name === 'correct') {
         if (audioFiles.wrong) { audioFiles.wrong.pause(); audioFiles.wrong.currentTime = 0; }
     }

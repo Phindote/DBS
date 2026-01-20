@@ -2,7 +2,7 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility: ONLY show on main menu
+    // Toggle Floating Shop Button Visibility
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
         if (id === 'screen-menu') {
@@ -12,22 +12,25 @@ function switchScreen(id) {
         }
     }
 
-    // FIX: Removed stopLongSFX() here. 
-    // It was killing the BGM before playMusic could check if it was already playing.
-    // playMusic() inside the blocks below will handle stopping previous tracks if necessary.
-
+    // Music Logic based on Screen ID
     if (id === 'screen-game') {
         resizeCanvas();
-        if (gameState.difficulty === 'junior') playMusic('battleJr');
-        else playMusic('battleSr');
+        // Battle music is triggered in initGame, so we don't play here
     } else if (id === 'screen-result') {
-        // Music handled in endGame
+        // Result music is triggered in endGame
     } else {
-        // For Menu, Pokedex, Shop, Achievements, Login -> Ensure Theme is playing
-        // Since we removed the "stop" command above, playMusic will now see the theme is 
-        // already playing and do nothing (Seamless).
-        if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
-            playMusic('theme'); 
+        // Handle Menu & Sub-menus BGM
+        if (id === 'screen-shop') {
+            playMusic('bgm_shop');
+        } else if (id === 'screen-pokedex') {
+            playMusic('bgm_pokedex');
+        } else if (id === 'screen-achievements') {
+            playMusic('bgm_achievements');
+        } else if (id === 'screen-menu' || id === 'screen-login') {
+            playMusic('theme'); // Main Theme
+        } else {
+            // Default fall back
+            playMusic('theme');
         }
         
         if (id === 'screen-menu') checkAchievements();

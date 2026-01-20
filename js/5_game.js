@@ -4,7 +4,7 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
-    // FORCE PLAY MUSIC IMMEDIATELY - THEME
+    // FORCE PLAY MUSIC IMMEDIATELY
     playMusic('theme'); 
 
     const c = g + l;
@@ -318,12 +318,50 @@ function recordHistory(val, isCorrect) {
     });
 }
 
-function endGame(win) {
+function endGame(completed) {
+    // NEW LOGIC:
+    // Defeat if: 
+    // 1. HP <= 0 (Died mid-game)
+    // 2. Completed but all answers wrong (correct count == 0)
+    // 3. Completed but correct answers < 50% of total
+    
+    // Calculate Correct Count from History
+    // Since history records every attempt (including wrong ones), we need to filter.
+    // However, the game structure only records ONE entry per question if correct (it moves on).
+    // If wrong 3 times, it records ONE entry as wrong and moves on.
+    // So history length should match processed questions count mostly.
+    
+    const correctCount = gameState.history.filter(h => h.isCorrect).length;
+    const totalQuestions = gameState.pool.length;
+    const isAlive = gameState.user.hp > 0;
+    
     let resultType = 'defeat';
-    if (win) {
-        const hasSkip = gameState.history.some(h => !h.isCorrect);
-        if (!hasSkip) resultType = 'perfect';
-        else resultType = 'success';
+
+    if (!isAlive) {
+        resultType = 'defeat'; // Died
+    } else if (correctCount === 0) {
+        resultType = 'defeat'; // All wrong (even if alive)
+    } else if (correctCount < (totalQuestions / 2)) {
+        resultType = 'defeat'; // Less than 50% correct
+    } else {
+        // Success or Perfect
+        // Perfect definition: No wrong attempts at all? Or just got everything right?
+        // Usually Perfect means "Full Marks".
+        if (correctCount === totalQuestions) {
+             // Check if there were any wrong attempts (history tracks wrong attempts if they skipped?)
+             // Actually history logic: recordHistory is called on correct, OR on skip (wrong 3 times).
+             // It is NOT called on intermediate wrong answers.
+             // So if history length == correctCount, it means no skips.
+             // But did they lose HP?
+             // Perfect usually implies 100 HP.
+             if (gameState.user.hp === 100) {
+                 resultType = 'perfect';
+             } else {
+                 resultType = 'success';
+             }
+        } else {
+             resultType = 'success';
+        }
     }
 
     if (resultType === 'perfect') {
@@ -367,13 +405,18 @@ function endGame(win) {
         gameState.stats.lastPerfectChapter = "";
     }
 
-    if(win && gameState.user.hp === 100 && !gameState.unlockedAchievements.includes("ach_7")) {
+    if(resultType === 'perfect' && !gameState.unlockedAchievements.includes("ach_7")) {
         if(gameState.stats.perfectChapterIds && gameState.stats.perfectChapterIds.length >= 3) gameState.unlockedAchievements.push("ach_7");
     }
-    if(win && gameState.user.hp < 10 && !gameState.unlockedAchievements.includes("ach_8")) gameState.unlockedAchievements.push("ach_8");
-    if(win && gameState.user.hp < 5 && !gameState.unlockedAchievements.includes("ach_9")) gameState.unlockedAchievements.push("ach_9");
+    
+    // Low HP achievements checked only if won? Or anytime? Usually anytime alive.
+    // But win condition applies.
+    if(resultType !== 'defeat') {
+        if(gameState.user.hp < 10 && !gameState.unlockedAchievements.includes("ach_8")) gameState.unlockedAchievements.push("ach_8");
+        if(gameState.user.hp < 5 && !gameState.unlockedAchievements.includes("ach_9")) gameState.unlockedAchievements.push("ach_9");
+    }
 
-    if (gameState.mode === 'mix' && win) {
+    if (gameState.mode === 'mix' && resultType !== 'defeat') {
         gameState.stats.mixWinCount++;
         const count = gameState.mixSelectedKeys.length;
         if(count >= 5) gameState.stats.mixWinCount5++;
@@ -381,7 +424,7 @@ function endGame(win) {
         if(count >= 16) gameState.stats.mixWinCount16++;
     }
 
-    if(document.getElementById("mixRandomCount").value && gameState.mode === 'mix' && win) {
+    if(document.getElementById("mixRandomCount").value && gameState.mode === 'mix' && resultType !== 'defeat') {
        gameState.stats.randomWinCount++;
     }
 
