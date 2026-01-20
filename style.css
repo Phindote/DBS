@@ -52,15 +52,31 @@ display: flex;
 align-items: center;
 justify-content: center;
 flex-direction: column;
-min-height: 80px;
+/* min-height removed to let image dictate height */
 flex-shrink: 0;
+overflow: hidden; /* Ensure image doesn't overflow rounded corners if header had them */
 }
+
+/* --- Banner CSS 修改重點 --- */
 .header-banner {
-width: 100%;
-height: auto;
-display: block;
-object-fit: cover;
+    width: 100%;
+    /* 手機版預設：高度自動，按比例縮放，保持手機端的「幼身」感覺 */
+    height: auto; 
+    display: block;
+    /* 確保圖片填滿且不變形，多餘部分會被裁切 */
+    object-fit: cover;
+    object-position: center;
 }
+
+/* 電腦版/平板版 Override (當螢幕闊度大於 768px 時生效) */
+@media screen and (min-width: 768px) {
+    .header-banner {
+        /* 強制設定一個較矮的固定高度，解決電腦版太闊的問題 */
+        height: 180px; 
+    }
+}
+/* ------------------------ */
+
 .footer-bar {
 background: #333;
 color: #fff;
