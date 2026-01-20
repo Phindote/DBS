@@ -141,15 +141,16 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards - REVERTED TO ORIGINAL */
+/* Pokedex Grid & Cards - Original Style with X-lock */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 15px;
     width: 100%;
-    max-height: 60vh;
-    overflow-y: auto;
+    max-height: none; /* Let parent control scroll */
+    overflow-y: visible; /* Let parent control scroll */
     padding: 5px;
+    box-sizing: border-box;
 }
 .pokedex-card, .shop-card {
     background: #fff;
@@ -166,7 +167,6 @@ select.form-input {
     align-items: center;
     z-index: 1;
 }
-/* Hover effect with z-index fix */
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
     z-index: 100;
@@ -183,7 +183,6 @@ select.form-input {
 }
 .unlocked .pokedex-img { filter: none; opacity: 1; }
 
-/* UPDATED: Title styling for auto-adjust/single line */
 .pokedex-title, .shop-title {
     font-size: 0.85rem;
     font-weight: bold;
@@ -193,20 +192,14 @@ select.form-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Force single line with ellipsis */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%; /* Ensure it takes full width to calc overflow */
-    padding: 0 2px;
-    box-sizing: border-box;
+    width: 100%;
 }
-
-/* Responsive adjustment for very small screens */
 @media screen and (max-width: 400px) {
     .pokedex-title, .shop-title {
-        font-size: 0.75rem; /* Smaller font on small screens */
+        font-size: 0.75rem; 
     }
 }
 
