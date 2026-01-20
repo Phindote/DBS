@@ -2,9 +2,18 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Only stop Victory/Defeat loops if leaving result screen
+    // Toggle Floating Shop Button Visibility
+    const shopBtn = document.getElementById("floatingShopBtn");
+    if (shopBtn) {
+        if (id === 'screen-login' || id === 'screen-loading') {
+            shopBtn.style.display = 'none';
+        } else {
+            shopBtn.style.display = 'block';
+        }
+    }
+
     if (id !== 'screen-result') {
-        // We don't call stopLongSFX here because playMusic handles switching.
+        stopLongSFX();
     }
 
     if (id === 'screen-game') {
@@ -12,12 +21,9 @@ function switchScreen(id) {
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else {
-        // For Menu, Pokedex, Shop, Achievements, AND LOGIN (Edit Profile), ensure Theme plays.
-        // playMusic internal logic prevents restart if already playing.
         if (id === 'screen-menu' || id === 'screen-pokedex' || id === 'screen-achievements' || id === 'screen-shop' || id === 'screen-login') {
             playMusic('theme'); 
         }
-        
         if (id === 'screen-menu') checkAchievements();
     }
 }
@@ -654,15 +660,12 @@ function renderInventory() {
     document.getElementById("btnTabInventory").classList.add("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
-    // Updated: Use card style for inventory slots too, matching Pokedex look but empty
     for(let i=0; i<100; i++) {
         const card = document.createElement("div");
-        card.className = "pokedex-card"; // Reuse Pokedex card style for consistent big look
-        // Make it look empty or filled
+        card.className = "pokedex-card"; 
         if(gameState.inventory[i]) {
              card.innerHTML = `<div class="pokedex-title">${gameState.inventory[i].name}</div>`;
         } else {
-             // Empty slot visual
              card.style.opacity = "0.5";
              card.innerHTML = `<div style="font-size:0.8rem; color:#ccc; margin-top:20px;">空</div>`;
         }
