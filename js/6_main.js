@@ -44,16 +44,18 @@ function initDraggableMenu() {
     let currentY;
     let initialX;
     let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
     
-    // Initial Y is 0 (relative to CSS bottom:60px)
-    let yOffset = 0; 
+    // Set initial Position
+    xOffset = 0; 
+    yOffset = 0; 
 
     const mainBtn = document.getElementById("floatingMainBtn");
     const subMenu = document.getElementById("floatingSubMenu");
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // Expansion direction is handled by CSS row-reverse (Left expansion)
             subMenu.classList.toggle("visible");
         }
     });
@@ -68,10 +70,10 @@ function initDraggableMenu() {
     function dragStart(e) {
         if (e.target === mainBtn || mainBtn.contains(e.target) || e.target === dragItem) {
             if (e.type === "touchstart") {
-                initialX = e.touches[0].clientX; // Only track X for dragging intention
+                initialX = e.touches[0].clientX - xOffset;
                 initialY = e.touches[0].clientY - yOffset;
             } else {
-                initialX = e.clientX;
+                initialX = e.clientX - xOffset;
                 initialY = e.clientY - yOffset;
             }
             if (e.target === mainBtn || mainBtn.contains(e.target)) {
@@ -87,8 +89,57 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK LOGIC (強制歸位) ---
-        // Force X back to 0 (Right Edge)
+        // --- SNAP BACK & BOUNDARY LOGIC ---
+        // 1. Force X to 0 (Right Edge)
+        currentX = 0;
+        xOffset = 0; 
+
+        // 2. Bound Y position
+        const header = document.querySelector('.header-bar');
+        const footer = document.querySelector('.footer-bar');
+        const profileCard = document.querySelector('.profile-card'); 
+        
+        const headerHeight = header ? header.offsetHeight : 100;
+        const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
+        const dragItemRect = dragItem.getBoundingClientRect();
+        
+        // Define Safe Zone Top
+        // Default safe top is under the header
+        let safeTopY = headerHeight + 10; 
+        
+        // New Rule: If Profile Card is visible, limit to its TOP edge
+        if (profileCard && profileCard.offsetParent !== null) {
+             const cardRect = profileCard.getBoundingClientRect();
+             // We want the BOTTOM of the button to be no higher than the TOP of the card?
+             // User said: "最高可達個人資料卡的頂端位置" -> The button can go up to the card's top edge.
+             // Button Top >= Card Top.
+             // Actually, usually "limit to top" means button shouldn't go ABOVE it.
+             safeTopY = cardRect.top;
+        }
+        
+        // Calculate Translation Y required to reach Safe Top
+        // Initial position is bottom: 60px.
+        // Screen Y = (WindowHeight - 60 - ButtonHeight) + TranslateY
+        // We want Screen Y >= SafeTopY
+        // => TranslateY >= SafeTopY - (WindowHeight - 60 - ButtonHeight)
+        
+        const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
+        const minTranslateY = safeTopY - baseScreenY;
+        
+        // Define Safe Zone Bottom (Footer)
+        const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
+
+        // Clamp currentY
+        if (currentY < minTranslateY) currentY = minTranslateY;
+        if (currentY > maxTranslateY) currentY = maxTranslateY;
+        
+        // Fallback for extreme cases
+        if (minTranslateY > maxTranslateY) {
+             const fallbackMin = headerHeight + 10 - baseScreenY;
+             if (currentY < fallbackMin) currentY = fallbackMin;
+        }
+
+        yOffset = currentY;
         setTranslate(0, currentY, dragItem); 
     }
 
@@ -96,55 +147,14 @@ function initDraggableMenu() {
         if (active) {
             e.preventDefault();
             dragItem.classList.add("dragging");
-            
-            // We only care about Y dragging effectively, X follows pointer but snaps back later
-            let clientY;
-            let clientX;
             if (e.type === "touchmove") {
-                clientY = e.touches[0].clientY;
-                clientX = e.touches[0].clientX;
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
             } else {
-                clientY = e.clientX; // Typo in original logic? Assuming Y for vertical
-                clientY = e.clientY;
-                clientX = e.clientX;
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
             }
-
-            currentY = clientY - initialY;
-            currentX = clientX - initialX; // Just tracking for fluidity
-
-            // --- BOUNDARY LOGIC ---
-            const header = document.querySelector('.header-bar');
-            const profileCard = document.querySelector('.profile-card'); 
-            
-            // Calculate Top Limit
-            // Default: Below Banner
-            let topLimitY = (header ? header.getBoundingClientRect().bottom : 100) + 10;
-            
-            // If Profile Card is visible, limit to its top
-            if (profileCard && profileCard.offsetParent !== null) {
-                 topLimitY = profileCard.getBoundingClientRect().top;
-            }
-
-            // Drag Item CSS is bottom: 60px.
-            // ScreenY = WindowHeight - 60 - Height + TranslateY (Assuming upwards is negative? No, translate Y moves down)
-            // Wait, coordinate system: +Y is down.
-            // Initial position is visually at bottom. 
-            // If we drag UP, Y becomes negative.
-            
-            // Current visual Top = (WindowHeight - 60 - Height) + currentY
-            // We want Visual Top >= topLimitY
-            // => currentY >= topLimitY - (WindowHeight - 60 - Height)
-            
-            const rect = dragItem.getBoundingClientRect();
-            const baseTop = window.innerHeight - 60 - rect.height;
-            const minTranslateY = topLimitY - baseTop;
-
-            if (currentY < minTranslateY) currentY = minTranslateY;
-
-            // Bottom Limit? Keep above footer?
-            // Let's just strictly limit Top as requested.
-
-            yOffset = currentY;
+            // Allow free dragging visual
             setTranslate(currentX, currentY, dragItem);
         }
     }

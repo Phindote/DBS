@@ -21,9 +21,11 @@ function switchScreen(id) {
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else {
+        // Ensure theme music plays on these screens
         if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
             playMusic('theme'); 
         }
+        
         if (id === 'screen-menu') checkAchievements();
     }
 }
@@ -430,6 +432,7 @@ function drawRadarChartSVG() {
     const container = document.getElementById("radarContainer");
     container.innerHTML = "";
     
+    // Increased canvas size to fit text
     const width = 400;
     const height = 350;
     const cx = 200;
@@ -660,20 +663,21 @@ function renderInventory() {
     document.getElementById("btnTabInventory").classList.add("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
-    // Updated: Reuse big card style for inventory
+    // Use card style for inventory slots as requested, making them bigger and clearer
     for(let i=0; i<100; i++) {
         const card = document.createElement("div");
         card.className = "pokedex-card"; 
+        
         if(gameState.inventory[i]) {
              card.innerHTML = `
                 <img src="images/items/${gameState.inventory[i].img}" class="pokedex-img">
                 <div class="pokedex-title">${gameState.inventory[i].name}</div>
              `;
         } else {
-             // Empty slot visual - Keep it big and consistent
+             // Empty slot visual
              card.style.opacity = "0.5";
              card.innerHTML = `
-                <div style="width:100%; height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">${i+1}</div>
+                <div style="width:100%; flex-grow:1; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">${i+1}</div>
                 <div style="font-size:0.8rem; color:#ccc;">空</div>
              `;
         }
