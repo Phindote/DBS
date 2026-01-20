@@ -56,7 +56,7 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // Expansion direction logic is now handled by CSS row-reverse
+            // Expansion handled by CSS row-reverse (Left expansion)
             subMenu.classList.toggle("visible");
         }
     });
@@ -90,52 +90,36 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK & BOUNDARY LOGIC (強制歸位與邊界) ---
-        // 1. Force X to 0 (Right Edge)
+        // --- SNAP BACK TO RIGHT EDGE (X=0) ---
         currentX = 0;
         xOffset = 0; 
 
-        // 2. Bound Y position carefully
-        // Get limits dynamically
+        // --- Y-AXIS BOUNDARIES ---
         const header = document.querySelector('.header-bar');
         const footer = document.querySelector('.footer-bar');
-        const profileCard = document.querySelector('.profile-card'); // Try to find profile card
+        const profileCard = document.querySelector('.profile-card'); 
         
         const headerHeight = header ? header.offsetHeight : 100;
         const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
         const dragItemRect = dragItem.getBoundingClientRect();
         
-        // Define Safe Zone Top
-        // If profile card is visible, limit to its top. Else limit to header bottom.
+        // Dynamic Top Limit: If profile card is visible, limit to its top. Else banner bottom.
         let safeTopY = headerHeight + 10; 
-        if (profileCard && profileCard.offsetParent !== null) { // Check if visible
+        // Check if profile card is visible (offsetParent is not null)
+        if (profileCard && profileCard.offsetParent !== null) { 
              safeTopY = profileCard.getBoundingClientRect().top;
         }
         
-        // Calculate Translation Y required to reach Safe Top
-        // Initial position of button is bottom: 60px.
-        // Screen Y = (WindowHeight - 60 - ButtonHeight) + TranslateY
-        // We want Screen Y >= SafeTopY
-        // => TranslateY >= SafeTopY - (WindowHeight - 60 - ButtonHeight)
-        
+        // Calculate needed TranslateY
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
         const minTranslateY = safeTopY - baseScreenY;
-        
-        // Define Safe Zone Bottom
-        // Must be above Footer
-        // Screen Y + Height <= FooterTop
-        // (BaseScreenY + TranslateY) + Height <= FooterTop
-        // TranslateY <= FooterTop - BaseScreenY - Height - 10 (buffer)
-        
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
 
-        // Clamp currentY
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
         
-        // If profile card logic causes weird jumps (e.g. negative infinity), fallback to header
+        // Safety Fallback
         if (minTranslateY > maxTranslateY) {
-             // Fallback: just keep it between header and footer
              const fallbackMin = headerHeight + 10 - baseScreenY;
              if (currentY < fallbackMin) currentY = fallbackMin;
         }
@@ -155,9 +139,7 @@ function initDraggableMenu() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
             }
-
-            // Only allow dragging, boundaries applied on End or partially here
-            // Let's apply loose boundaries here to prevent total disappearance
+            // Allow free dragging visual, clamp on End
             setTranslate(currentX, currentY, dragItem);
         }
     }
@@ -244,7 +226,7 @@ function handleFooterClick() {
         if (footerClickCount >= 10) {
             footerClickCount = 0;
             const pwd = prompt("請輸入開發者密碼：");
-            if (pwd === null) return; // FIX: Cancel does nothing
+            if (pwd === null) return; 
             if (pwd === "DBS_Chinese") {
                 activateGodMode();
             } else {
