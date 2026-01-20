@@ -56,7 +56,7 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // Expansion handled by CSS row-reverse (Left expansion)
+            // CSS handles row-reverse and visibility toggling
             subMenu.classList.toggle("visible");
         }
     });
@@ -90,39 +90,26 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK TO RIGHT EDGE (X=0) ---
+        // --- SNAP BACK LOGIC (強制歸位到右側) ---
         currentX = 0;
         xOffset = 0; 
 
-        // --- Y-AXIS BOUNDARIES ---
+        // Bound Y position
         const header = document.querySelector('.header-bar');
         const footer = document.querySelector('.footer-bar');
-        const profileCard = document.querySelector('.profile-card'); 
         
         const headerHeight = header ? header.offsetHeight : 100;
         const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
         const dragItemRect = dragItem.getBoundingClientRect();
         
-        // Dynamic Top Limit: If profile card is visible, limit to its top. Else banner bottom.
-        let safeTopY = headerHeight + 10; 
-        // Check if profile card is visible (offsetParent is not null)
-        if (profileCard && profileCard.offsetParent !== null) { 
-             safeTopY = profileCard.getBoundingClientRect().top;
-        }
-        
-        // Calculate needed TranslateY
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
-        const minTranslateY = safeTopY - baseScreenY;
+        
+        // Define Limits
+        const minTranslateY = headerHeight + 10 - baseScreenY;
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
 
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
-        
-        // Safety Fallback
-        if (minTranslateY > maxTranslateY) {
-             const fallbackMin = headerHeight + 10 - baseScreenY;
-             if (currentY < fallbackMin) currentY = fallbackMin;
-        }
 
         yOffset = currentY;
         setTranslate(0, currentY, dragItem); 
@@ -139,7 +126,7 @@ function initDraggableMenu() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
             }
-            // Allow free dragging visual, clamp on End
+
             setTranslate(currentX, currentY, dragItem);
         }
     }
