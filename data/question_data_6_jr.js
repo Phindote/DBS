@@ -1,41 +1,40 @@
-// question_data_6_jr.js
-// 篇章：青玉案‧元夕 (初階 - 多項選擇題)
-// 題目數量：3
-
 if (typeof window.questionsDB === 'undefined') {
     window.questionsDB = {};
 }
 
-if (typeof window.questionsDB["p_qingyu"] === 'undefined') {
-    window.questionsDB["p_qingyu"] = {};
+if (typeof window.questionsDB["p_qingyuan"] === 'undefined') {
+    window.questionsDB["p_qingyuan"] = {};
 }
 
-window.questionsDB["p_qingyu"].title = "《青玉案‧元夕》";
-window.questionsDB["p_qingyu"].img = "dragon_6.jpg";
-window.questionsDB["p_qingyu"].content = `青玉案 元夕	辛棄疾 
+window.questionsDB["p_qingyuan"].title = "《青玉案·元夕》";
+window.questionsDB["p_qingyuan"].img = "dragon_6.jpg";
+window.questionsDB["p_qingyuan"].content = `青玉案·元夕 辛棄疾
 
-東風夜放花千樹，更吹落、星如雨。寶馬雕車香滿路。鳳簫聲動，玉壺光轉，一夜魚龍舞。　　蛾兒雪柳黃金縷，笑語盈盈暗香去。眾裏尋他千百度；驀然迴首，那人卻在、燈火闌珊處。`;
+東風夜放花千樹，更吹落，星如雨。
+寶馬雕車香滿路。鳳簫聲動，玉壺光轉，一夜魚龍舞。
+蛾兒雪柳黃金縷，笑語盈盈暗香去。
+眾裡尋他千百度，驀然回首，那人卻在，燈火闌珊處。`;
 
-window.questionsDB["p_qingyu"].junior = [
+window.questionsDB["p_qingyuan"].junior = [
     {
         id: "qing_jr_01",
-        line: "「東風夜放花千樹」的「花千樹」是形容什麼景象？",
-        word: "花千樹",
-        answer: "燈火繁多",
-        options: ["花朵盛開", "燈火繁多", "星星閃爍", "樹木茂盛"]
+        line: "「眾裡尋他千百度」",
+        word: "度",
+        answer: "次、回",
+        options: ["度過", "次、回", "程度", "度量"]
     },
     {
         id: "qing_jr_02",
-        line: "「驀然迴首，那人卻在、燈火闌珊處」的「驀然」，意思是？",
+        line: "「驀然回首」",
         word: "驀然",
-        answer: "忽然",
-        options: ["寂寞", "忽然", "冷漠", "雖然"]
+        answer: "突然",
+        options: ["突然", "靜靜地", "茫然地", "偶然"]
     },
     {
         id: "qing_jr_03",
-        line: "「那人卻在、燈火闌珊處」的「闌珊」，意思是？",
+        line: "「那人卻在、燈火闌珊處」",
         word: "闌珊",
-        answer: "零落稀疏",
-        options: ["燦爛奪目", "零落稀疏", "熱鬧非凡", "昏暗不明"]
+        answer: "零落",
+        options: ["燦爛", "零落", "熱鬧", "明亮"]
     }
 ];
