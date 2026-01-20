@@ -470,16 +470,16 @@
     color: var(--primary-red);
     font-weight: bold;
 }
-/* ----- FLOATING MENU ROW-REVERSE for Left Expansion ----- */
+/* ----- FLOATING MENU LEFT EXPANSION ----- */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row-reverse; /* Items flow Right to Left */
+    flex-direction: row; /* Main button right, sub left */
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
     touch-action: none;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -493,6 +493,7 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
+    order: 2; /* Main Button always on the right */
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -502,12 +503,13 @@
 }
 #floatingSubMenu {
     display: flex;
-    flex-direction: row-reverse; 
+    flex-direction: row;
     gap: 10px;
     transition: opacity 0.3s, transform 0.3s;
     opacity: 0;
     pointer-events: none;
-    transform: translateX(20px); 
+    transform: translateX(20px);
+    order: 1; /* Sub menu expands to the left of main button */
 }
 #floatingSubMenu.visible {
     opacity: 1;
