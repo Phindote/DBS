@@ -55,7 +55,7 @@ function playMusic(type) {
     else if (type === 'success') target = audioFiles.success;
     else if (type === 'defeat') target = audioFiles.defeat;
     
-    // CRITICAL FIX: If same music is already playing, do nothing.
+    // CRITICAL FIX: If same music is already playing, do nothing to ensure seamless loop
     if (currentBGM === target && !target.paused) return;
     
     stopAllMusic();

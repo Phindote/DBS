@@ -12,22 +12,23 @@ function switchScreen(id) {
         }
     }
 
-    // Stop victory/defeat loops if leaving result screen
     if (id !== 'screen-result') {
         stopLongSFX();
     }
 
     // --- MUSIC LOGIC ---
+    // Rule: Play theme everywhere except Battle and Result
     if (id === 'screen-game') {
-        // Battle: Switch to battle music
+        // Battle: Music handled by initGame/switched here if needed, but usually initGame does it.
+        // Actually, initGame calls switchScreen. Let's make sure correct music plays.
         resizeCanvas();
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else if (id === 'screen-result') {
-        // Result: Handled by endGame() in game.js, don't force theme here
+        // Result: Handled by endGame(), don't force theme here
     } else {
-        // ALL other screens (Menu, Shop, Pokedex, Achievements, LOGIN/Edit Profile)
-        // enforce Theme music. playMusic() handles "don't restart if already playing".
+        // For Menu, Shop, Pokedex, Achievements, and LOGIN (Edit Profile)
+        // Ensure Theme plays. If already playing, playMusic() ignores it (Seamless).
         playMusic('theme'); 
         
         if (id === 'screen-menu') checkAchievements();
