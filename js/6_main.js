@@ -55,20 +55,6 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // FIX: Direction Logic
-            // The rect.top is relative to viewport. 
-            const rect = dragItem.getBoundingClientRect();
-            // If button is in top half (closer to 0), expand DOWN.
-            // If button is in bottom half (closer to innerHeight), expand UP.
-            
-            // NOTE: CSS default is flex-direction: column-reverse (Upwards)
-            if(rect.top < window.innerHeight / 2) {
-                // Top half -> Expand DOWN (Normal column)
-                dragItem.style.flexDirection = "column";
-            } else {
-                // Bottom half -> Expand UP (Reverse column)
-                dragItem.style.flexDirection = "column-reverse";
-            }
             subMenu.classList.toggle("visible");
         }
     });
@@ -102,26 +88,9 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // Snap to Right Edge
+        // SNAP BACK to Right (X = 0)
         currentX = 0;
-        xOffset = 0; 
-        
-        // Re-enforce bounds on Drop (Just in case)
-        const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
-        const footer = document.querySelector('.footer-bar');
-        const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
-        const rect = dragItem.getBoundingClientRect();
-        
-        // We use the same limits as in drag()
-        const baseTop = window.innerHeight - 60 - rect.height; 
-        const limitMinY = headerHeight - baseTop;
-        const baseBottom = window.innerHeight - 60;
-        const limitMaxY = footerTop - baseBottom - 20;
-
-        if (currentY < limitMinY) currentY = limitMinY;
-        if (currentY > limitMaxY) currentY = limitMaxY;
-        
-        yOffset = currentY;
+        xOffset = 0;
         setTranslate(0, currentY, dragItem); 
     }
 
@@ -137,45 +106,35 @@ function initDraggableMenu() {
                 currentY = e.clientY - initialY;
             }
 
-            // BOUNDARY LOGIC FIX
-            const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
+            // BOUNDARY LOGIC
+            // Get boundaries dynamically
+            // Top Limit: Bottom of profile card (approx 150px)
+            const headerHeight = 150; // Roughly below banner and profile
+            // Bottom Limit: Top of Footer
             const footer = document.querySelector('.footer-bar');
-            
-            // Footer top relative to viewport
             const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
             
             const rect = dragItem.getBoundingClientRect();
             
-            // Calculate absolute Y limit relative to 'bottom: 60px' origin
-            // Start Y (visual) = window.innerHeight - 60
-            // Current visual Top = Start Y + currentY - Height (if expanding up?) 
-            // Actually, dragItem is the container. height varies if open/closed.
-            // Let's assume we drag based on the Main Button position mostly.
+            // Calculate absolute top position based on currentY
+            // Initial position is bottom: 60px.
+            // Absolute Top = (WindowHeight - 60 - Height) + currentY
             
-            // Simplified Logic: 
-            // Min Y (Top) = Header Height - (Start Y position)
-            // Max Y (Bottom) = Footer Top - (Start Y position) - Button Height
-            
-            const startYPos = window.innerHeight - 60; // The CSS 'bottom: 60px' means Y is here
-            
-            // Limit Top: Button shouldn't go above Header
-            // We allow it to go up to header.
-            // currentY is offset. 
-            // Visual Top = startYPos + currentY.
-            // We want Visual Top >= Header Height
-            // currentY >= Header Height - startYPos
-            const limitMinY = headerHeight - startYPos;
+            const initialTop = window.innerHeight - 60 - rect.height;
+            const absoluteTop = initialTop + currentY;
+            const absoluteBottom = absoluteTop + rect.height;
 
-            // Limit Bottom: Button shouldn't go below Footer
-            // Visual Bottom = Visual Top + 50 (Button Height)
-            // We want Visual Bottom <= Footer Top
-            // startYPos + currentY + 50 <= Footer Top
-            // currentY <= Footer Top - startYPos - 50
-            const limitMaxY = footerTop - startYPos - 50; 
+            // Constrain Y
+            if (absoluteTop < headerHeight) {
+                currentY = headerHeight - initialTop;
+            }
+            if (absoluteBottom > footerTop) {
+                currentY = footerTop - rect.height - initialTop;
+            }
 
-            if (currentY < limitMinY) currentY = limitMinY;
-            if (currentY > limitMaxY) currentY = limitMaxY;
-
+            // Constrain X (Keep it on screen, stick to right)
+            // It starts at right: 20px. 
+            // We allow moving left (negative X) but not right (positive X > 0)
             if (currentX > 0) currentX = 0; 
             
             xOffset = currentX;
@@ -283,25 +242,19 @@ function handleFooterClick() {
 
 function activateGodMode() {
     window.godModeActive = true;
-    backupGameState = JSON.parse(JSON.stringify(gameState)); 
+    backupGameState = JSON.parse(JSON.stringify(gameState));
     devModeActive = true;
-
-    // Max User
     gameState.user.level = 99;
     gameState.user.xp = 9999;
     gameState.user.energy = 100;
-    gameState.user.title = TITLES[TITLES.length - 1]; 
-
-    // Max Chapters & Questions
+    gameState.user.title = TITLES[TITLES.length - 1];
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
     gameState.solvedSeniorQuestionIds = [];
-
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
         gameState.masteredChapters.push('mix');
-
         if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
         if(db[k].senior) {
             db[k].senior.forEach(q => {
@@ -310,15 +263,10 @@ function activateGodMode() {
             });
         }
     });
-
-    // Max Achievements
     gameState.unlockedAchievements = ACHIEVEMENTS.map(a => a.id);
-
-    // Fake Stats for visual completeness
     gameState.stats.totalPlayTime = 99999;
     gameState.stats.mixWinCount = 999;
-    
-    updateLevel(); 
+    updateLevel();
     alert("⚡ 上帝模式已啟動 ⚡\n所有能力已全滿！(點擊底部 3 次可還原)");
 }
 
