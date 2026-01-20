@@ -135,7 +135,7 @@ select.form-input {
     font-size: 1rem;
 }
 .profile-row:first-child span {
-    font-size: 1.3rem;
+    font-size: 1.3rem; 
     display: flex;
     align-items: center;
 }
@@ -303,19 +303,20 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD */
+/* Battle HUD - Compact Version */
 .battle-hud {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 20px;
-    padding: 15px;
+    grid-template-columns: 80px 1fr; /* Fixed width for logo, rest for bars */
+    gap: 10px;
+    padding: 8px 12px; /* Reduced padding */
     background: #eee;
     border-radius: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* Reduced margin */
     font-weight: bold;
     box-sizing: border-box;
     align-items: center;
+    flex-shrink: 0; /* Prevent HUD shrinking */
 }
 .battle-hud-left {
     display: flex;
@@ -323,24 +324,31 @@ select.form-input {
     align-items: center;
     justify-content: center;
     text-align: center;
-    gap: 5px;
+    gap: 2px;
+}
+.battle-hud-left .profile-logo {
+    width: 40px !important;
+    height: 40px !important;
+}
+.battle-hud-left div {
+    font-size: 0.8rem !important; 
 }
 .battle-hud-right {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px; /* Tighter gap */
 }
 .hud-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 1rem;
+    font-size: 0.85rem; /* Smaller text */
 }
 .bar-container {
     width: 100%;
-    height: 12px;
+    height: 8px; /* Thinner bars */
     background: #ccc;
-    border-radius: 6px;
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
 }
