@@ -21,11 +21,9 @@ function switchScreen(id) {
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else {
-        // Ensure theme music plays on these screens
         if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
             playMusic('theme'); 
         }
-        
         if (id === 'screen-menu') checkAchievements();
     }
 }
@@ -662,16 +660,10 @@ function renderInventory() {
     document.getElementById("btnTabInventory").classList.add("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
-    // REVERTED to Card style instead of small grid
+    // Updated: Reuse big card style for inventory
     for(let i=0; i<100; i++) {
-        // Only show if there's an item, or maybe show first 20 empty slots? 
-        // For now, let's show all 100 but styled as cards.
-        // Actually, 100 cards might lag. Let's just show collected items + some empty.
-        // User asked for "100 slots".
-        
         const card = document.createElement("div");
-        card.className = "pokedex-card"; // Reuse the big card style
-        
+        card.className = "pokedex-card"; 
         if(gameState.inventory[i]) {
              card.innerHTML = `
                 <img src="images/items/${gameState.inventory[i].img}" class="pokedex-img">
