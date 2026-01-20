@@ -141,7 +141,7 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* Pokedex Grid & Cards (Fix for overflow) */
+/* Pokedex Grid & Cards - FIXED LAYOUT */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -149,13 +149,13 @@ select.form-input {
     width: 100%;
     max-height: 60vh;
     overflow-y: auto;
-    padding: 5px;
+    padding: 15px; /* More padding to avoid edge clipping */
 }
 .pokedex-card, .shop-card {
     background: #fff;
     border: none;
     border-radius: 12px;
-    padding: 15px;
+    padding: 15px 10px; /* Increased vertical padding */
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
@@ -164,12 +164,13 @@ select.form-input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between; /* Ensures content is spaced out, stats pushed to bottom */
-    height: 100%; /* Fill the grid cell */
-    min-height: 180px; /* Ensure minimum height */
+    justify-content: space-between; /* Ensures content is spread out, preventing overflow overlap */
+    height: 100%; /* Fill the grid cell height */
+    min-height: 180px; /* Minimum height to fit everything nicely */
+    box-sizing: border-box;
     z-index: 1;
-    box-sizing: border-box; /* Include padding in height */
 }
+/* Ensure hover state stays on top */
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
     z-index: 100; 
@@ -181,38 +182,39 @@ select.form-input {
     object-fit: contain;
     margin-bottom: 10px;
     border: none;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent image from squishing */
 }
 .pokedex-img { filter: grayscale(100%); opacity: 0.7; }
 .unlocked .pokedex-img { filter: none; opacity: 1; }
+
 .pokedex-title, .shop-title {
     font-size: 0.9rem;
     font-weight: bold;
     margin-bottom: 8px;
     color: #555;
-    min-height: 40px; /* Give title enough space */
+    min-height: 2.4em; /* Allow 2 lines of text */
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
     line-height: 1.2;
 }
 .shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
+
 .pokedex-stats { 
     display: flex; 
     flex-direction: column; 
     gap: 4px; 
     width: 100%; 
-    margin-top: auto; /* Pushes stats to the bottom */
+    margin-top: auto; /* Push to bottom */
 }
 .stat-badge { 
     font-size: 0.75rem; 
-    padding: 4px 6px; 
+    padding: 3px 6px; 
     border-radius: 8px; 
-    font-weight: bold;
-    white-space: nowrap; 
+    font-weight: bold; 
+    white-space: nowrap; /* Prevent text wrapping inside badge */
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 .stat-jr { color: #2980b9; background: #eaf6ff; }
 .stat-sr { color: #c0392b; background: #f9ebea; }
@@ -329,12 +331,13 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - Fix: WIDER Left Column */
+/* Battle HUD - Expanded Left Side */
 .battle-hud {
     width: 100%;
     display: grid;
-    grid-template-columns: 140px 1fr; /* Increased from 80px to 140px */
-    gap: 15px;
+    /* CHANGED: Increased first column from 80px to 130px for better fit */
+    grid-template-columns: 130px 1fr; 
+    gap: 10px;
     padding: 8px 12px;
     background: #eee;
     border-radius: 10px;
@@ -351,7 +354,7 @@ select.form-input {
     justify-content: center;
     text-align: center;
     gap: 2px;
-    overflow: hidden; /* Prevent spill */
+    width: 100%; /* Fill the column */
 }
 .battle-hud-left .profile-logo {
     width: 45px !important;
@@ -359,10 +362,10 @@ select.form-input {
 }
 .battle-hud-left div {
     font-size: 0.85rem !important; 
+    width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%;
 }
 .battle-hud-right {
     display: flex;
@@ -411,6 +414,7 @@ select.form-input {
     z-index: 10000;
     transition: transform 0.2s;
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    display: none; /* Default hidden, controlled by JS */
 }
 #floatingShopBtn:active { transform: scale(0.95); }
 #floatingShopBtn img { width: 100%; height: 100%; object-fit: contain; }
