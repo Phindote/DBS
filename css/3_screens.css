@@ -10,6 +10,7 @@
     box-sizing: border-box;
     height: 100%;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scroll */
     overscroll-behavior: contain;
 }
 .screen.active {
@@ -127,7 +128,7 @@
     margin-top: 5px;
     flex: 1;
     min-height: 0;
-    overflow-y: auto; /* Enable vertical scroll */
+    overflow-y: auto; 
 }
 #singleChapterList, #mixChapterList, #shopContainer {
     flex: 1;
@@ -135,6 +136,8 @@
     overflow-y: auto;
     border: none;
     padding: 5px;
+    width: 100%; /* Fix overflow */
+    box-sizing: border-box;
 }
 #singleConfirmArea {
     margin-top: 15px;
