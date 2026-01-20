@@ -1,6 +1,6 @@
 .screen {
 display: none;
-padding: 10px; /* Reduced padding */
+padding: 20px;
 flex-grow: 1;
 flex-direction: column;
 align-items: center;
@@ -147,120 +147,109 @@ animation: fadeIn 0.3s ease;
 #screen-difficulty {
 justify-content: center;
 }
-/* ----- BATTLE SCREEN LAYOUT FIX ----- */
+
+/* --- REVERTED BATTLE SCREEN TO ORIGINAL LAYOUT LOGIC --- */
 #screen-game {
-display: none;
-flex-direction: column;
-overflow: hidden; /* No scroll on main container */
-height: 100%;
-padding: 10px;
-box-sizing: border-box;
-justify-content: space-between; /* Space out elements */
+    display: none; /* Controlled by JS */
+    /* Remove 'flex-direction: column' and 'height: 100%' to allow natural scrolling if needed, 
+       but we keep minimal styles to prevent layout break */
+    flex-direction: column;
+    height: 100%;
+    padding: 10px;
+    overflow-y: auto; /* Allow scrolling if content is too tall */
 }
 #screen-game.active {
-display: flex;
+    display: flex;
 }
 .boss-area {
-width: 100%;
-/* STRICT HEIGHT CONTROL */
-flex: 0 1 35%; /* Target 35% height, can shrink */
-display: flex;
-flex-direction: column;
-justify-content: flex-end; /* Align dragon to bottom of its box */
-align-items: center;
-margin-bottom: 5px;
-position: relative;
-z-index: 10;
-overflow: visible; /* Allow animation shake */
+    width: 100%;
+    /* Revert to fixed height logic for stability */
+    height: 250px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 .boss-img {
-width: auto;
-height: auto;
-max-width: 80%; /* Don't be too wide */
-max-height: 85%; /* Leave room for text */
-object-fit: contain;
-animation: float 3s ease-in-out infinite;
-border: none;
-filter: none;
-transition: transform 0.1s; /* Faster for shake */
-z-index: 10;
+    max-height: 180px; /* Fixed max height ensures it fits */
+    max-width: 100%;
+    width: auto;
+    object-fit: contain;
+    animation: float 3s ease-in-out infinite;
+    border: none;
+    filter: none;
+    transition: all 0.2s;
+    z-index: 10;
 }
 .battle-chapter-name {
-margin-top: 2px;
-font-size: 0.95rem;
-font-weight: bold;
-color: var(--primary-blue);
-text-align: center;
-z-index: 10;
-flex-shrink: 0;
+    margin-top: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--primary-blue);
+    text-align: center;
+    z-index: 10;
 }
 .progress-display {
-width: 100%;
-text-align: center;
-font-size: 0.9rem;
-font-weight: bold;
-color: var(--primary-blue);
-margin-bottom: 2px;
-background: #eef2f7;
-padding: 2px;
-border-radius: 8px;
-flex-shrink: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--primary-blue);
+    margin-bottom: 5px;
+    background: #eef2f7;
+    padding: 3px;
+    border-radius: 8px;
 }
 .question-box {
-background: #fff;
-padding: 10px 15px;
-border-radius: 12px;
-border: 2px solid var(--primary-blue);
-width: 100%;
-text-align: center;
-box-sizing: border-box;
-position: relative;
-z-index: 20;
-transition: border-color 0.2s, background 0.2s, transform 0.1s;
-/* Take remaining space but ensure usability */
-flex: 1 1 auto; 
-margin-bottom: 5px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-overflow-y: auto; /* Scroll ONLY text if massive */
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    border: 2px solid var(--primary-blue);
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 20;
+    transition: border-color 0.2s, background 0.2s, transform 0.1s;
+    margin-bottom: 10px;
+    /* Removed flex properties that were causing squishing */
 }
+/* --- END REVERT --- */
+
 .crack-stage-1 { border-color: #f39c12; border-style: dashed; }
 .crack-stage-2 { border-color: #e67e22; border-style: dashed; transform: rotate(-1deg); }
 .crack-stage-3 { border-color: #d35400; border-style: double; border-width: 4px; transform: rotate(1deg); }
 .crack-stage-4 { border-color: #c0392b; border-style: groove; border-width: 5px; transform: rotate(-2deg); background: #fff0f0; }
 .crack-stage-5 { border-color: #ff0000; border-style: ridge; border-width: 6px; transform: rotate(2deg); background: #ffe6e6; }
-.poem-line { font-size: 1.1rem; margin-bottom: 10px; font-family: 'Kaiti', 'STKaiti', serif; line-height: 1.4; }
-.target-word { color: var(--primary-red); font-weight: bold; font-size: 1.25rem; margin: 0 5px; }
+.poem-line { font-size: 1.3rem; margin-bottom: 10px; font-family: 'Kaiti', 'STKaiti', serif; }
+.target-word { color: var(--primary-red); font-weight: bold; font-size: 1.4rem; margin: 0 5px; }
 #answerInput {
 width: 90%;
 padding: 10px;
-font-size: 1rem;
+font-size: 1.1rem;
 border: 2px solid #ccc;
 border-radius: 5px;
 text-align: center;
 transition: all 0.3s;
 }
-.mc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; }
+.mc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .mc-btn {
 background: var(--white);
 border: 1px solid var(--primary-blue);
-padding: 10px;
+padding: 12px;
 border-radius: 8px;
 cursor: pointer;
-font-size: 0.95rem;
+font-size: 1.1rem;
 transition: all 0.2s;
-display: flex;
-align-items: center;
-justify-content: center;
-min-height: 44px; /* Touchable area */
 }
 .mc-btn:hover:not(:disabled) { background: var(--primary-blue); color: white; }
 .mc-btn:disabled { background: #e0e0e0; color: #aaa; border-color: #ccc; cursor: not-allowed; transform: none; }
 .error-msg { color: var(--primary-red); margin-top: 5px; font-weight: bold; min-height: 20px; font-size: 0.9rem; }
-.game-footer-btn { margin-top: 0; width: 100%; text-align: center; padding-top: 5px; flex-shrink: 0; }
-/* ----------------------------------- */
-
+.game-footer-btn { margin-top: auto; width: 100%; text-align: center; padding-top: 5px; flex-shrink: 0; }
 #resultImageContainer {
 width: 100%;
 display: flex;
@@ -498,6 +487,7 @@ flex-direction: column-reverse;
 align-items: center;
 gap: 10px;
 touch-action: none;
+transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Snapping animation */
 }
 #floatingMainBtn {
 width: 50px;
