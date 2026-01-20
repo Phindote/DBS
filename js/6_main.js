@@ -47,7 +47,6 @@ function initDraggableMenu() {
     let xOffset = 0;
     let yOffset = 0;
     
-    // Set initial Position (Right side)
     xOffset = 0; 
     yOffset = 0; 
 
@@ -56,11 +55,18 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
+            // FIX: Direction Logic
+            // The rect.top is relative to viewport. 
             const rect = dragItem.getBoundingClientRect();
-            const isTopHalf = rect.top < window.innerHeight / 2;
-            if(isTopHalf) {
+            // If button is in top half (closer to 0), expand DOWN.
+            // If button is in bottom half (closer to innerHeight), expand UP.
+            
+            // NOTE: CSS default is flex-direction: column-reverse (Upwards)
+            if(rect.top < window.innerHeight / 2) {
+                // Top half -> Expand DOWN (Normal column)
                 dragItem.style.flexDirection = "column";
             } else {
+                // Bottom half -> Expand UP (Reverse column)
                 dragItem.style.flexDirection = "column-reverse";
             }
             subMenu.classList.toggle("visible");
@@ -96,41 +102,27 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK LOGIC (強制歸位) ---
-        // 1. Always snap to Right edge (X = 0)
+        // Snap to Right Edge
         currentX = 0;
         xOffset = 0; 
-
-        // 2. Bound Y position between Header and Footer
-        const headerHeight = document.querySelector('.header-bar').offsetHeight;
-        const footerRect = document.querySelector('.footer-bar').getBoundingClientRect();
-        // Calculate bounds relative to the initial position (bottom: 60px, right: 20px)
-        // Since we use transform translate, we need to calculate offset relative to start.
-        // But simpler approach: keep X=0 (right:20px), just clamp Y.
         
-        // We need to check actual screen bounds for Y
+        // Re-enforce bounds on Drop (Just in case)
+        const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
+        const footer = document.querySelector('.footer-bar');
+        const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
         const rect = dragItem.getBoundingClientRect();
-        let newTop = rect.top;
         
-        const minTop = headerHeight + 10; // 10px buffer below header
-        const maxTop = footerRect.top - rect.height - 10; // 10px buffer above footer
+        // We use the same limits as in drag()
+        const baseTop = window.innerHeight - 60 - rect.height; 
+        const limitMinY = headerHeight - baseTop;
+        const baseBottom = window.innerHeight - 60;
+        const limitMaxY = footerTop - baseBottom - 20;
 
-        let correctionY = 0;
+        if (currentY < limitMinY) currentY = limitMinY;
+        if (currentY > limitMaxY) currentY = limitMaxY;
         
-        // Convert client rect back to translate Y
-        // Current Transform Y = currentY (stored in variable)
-        
-        // It's tricky to clamp 'translate' directly without knowing absolute positions perfectly.
-        // Instead, we simply clamp the *visual* position logic we used in drag().
-        // In drag(), we already clamped Y. So on drop, we just ensure X is reset.
-        
-        // Re-run the clamp logic one last time to be safe
-        const itemHeight = dragItem.offsetHeight;
-        const minY = headerHeight - (window.innerHeight - 60 - 20); // Approx based on CSS bottom:60px
-        // Actually, let's just stick to the drag logic's clamp constraints.
-        // The most important thing is resetting X.
-        
-        setTranslate(0, currentY, dragItem); // Force X to 0 (Right side)
+        yOffset = currentY;
+        setTranslate(0, currentY, dragItem); 
     }
 
     function drag(e) {
@@ -145,41 +137,45 @@ function initDraggableMenu() {
                 currentY = e.clientY - initialY;
             }
 
-            // --- BOUNDARY LOGIC (邊界限制) ---
+            // BOUNDARY LOGIC FIX
             const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
             const footer = document.querySelector('.footer-bar');
+            
+            // Footer top relative to viewport
             const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
             
             const rect = dragItem.getBoundingClientRect();
             
-            // We want to limit the *visual* movement. 
-            // The item is positioned at bottom: 60px.
-            // Translate Y moves it relative to that.
-            // +Y moves down, -Y moves up.
+            // Calculate absolute Y limit relative to 'bottom: 60px' origin
+            // Start Y (visual) = window.innerHeight - 60
+            // Current visual Top = Start Y + currentY - Height (if expanding up?) 
+            // Actually, dragItem is the container. height varies if open/closed.
+            // Let's assume we drag based on the Main Button position mostly.
             
-            // Limit Top edge: Must be below Header
-            // Current Top = (WindowHeight - 60 - Height) + currentY
-            // We want Current Top > HeaderHeight
-            // => currentY > HeaderHeight - (WindowHeight - 60 - Height)
-            const baseTop = window.innerHeight - 60 - rect.height;
-            const limitMinY = headerHeight - baseTop;
+            // Simplified Logic: 
+            // Min Y (Top) = Header Height - (Start Y position)
+            // Max Y (Bottom) = Footer Top - (Start Y position) - Button Height
+            
+            const startYPos = window.innerHeight - 60; // The CSS 'bottom: 60px' means Y is here
+            
+            // Limit Top: Button shouldn't go above Header
+            // We allow it to go up to header.
+            // currentY is offset. 
+            // Visual Top = startYPos + currentY.
+            // We want Visual Top >= Header Height
+            // currentY >= Header Height - startYPos
+            const limitMinY = headerHeight - startYPos;
 
-            // Limit Bottom edge: Must be above Footer
-            // Current Bottom = (WindowHeight - 60) + currentY
-            // We want Current Bottom < FooterTop
-            // => currentY < FooterTop - (WindowHeight - 60)
-            const baseBottom = window.innerHeight - 60;
-            const limitMaxY = footerTop - baseBottom - 10; // 10px buffer
+            // Limit Bottom: Button shouldn't go below Footer
+            // Visual Bottom = Visual Top + 50 (Button Height)
+            // We want Visual Bottom <= Footer Top
+            // startYPos + currentY + 50 <= Footer Top
+            // currentY <= Footer Top - startYPos - 50
+            const limitMaxY = footerTop - startYPos - 50; 
 
             if (currentY < limitMinY) currentY = limitMinY;
             if (currentY > limitMaxY) currentY = limitMaxY;
 
-            // Update Y only, allow X to move freely during drag, but dragEnd will snap it.
-            // Actually user wants it restricted *during* drag too? "不能拖出"
-            // Let's restrict X to not go off screen right.
-            // It starts at right:20px. 
-            // +X moves right (off screen), -X moves left (into screen).
-            // Max X should be 0 (stick to right margin).
             if (currentX > 0) currentX = 0; 
             
             xOffset = currentX;
@@ -270,7 +266,7 @@ function handleFooterClick() {
         if (footerClickCount >= 10) {
             footerClickCount = 0;
             const pwd = prompt("請輸入開發者密碼：");
-            if (pwd === null) return; // Cancel does nothing
+            if (pwd === null) return; 
             if (pwd === "DBS_Chinese") {
                 activateGodMode();
             } else {
@@ -287,19 +283,25 @@ function handleFooterClick() {
 
 function activateGodMode() {
     window.godModeActive = true;
-    backupGameState = JSON.parse(JSON.stringify(gameState));
+    backupGameState = JSON.parse(JSON.stringify(gameState)); 
     devModeActive = true;
+
+    // Max User
     gameState.user.level = 99;
     gameState.user.xp = 9999;
     gameState.user.energy = 100;
-    gameState.user.title = TITLES[TITLES.length - 1];
+    gameState.user.title = TITLES[TITLES.length - 1]; 
+
+    // Max Chapters & Questions
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
     gameState.solvedSeniorQuestionIds = [];
+
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
         gameState.masteredChapters.push('mix');
+
         if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
         if(db[k].senior) {
             db[k].senior.forEach(q => {
@@ -308,10 +310,15 @@ function activateGodMode() {
             });
         }
     });
+
+    // Max Achievements
     gameState.unlockedAchievements = ACHIEVEMENTS.map(a => a.id);
+
+    // Fake Stats for visual completeness
     gameState.stats.totalPlayTime = 99999;
     gameState.stats.mixWinCount = 999;
-    updateLevel();
+    
+    updateLevel(); 
     alert("⚡ 上帝模式已啟動 ⚡\n所有能力已全滿！(點擊底部 3 次可還原)");
 }
 
