@@ -55,6 +55,8 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
+            // Updated: always expand left (row-reverse)
+            dragItem.style.flexDirection = "row-reverse";
             subMenu.classList.toggle("visible");
         }
     });
@@ -88,9 +90,12 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // SNAP BACK to Right (X = 0)
+        // Force Snap back to RIGHT (X = 0)
         currentX = 0;
-        xOffset = 0;
+        xOffset = 0; 
+        
+        // Ensure Y is within bounds one last time
+        // Note: drag() already constrains Y, but we ensure X resets here.
         setTranslate(0, currentY, dragItem); 
     }
 
@@ -106,35 +111,50 @@ function initDraggableMenu() {
                 currentY = e.clientY - initialY;
             }
 
-            // BOUNDARY LOGIC
-            // Get boundaries dynamically
-            // Top Limit: Bottom of profile card (approx 150px)
-            const headerHeight = 150; // Roughly below banner and profile
-            // Bottom Limit: Top of Footer
+            // --- SMART BOUNDARY LOGIC ---
+            // 1. Bottom limit: Banner (header-bar) bottom
+            // 2. Top limit: Footer top OR Profile Card top if visible
+            
+            const headerHeight = document.querySelector('.header-bar').offsetHeight || 100;
             const footer = document.querySelector('.footer-bar');
             const footerTop = footer ? footer.getBoundingClientRect().top : window.innerHeight;
             
+            // Check if profile card is visible
+            const profileCard = document.querySelector('.profile-card');
+            let topLimitY = headerHeight;
+            
+            if (profileCard && profileCard.offsetParent !== null) {
+                // If profile card is visible, limit is its top edge
+                topLimitY = profileCard.getBoundingClientRect().top;
+            }
+
             const rect = dragItem.getBoundingClientRect();
             
-            // Calculate absolute top position based on currentY
+            // Calculate min/max Y translate values
             // Initial position is bottom: 60px.
-            // Absolute Top = (WindowHeight - 60 - Height) + currentY
+            // Translate Y moves relative to that.
             
-            const initialTop = window.innerHeight - 60 - rect.height;
-            const absoluteTop = initialTop + currentY;
-            const absoluteBottom = absoluteTop + rect.height;
+            // Top Limit (Highest point):
+            // Visual Top = (WindowHeight - 60 - Height) + currentY
+            // We want Visual Top >= topLimitY
+            // => currentY >= topLimitY - (WindowHeight - 60 - Height)
+            const baseTop = window.innerHeight - 60 - rect.height;
+            const limitMinY = topLimitY - baseTop + 10; // +10 buffer
 
-            // Constrain Y
-            if (absoluteTop < headerHeight) {
-                currentY = headerHeight - initialTop;
-            }
-            if (absoluteBottom > footerTop) {
-                currentY = footerTop - rect.height - initialTop;
-            }
+            // Bottom Limit (Lowest point):
+            // Visual Bottom = (WindowHeight - 60) + currentY
+            // We want Visual Bottom <= FooterTop
+            // => currentY <= FooterTop - (WindowHeight - 60)
+            const baseBottom = window.innerHeight - 60;
+            const limitMaxY = footerTop - baseBottom - 10; 
 
-            // Constrain X (Keep it on screen, stick to right)
-            // It starts at right: 20px. 
-            // We allow moving left (negative X) but not right (positive X > 0)
+            if (currentY < limitMinY) currentY = limitMinY;
+            if (currentY > limitMaxY) currentY = limitMaxY;
+
+            // Constrain X to 0 (Right edge) during drag too?
+            // User said "Free drag" but "Return to right".
+            // Usually dragging allows X movement but snaps back.
+            // Let's allow X movement for feel, but restrict it from going off-screen right.
             if (currentX > 0) currentX = 0; 
             
             xOffset = currentX;
@@ -225,7 +245,7 @@ function handleFooterClick() {
         if (footerClickCount >= 10) {
             footerClickCount = 0;
             const pwd = prompt("請輸入開發者密碼：");
-            if (pwd === null) return; 
+            if (pwd === null) return; // Fix: Cancel button does nothing
             if (pwd === "DBS_Chinese") {
                 activateGodMode();
             } else {
