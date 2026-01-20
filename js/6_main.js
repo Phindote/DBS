@@ -89,8 +89,8 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK & BOUNDARY LOGIC ---
-        // 1. Force X to 0 (Right Edge)
+        // --- SNAP BACK LOGIC (Always snap to Right edge) ---
+        // Force X to 0 (Right Edge, based on CSS right:20px)
         currentX = 0;
         xOffset = 0; 
 
@@ -104,36 +104,22 @@ function initDraggableMenu() {
         const dragItemRect = dragItem.getBoundingClientRect();
         
         // Define Safe Zone Top
-        // Default safe top is under the header
         let safeTopY = headerHeight + 10; 
-        
-        // New Rule: If Profile Card is visible, limit to its TOP edge
-        if (profileCard && profileCard.offsetParent !== null) {
-             const cardRect = profileCard.getBoundingClientRect();
-             // We want the BOTTOM of the button to be no higher than the TOP of the card?
-             // User said: "最高可達個人資料卡的頂端位置" -> The button can go up to the card's top edge.
-             // Button Top >= Card Top.
-             // Actually, usually "limit to top" means button shouldn't go ABOVE it.
-             safeTopY = cardRect.top;
+        if (profileCard && profileCard.offsetParent !== null) { 
+             safeTopY = profileCard.getBoundingClientRect().top;
         }
         
-        // Calculate Translation Y required to reach Safe Top
-        // Initial position is bottom: 60px.
-        // Screen Y = (WindowHeight - 60 - ButtonHeight) + TranslateY
-        // We want Screen Y >= SafeTopY
-        // => TranslateY >= SafeTopY - (WindowHeight - 60 - ButtonHeight)
-        
+        // Calculate Translation Y limits
+        // Base screen Y (where translate Y=0 lands) = WindowHeight - 60 - Height
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
-        const minTranslateY = safeTopY - baseScreenY;
         
-        // Define Safe Zone Bottom (Footer)
+        const minTranslateY = safeTopY - baseScreenY;
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
 
         // Clamp currentY
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
         
-        // Fallback for extreme cases
         if (minTranslateY > maxTranslateY) {
              const fallbackMin = headerHeight + 10 - baseScreenY;
              if (currentY < fallbackMin) currentY = fallbackMin;
@@ -154,7 +140,7 @@ function initDraggableMenu() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
             }
-            // Allow free dragging visual
+
             setTranslate(currentX, currentY, dragItem);
         }
     }
