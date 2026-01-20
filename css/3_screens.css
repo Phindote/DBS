@@ -9,14 +9,13 @@
     width: 100%;
     box-sizing: border-box;
     height: 100%;
-    /* CRITICAL FIX: Lock screen scrolling. Let internal containers scroll. */
-    overflow: hidden; 
+    /* CRITICAL FIX: Lock horizontal scroll on screen level */
+    overflow-x: hidden; 
+    overflow-y: hidden; /* Content scrolls inside containers, not screen */
 }
 .screen.active {
     display: flex;
 }
-
-/* Loading Screen */
 #screen-loading {
     position: fixed;
     inset: 0;
@@ -64,8 +63,6 @@
     width: auto;
     z-index: 2;
 }
-
-/* Login Screen */
 #screen-login {
     justify-content: center;
     background: url('../images/bg/login_bg.jpg') no-repeat center center;
@@ -78,8 +75,6 @@
     font-size: 2rem;
     margin-bottom: 20px;
 }
-
-/* Menu Layout */
 .menu-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -91,7 +86,6 @@
     min-height: 0;
     margin-bottom: 20px;
     box-sizing: border-box;
-    overflow-y: auto; /* Allow scrolling if menu buttons don't fit */
 }
 .menu-btn {
     background: linear-gradient(145deg, #ffffff, #f0f0f0);
@@ -125,9 +119,6 @@
     box-shadow: 0 10px 25px rgba(0, 51, 153, 0.15);
     background: linear-gradient(145deg, #ffffff, #e6f0ff);
 }
-
-/* Sub Menu & Content Containers */
-/* This style applies to the Chapter Selection AND now Shop/Pokedex/Achievements */
 .sub-menu {
     width: 100%;
     max-width: 600px;
@@ -137,26 +128,23 @@
     margin-top: 5px;
     flex: 1;
     min-height: 0;
-    overflow-y: auto; /* Scroll ONLY the list */
-    overflow-x: hidden; /* Lock horizontal */
-    width: 100%;
-    box-sizing: border-box;
-    padding-right: 5px; /* Space for scrollbar */
+    overflow-y: auto; 
+    overflow-x: hidden; /* Fix horizontal scroll */
 }
-
-/* Specific Containers for Scrolling */
+/* Fixed Container Logic applied to Pokedex, Shop, Achievements */
 #singleChapterList, #mixChapterList, #shopContainer, #pokedexContainer, #sealContainer {
     flex: 1;
+    max-height: 50vh; /* Adjust based on screen size, or use flex-grow */
+    /* Better approach: Use flex grow inside the flex column screen */
+    min-height: 0; /* Important for firefox flex scroll */
     overflow-y: auto;
     overflow-x: hidden;
     border: none;
     padding: 5px;
-    width: 100%;
+    width: 100%; /* Ensure full width */
+    max-width: 100%; /* Prevent overflow */
     box-sizing: border-box;
-    /* Ensure content doesn't wobble */
-    margin: 0 auto;
 }
-
 #singleConfirmArea {
     margin-top: 15px;
     padding: 10px;
@@ -165,20 +153,16 @@
     text-align: center;
     display: none;
     animation: fadeIn 0.3s ease;
-    flex-shrink: 0; /* Don't shrink confirm area */
 }
-
 #screen-difficulty {
     justify-content: center;
 }
-
-/* Battle Screen */
 #screen-game {
     display: none; 
     flex-direction: column;
     height: 100%;
     padding: 10px;
-    overflow: hidden; /* Lock screen */
+    overflow-y: auto; 
 }
 #screen-game.active {
     display: flex;
@@ -238,12 +222,7 @@
     z-index: 20;
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
     margin-bottom: 10px;
-    /* Ensure question box doesn't overflow */
-    overflow-y: auto;
-    max-height: 30vh;
 }
-
-/* Effects */
 .crack-stage-1 { border-color: #f39c12; border-style: dashed; }
 .crack-stage-2 { border-color: #e67e22; border-style: dashed; transform: rotate(-1deg); }
 .crack-stage-3 { border-color: #d35400; border-style: double; border-width: 4px; transform: rotate(1deg); }
@@ -251,7 +230,6 @@
 .crack-stage-5 { border-color: #ff0000; border-style: ridge; border-width: 6px; transform: rotate(2deg); background: #ffe6e6; }
 .poem-line { font-size: 1.3rem; margin-bottom: 10px; font-family: 'Kaiti', 'STKaiti', serif; }
 .target-word { color: var(--primary-red); font-weight: bold; font-size: 1.4rem; margin: 0 5px; }
-
 #answerInput {
     width: 90%;
     padding: 10px;
@@ -275,8 +253,6 @@
 .mc-btn:disabled { background: #e0e0e0; color: #aaa; border-color: #ccc; cursor: not-allowed; transform: none; }
 .error-msg { color: var(--primary-red); margin-top: 5px; font-weight: bold; min-height: 20px; font-size: 0.9rem; }
 .game-footer-btn { margin-top: auto; width: 100%; text-align: center; padding-top: 5px; flex-shrink: 0; }
-
-/* Result */
 #resultImageContainer {
     width: 100%;
     display: flex;
@@ -311,8 +287,6 @@
 .result-table th { background-color: var(--primary-blue); color: white; }
 .res-wrong { color: var(--primary-red); font-weight: bold; }
 .res-correct { color: var(--hp-green); font-weight: bold; }
-
-/* Modals */
 #contentModal, #helpModal, #titlesModal {
     display: none;
     position: fixed;
@@ -491,16 +465,14 @@
 .node-status {
     font-size: 1.5rem;
 }
-/* Ensure these headings stay at top, don't scroll */
 #screen-pokedex h2,
 #screen-achievements h2,
 #screen-shop h2 {
     margin-top: 0 !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 15px !important;
     line-height: 1 !important;
     padding: 5px 0 !important;
     display: block;
-    flex-shrink: 0;
 }
 .compact-header-text {
     font-size: 0.9rem;
@@ -508,14 +480,13 @@
     color: var(--primary-red);
     font-weight: bold;
 }
-/* Floating Menu */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row; 
+    flex-direction: row-reverse; /* Button on right, expands left */
     align-items: center;
     gap: 15px; 
     touch-action: none;
@@ -531,7 +502,6 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
-    order: 2; 
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -540,18 +510,18 @@
     object-fit: contain;
 }
 #floatingSubMenu {
-    display: none;
-    flex-direction: row; 
+    display: flex;
+    flex-direction: row-reverse; 
     gap: 10px;
-    order: 1; 
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(20px); 
 }
 #floatingSubMenu.visible {
-    display: flex;
-    animation: slideLeft 0.3s ease forwards;
-}
-@keyframes slideLeft {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
 }
 .btn-control-float {
     width: 40px;
