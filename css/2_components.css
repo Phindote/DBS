@@ -158,16 +158,22 @@ select.form-input {
     padding: 10px;
     text-align: center;
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 150px; /* Ensure cards have size even if empty */
+    min-height: 150px;
     justify-content: center;
+    z-index: 1; /* Default z-index */
 }
-.pokedex-card:hover, .shop-card:hover { transform: translateY(-5px); }
+/* CRITICAL FIX: Higher z-index on hover to prevent text overlapping */
+.pokedex-card:hover, .shop-card:hover { 
+    transform: translateY(-5px); 
+    z-index: 100; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
 .pokedex-img, .shop-img {
     width: 100%;
     height: 100px;
@@ -305,7 +311,7 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD */
+/* Battle HUD - Compact Version */
 .battle-hud {
     width: 100%;
     display: grid;
