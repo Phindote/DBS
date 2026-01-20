@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_yuexia"] === 'undefined') {
 }
 
 window.questionsDB["p_yuexia"].title = "《月下獨酌》";
-window.questionsDB["p_yuexia"].img = "yuexia.jpg";
+window.questionsDB["p_yuexia"].img = "dragon_1.jpg";
 window.questionsDB["p_yuexia"].content = `月下獨酌 李白
 
 花間一壺酒，獨酌無相親。
