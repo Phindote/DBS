@@ -12,22 +12,18 @@ const audioFiles = {
 audioFiles.theme.loop = true;
 audioFiles.battleJr.loop = true;
 audioFiles.battleSr.loop = true;
-
 Object.values(audioFiles).forEach(a => {
     a.preload = 'auto';
 });
-
 let isMusicOn = true;
 let isSFXEnabled = true;
 let currentBGM = null;
-
 function toggleMusic() {
     isMusicOn = !isMusicOn;
     const btn = document.getElementById('btnBGM');
     if (isMusicOn) {
         btn.classList.remove('off');
         if (currentBGM) {
-            currentBGM.currentTime = 0;
             currentBGM.play().catch(e=>{});
         }
     } else {
@@ -35,7 +31,6 @@ function toggleMusic() {
         if (currentBGM) currentBGM.pause();
     }
 }
-
 function toggleSFX() {
     isSFXEnabled = !isSFXEnabled;
     const btn = document.getElementById('btnSFX');
@@ -45,7 +40,12 @@ function toggleSFX() {
         btn.classList.add('off');
     }
 }
-
+function stopAllMusic() {
+    [audioFiles.theme, audioFiles.battleJr, audioFiles.battleSr, audioFiles.victory, audioFiles.success, audioFiles.defeat].forEach(a => {
+        a.pause();
+        a.currentTime = 0;
+    });
+}
 function playMusic(type) {
     let target = null;
     if (type === 'theme') target = audioFiles.theme;
@@ -55,28 +55,23 @@ function playMusic(type) {
     else if (type === 'success') target = audioFiles.success;
     else if (type === 'defeat') target = audioFiles.defeat;
     
-    if (currentBGM === target) {
-        if (isMusicOn && target.paused) target.play().catch(e=>{});
-        return;
-    }
+    if (currentBGM === target && !target.paused) return;
     
-    [audioFiles.theme, audioFiles.battleJr, audioFiles.battleSr, audioFiles.victory, audioFiles.success, audioFiles.defeat].forEach(a => {
-        a.pause();
-        a.currentTime = 0;
-    });
+    stopAllMusic();
     
     currentBGM = target;
     if (isMusicOn && currentBGM) {
-        currentBGM.play().catch(e=>{});
+        const playPromise = currentBGM.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("Audio playback failed: " + error);
+            });
+        }
     }
 }
-
 function stopLongSFX() {
-    audioFiles.victory.pause(); audioFiles.victory.currentTime = 0;
-    audioFiles.success.pause(); audioFiles.success.currentTime = 0;
-    audioFiles.defeat.pause(); audioFiles.defeat.currentTime = 0;
+    stopAllMusic();
 }
-
 function playSFX(name) {
     if (!isSFXEnabled) return;
     if (name === 'correct') {
