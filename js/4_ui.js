@@ -12,15 +12,23 @@ function switchScreen(id) {
         }
     }
 
+    // FIX: Removed stopLongSFX() here. 
+    // It was killing the BGM before playMusic could check if it was already playing.
+    // playMusic() inside the blocks below will handle stopping previous tracks if necessary.
+
     if (id === 'screen-game') {
         resizeCanvas();
-        // Music is handled in initGame for battle
+        if (gameState.difficulty === 'junior') playMusic('battleJr');
+        else playMusic('battleSr');
     } else if (id === 'screen-result') {
-        // Music is handled in endGame
+        // Music handled in endGame
     } else {
         // For Menu, Pokedex, Shop, Achievements, Login -> Ensure Theme is playing
-        // The playMusic function now handles "don't restart if already playing" logic.
-        playMusic('theme'); 
+        // Since we removed the "stop" command above, playMusic will now see the theme is 
+        // already playing and do nothing (Seamless).
+        if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
+            playMusic('theme'); 
+        }
         
         if (id === 'screen-menu') checkAchievements();
     }
