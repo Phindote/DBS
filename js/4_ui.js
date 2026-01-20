@@ -64,6 +64,10 @@ function updateMixStyles() {
 
 function showSubMenu(type) {
     document.querySelector(".menu-layout").style.display = "none";
+    // HIDE Profile Card to save space
+    const profileCard = document.querySelector(".profile-card");
+    if(profileCard) profileCard.style.display = "none";
+
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
         renderSingleList();
@@ -77,6 +81,10 @@ function resetMenu() {
     document.getElementById("subMenuSingle").style.display = "none";
     document.getElementById("subMenuMix").style.display = "none";
     document.querySelector(".menu-layout").style.display = "grid";
+    // SHOW Profile Card again
+    const profileCard = document.querySelector(".profile-card");
+    if(profileCard) profileCard.style.display = "flex";
+
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
     pendingSingleChapterKey = "";
@@ -370,7 +378,6 @@ function closeHelp() {
     document.getElementById("helpModal").style.display = "none";
 }
 
-// Stats & Radar Chart
 function showStatsModal() {
     document.getElementById("statsModal").style.display = "flex";
     drawRadarChartSVG();
@@ -499,7 +506,6 @@ function drawRadarChartSVG() {
     dataPoly.setAttribute("stroke-width", "2");
     svg.appendChild(dataPoly);
 
-    // Animation: Start from center (all 200,175) to target points
     let startPoints = "";
     for(let i=0; i<6; i++) {
         startPoints += `${cx},${cy} `;
@@ -526,7 +532,6 @@ function drawRadarChartSVG() {
     container.appendChild(svg);
 }
 
-// Particle System
 function resizeCanvas() {
     const canvas = document.getElementById('particleCanvas');
     if(canvas) {
@@ -599,7 +604,6 @@ function showUnlockNotification(newIds) {
         if(ach) {
             const div = document.createElement("div");
             div.style.marginBottom = "30px";
-            // Important: Use specific image for the seal
             div.innerHTML = `
                 <img src="images/achievements/${ach.id}.PNG" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
                 <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${ach.title}</div>
