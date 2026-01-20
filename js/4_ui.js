@@ -2,14 +2,13 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility
+    // Toggle Floating Shop Button Visibility: ONLY show on main menu
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
-        // HIDE on Login, Loading, AND Menu (Chapter Selection)
-        if (id === 'screen-login' || id === 'screen-loading' || id === 'screen-menu') {
-            shopBtn.style.display = 'none';
-        } else {
+        if (id === 'screen-menu') {
             shopBtn.style.display = 'block';
+        } else {
+            shopBtn.style.display = 'none';
         }
     }
 
@@ -22,9 +21,11 @@ function switchScreen(id) {
         if (gameState.difficulty === 'junior') playMusic('battleJr');
         else playMusic('battleSr');
     } else {
-        if (id === 'screen-menu' || id === 'screen-pokedex' || id === 'screen-achievements' || id === 'screen-shop' || id === 'screen-login') {
+        // Ensure theme music plays on these screens
+        if (['screen-menu', 'screen-pokedex', 'screen-achievements', 'screen-shop', 'screen-login'].includes(id)) {
             playMusic('theme'); 
         }
+        
         if (id === 'screen-menu') checkAchievements();
     }
 }
@@ -661,14 +662,28 @@ function renderInventory() {
     document.getElementById("btnTabInventory").classList.add("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
+    // REVERTED to Card style instead of small grid
     for(let i=0; i<100; i++) {
+        // Only show if there's an item, or maybe show first 20 empty slots? 
+        // For now, let's show all 100 but styled as cards.
+        // Actually, 100 cards might lag. Let's just show collected items + some empty.
+        // User asked for "100 slots".
+        
         const card = document.createElement("div");
-        card.className = "pokedex-card"; 
+        card.className = "pokedex-card"; // Reuse the big card style
+        
         if(gameState.inventory[i]) {
-             card.innerHTML = `<div class="pokedex-title">${gameState.inventory[i].name}</div>`;
+             card.innerHTML = `
+                <img src="images/items/${gameState.inventory[i].img}" class="pokedex-img">
+                <div class="pokedex-title">${gameState.inventory[i].name}</div>
+             `;
         } else {
+             // Empty slot visual - Keep it big and consistent
              card.style.opacity = "0.5";
-             card.innerHTML = `<div style="font-size:0.8rem; color:#ccc; margin-top:20px;">空</div>`;
+             card.innerHTML = `
+                <div style="width:100%; height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">${i+1}</div>
+                <div style="font-size:0.8rem; color:#ccc;">空</div>
+             `;
         }
         container.appendChild(card);
     }
