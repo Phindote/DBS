@@ -4,6 +4,7 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
+    // FORCE PLAY MUSIC IMMEDIATELY - THEME
     playMusic('theme'); 
 
     const c = g + l;
@@ -136,6 +137,10 @@ function initGame(diff) {
     updateCrackStage();
     switchScreen("screen-game");
     renderQuestion();
+    
+    // Play correct battle BGM
+    if (diff === 'junior') playMusic('bgm_battle_jr');
+    else playMusic('bgm_battle_sr');
 }
 
 function renderQuestion() {
@@ -264,19 +269,13 @@ function checkAnswer(userVal, uiElement) {
         } else {
             gameState.wrongGuesses.push(userVal);
         }
-        
-        // CRITICAL FIX: Robust particle coordinates
         const bossRect = bossImg.getBoundingClientRect();
         const startX = bossRect.left + bossRect.width / 2;
-        const startY = bossRect.bottom; // Start exactly from bottom of image
-        
-        const qBoxRect = qBox.getBoundingClientRect();
-        const endX = qBoxRect.left + qBoxRect.width / 2;
-        const endY = qBoxRect.top + qBoxRect.height / 2;
-
-        fireBeam(startX, startY, endX, endY, '#e74c3c');
+        const startY = bossRect.bottom - 20; 
+        const end = getCenter(qBox);
+        fireBeam(startX, startY, end.x, end.y, '#e74c3c');
         setTimeout(() => {
-            for(let i=0; i<10; i++) createParticle(endX, endY, '#e74c3c', 'spark');
+            for(let i=0; i<10; i++) createParticle(end.x, end.y, '#e74c3c', 'spark');
             gameState.wrongCount++;
             gameState.stats.totalWrong++;
             gameState.user.hp -= GAME_CONFIG.HP_PENALTY;
@@ -328,7 +327,7 @@ function endGame(win) {
     }
 
     if (resultType === 'perfect') {
-        playMusic('victory');
+        playMusic('bgm_victory');
         document.getElementById("resultImg").src = "images/results/img_perfect.PNG";
         document.getElementById("endTitle").innerText = "完美通關！";
         document.getElementById("endTitle").style.color = "#f1c40f";
@@ -352,7 +351,7 @@ function endGame(win) {
         }
 
     } else if (resultType === 'success') {
-        playMusic('success');
+        playMusic('bgm_success');
         document.getElementById("resultImg").src = "images/results/img_success.PNG";
         document.getElementById("endTitle").innerText = "順利通關！";
         document.getElementById("endTitle").style.color = "#2ecc71";
@@ -360,7 +359,7 @@ function endGame(win) {
         gameState.stats.consecutivePerfect = 0;
         gameState.stats.lastPerfectChapter = "";
     } else {
-        playMusic('defeat');
+        playMusic('bgm_defeat');
         document.getElementById("resultImg").src = "images/results/img_defeat.PNG";
         document.getElementById("endTitle").innerText = "力竭戰敗...";
         document.getElementById("endTitle").style.color = "#e74c3c";
