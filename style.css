@@ -16,7 +16,7 @@ height: 100%;
 margin: 0;
 padding: 0;
 overflow: hidden; /* 強制禁止捲動 */
-overscroll-behavior: none;
+overscroll-behavior: none; /* 禁止彈性捲動 */
 }
 body {
 font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
@@ -25,7 +25,7 @@ display: flex;
 flex-direction: column;
 color: var(--text-dark);
 user-select: none;
-position: fixed;
+position: fixed; /* 鎖死 Body 防止手機版拖曳 */
 inset: 0;
 }
 .container {
@@ -37,11 +37,20 @@ background: var(--white);
 border-radius: 20px;
 box-shadow: var(--card-shadow);
 overflow: hidden;
-position: relative;
+position: relative; /* 讓絕對定位的子元素參照此容器 */
 display: flex;
 flex-direction: column;
 max-height: calc(100vh - 40px); 
 }
+/* 電腦版保持邊距，手機版填滿 */
+@media screen and (max-width: 768px) {
+    .container {
+        margin: 0;
+        border-radius: 0;
+        max-height: 100%;
+    }
+}
+
 .header-bar {
 background: linear-gradient(90deg, var(--primary-blue), var(--primary-red));
 padding: 0;
@@ -52,30 +61,22 @@ display: flex;
 align-items: center;
 justify-content: center;
 flex-direction: column;
-/* min-height removed to let image dictate height */
 flex-shrink: 0;
-overflow: hidden; /* Ensure image doesn't overflow rounded corners if header had them */
+overflow: hidden;
 }
 
-/* --- Banner CSS 修改重點 --- */
 .header-banner {
     width: 100%;
-    /* 手機版預設：高度自動，按比例縮放，保持手機端的「幼身」感覺 */
     height: auto; 
     display: block;
-    /* 確保圖片填滿且不變形，多餘部分會被裁切 */
     object-fit: cover;
     object-position: center;
 }
-
-/* 電腦版/平板版 Override (當螢幕闊度大於 768px 時生效) */
 @media screen and (min-width: 768px) {
     .header-banner {
-        /* 強制設定一個較矮的固定高度，解決電腦版太闊的問題 */
         height: 180px; 
     }
 }
-/* ------------------------ */
 
 .footer-bar {
 background: #333;
@@ -88,17 +89,17 @@ flex-shrink: 0;
 cursor: pointer;
 }
 
-/* Updated Floating Menu Styles */
+/* Floating Menu - Now Positioned Absolute inside Container */
 #floatingMenuContainer {
-    position: fixed;
-    bottom: 60px; /* Above footer approx */
+    position: absolute; /* Changed from fixed to absolute */
+    bottom: 60px; /* Adjust as needed relative to footer */
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: column-reverse; /* Main btn at bottom */
+    flex-direction: column-reverse; 
     align-items: center;
     gap: 10px;
-    touch-action: none; /* Important for dragging */
+    touch-action: none; 
 }
 
 #floatingMainBtn {
@@ -160,8 +161,6 @@ cursor: pointer;
     pointer-events: none;
 }
 
-/* Old .audio-controls removed */
-
 .screen {
 display: none;
 padding: 20px;
@@ -173,7 +172,8 @@ position: relative;
 width: 100%;
 box-sizing: border-box;
 height: 100%;
-overflow-y: auto;
+overflow-y: auto; /* 內容過長才捲動 */
+overscroll-behavior: contain; /* 阻止傳遞捲動到外層 */
 }
 .screen.active {
 display: flex;
@@ -232,7 +232,6 @@ z-index: 2;
 }
 #screen-login {
 justify-content: center;
-/* Updated BG Path */
 background: url('images/bg/login_bg.jpg') no-repeat center center;
 background-size: cover;
 overflow: hidden;
@@ -391,7 +390,9 @@ grid-template-rows: 1fr 1fr;
 gap: 20px;
 width: 100%;
 max-width: 600px;
+/* 關鍵修改：使用 flex 1 和 min-height 0 防止 grid 撐爆容器 */
 flex: 1;
+min-height: 0; 
 margin-bottom: 20px;
 box-sizing: border-box;
 }
@@ -483,6 +484,7 @@ flex-direction: column;
 gap: 10px;
 margin-top: 5px;
 flex: 1; 
+min-height: 0; /* 讓子選單也能正確縮放 */
 }
 #singleChapterList, #mixChapterList {
 flex: 1;
