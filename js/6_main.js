@@ -47,6 +47,7 @@ function initDraggableMenu() {
     let xOffset = 0;
     let yOffset = 0;
     
+    // Set initial Position
     xOffset = 0; 
     yOffset = 0; 
 
@@ -55,6 +56,7 @@ function initDraggableMenu() {
 
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
+            // CSS handles row-reverse and visibility toggling
             subMenu.classList.toggle("visible");
         }
     });
@@ -88,11 +90,12 @@ function initDraggableMenu() {
         active = false;
         dragItem.classList.remove("dragging");
 
-        // --- SNAP BACK LOGIC ---
+        // --- SNAP BACK LOGIC (Always snap to Right edge) ---
+        // Force X to 0 (Right Edge, based on CSS right:20px)
         currentX = 0;
         xOffset = 0; 
 
-        // Bound Y position
+        // 2. Bound Y position
         const header = document.querySelector('.header-bar');
         const footer = document.querySelector('.footer-bar');
         const profileCard = document.querySelector('.profile-card'); 
@@ -101,15 +104,20 @@ function initDraggableMenu() {
         const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
         const dragItemRect = dragItem.getBoundingClientRect();
         
+        // Define Safe Zone Top
         let safeTopY = headerHeight + 10; 
         if (profileCard && profileCard.offsetParent !== null) { 
              safeTopY = profileCard.getBoundingClientRect().top;
         }
         
+        // Calculate Translation Y limits
+        // Base screen Y (where translate Y=0 lands) = WindowHeight - 60 - Height
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
+        
         const minTranslateY = safeTopY - baseScreenY;
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
 
+        // Clamp currentY
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
         
@@ -151,10 +159,10 @@ function goHome() {
 }
 
 function backToMenuFromEnd() {
-    stopLongSFX(); // Does nothing now, kept for safety
+    stopLongSFX();
     resetMenu();
     switchScreen("screen-menu");
-    playMusic('theme'); // Will trigger seamless switch from Result music
+    playMusic('theme');
 }
 
 window.onload = function() {

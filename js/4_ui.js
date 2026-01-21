@@ -2,7 +2,9 @@ function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Shop Button
+    // Toggle Floating Shop Button Visibility
+    // Only visible on Main Menu (screen-menu) initially
+    // Detailed logic for sub-menus is handled in showSubMenu/resetMenu
     const shopBtn = document.getElementById("floatingShopBtn");
     if (shopBtn) {
         if (id === 'screen-menu') {
@@ -18,9 +20,7 @@ function switchScreen(id) {
     } else if (id === 'screen-result') {
         // Music handled in endGame
     } else {
-        // Handle BGM for specific screens
-        // Because of the seamless check in playMusic, calling 'theme' when 'theme' is playing does nothing.
-        
+        // Handle BGM
         if (id === 'screen-shop') {
             playMusic('bgm_shop');
         } else if (id === 'screen-pokedex') {
@@ -30,7 +30,7 @@ function switchScreen(id) {
         } else if (id === 'screen-menu' || id === 'screen-login') {
             playMusic('theme'); 
         } else {
-            playMusic('theme'); // Fallback
+            playMusic('theme'); 
         }
         
         if (id === 'screen-menu') checkAchievements();
@@ -89,6 +89,10 @@ function showSubMenu(type) {
     document.querySelector(".menu-layout").style.display = "none";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "none";
+    
+    // CRITICAL FIX: Hide Shop Button in Sub-menus
+    const shopBtn = document.getElementById("floatingShopBtn");
+    if (shopBtn) shopBtn.style.display = 'none';
 
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
@@ -105,6 +109,10 @@ function resetMenu() {
     document.querySelector(".menu-layout").style.display = "grid";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
+    
+    // CRITICAL FIX: Show Shop Button again when back to Main Menu
+    const shopBtn = document.getElementById("floatingShopBtn");
+    if (shopBtn) shopBtn.style.display = 'block';
 
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
@@ -394,9 +402,23 @@ function editProfile() {
 
 function showHelp() {
     document.getElementById("helpModal").style.display = "flex";
+    // CRITICAL FIX: Hide shop button when Guide is open
+    const shopBtn = document.getElementById("floatingShopBtn");
+    if (shopBtn) shopBtn.style.display = 'none';
 }
 function closeHelp() {
     document.getElementById("helpModal").style.display = "none";
+    // CRITICAL FIX: Restore shop button if we are on Menu screen
+    const shopBtn = document.getElementById("floatingShopBtn");
+    const menuScreen = document.getElementById("screen-menu");
+    // Check if Menu is active AND we are not in a sub-menu (check layout display)
+    if (menuScreen.classList.contains('active') && shopBtn) {
+        // Also check if menu-layout is visible (meaning not in single/mix mode)
+        const menuLayout = document.querySelector(".menu-layout");
+        if (menuLayout && menuLayout.style.display !== 'none') {
+             shopBtn.style.display = 'block';
+        }
+    }
 }
 
 function showStatsModal() {
