@@ -172,7 +172,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 2px;
     position: relative;
     z-index: 10;
     flex-shrink: 0;
@@ -203,7 +203,7 @@
     font-size: 1rem;
     font-weight: bold;
     color: var(--primary-blue);
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     background: #eef2f7;
     padding: 3px;
     border-radius: 8px;
@@ -219,7 +219,7 @@
     position: relative;
     z-index: 20;
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 .crack-stage-1 { border-color: #f39c12; border-style: dashed; }
 .crack-stage-2 { border-color: #e67e22; border-style: dashed; transform: rotate(-1deg); }
