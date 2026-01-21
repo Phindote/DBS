@@ -21,6 +21,7 @@ let gameState = {
         lastPerfectChapter: ""
     },
     inventory: [], 
+    pets: [],
     mode: "",
     difficulty: "",
     pool: [],
@@ -49,6 +50,7 @@ function saveGame() {
         user: gameState.user,
         stats: gameState.stats,
         inventory: gameState.inventory,
+        pets: gameState.pets,
         masteredChapters: gameState.masteredChapters,
         solvedQuestionIds: gameState.solvedQuestionIds,
         unlockedAchievements: gameState.unlockedAchievements
@@ -89,6 +91,7 @@ function applyGameData(parsed) {
     if(typeof gameState.stats.lastPerfectChapter === 'undefined') gameState.stats.lastPerfectChapter = "";
 
     gameState.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : []; 
+    gameState.pets = Array.isArray(parsed.pets) ? parsed.pets : [];
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
@@ -97,6 +100,7 @@ function applyGameData(parsed) {
         gameState.masteredChapters = [];
         gameState.solvedQuestionIds = [];
         gameState.unlockedAchievements = [];
+        gameState.pets = [];
     }
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();

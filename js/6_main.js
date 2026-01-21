@@ -35,7 +35,6 @@ function preloadAssets(callback) {
         }
     });
 }
-
 function initDraggableMenu() {
     const dragItem = document.getElementById("floatingMenuContainer");
     const container = document.body;
@@ -46,28 +45,21 @@ function initDraggableMenu() {
     let initialY;
     let xOffset = 0;
     let yOffset = 0;
-    
-    // Set initial Position
     xOffset = 0; 
     yOffset = 0; 
-
     const mainBtn = document.getElementById("floatingMainBtn");
     const subMenu = document.getElementById("floatingSubMenu");
-
     mainBtn.addEventListener("click", (e) => {
         if(!dragItem.classList.contains("dragging")) {
-            // CSS handles row-reverse and visibility toggling
             subMenu.classList.toggle("visible");
         }
     });
-
     container.addEventListener("touchstart", dragStart, {passive: false});
     container.addEventListener("touchend", dragEnd, {passive: false});
     container.addEventListener("touchmove", drag, {passive: false});
     container.addEventListener("mousedown", dragStart);
     container.addEventListener("mouseup", dragEnd);
     container.addEventListener("mousemove", drag);
-
     function dragStart(e) {
         if (e.target === mainBtn || mainBtn.contains(e.target) || e.target === dragItem) {
             if (e.type === "touchstart") {
@@ -82,54 +74,36 @@ function initDraggableMenu() {
             }
         }
     }
-
     function dragEnd(e) {
         if(!active) return;
         initialX = currentX;
         initialY = currentY;
         active = false;
         dragItem.classList.remove("dragging");
-
-        // --- SNAP BACK LOGIC (Always snap to Right edge) ---
-        // Force X to 0 (Right Edge, based on CSS right:20px)
         currentX = 0;
         xOffset = 0; 
-
-        // 2. Bound Y position
         const header = document.querySelector('.header-bar');
         const footer = document.querySelector('.footer-bar');
         const profileCard = document.querySelector('.profile-card'); 
-        
         const headerHeight = header ? header.offsetHeight : 100;
         const footerRect = footer ? footer.getBoundingClientRect() : {top: window.innerHeight};
         const dragItemRect = dragItem.getBoundingClientRect();
-        
-        // Define Safe Zone Top
         let safeTopY = headerHeight + 10; 
         if (profileCard && profileCard.offsetParent !== null) { 
              safeTopY = profileCard.getBoundingClientRect().top;
         }
-        
-        // Calculate Translation Y limits
-        // Base screen Y (where translate Y=0 lands) = WindowHeight - 60 - Height
         const baseScreenY = window.innerHeight - 60 - dragItemRect.height;
-        
         const minTranslateY = safeTopY - baseScreenY;
         const maxTranslateY = footerRect.top - baseScreenY - dragItemRect.height - 10;
-
-        // Clamp currentY
         if (currentY < minTranslateY) currentY = minTranslateY;
         if (currentY > maxTranslateY) currentY = maxTranslateY;
-        
         if (minTranslateY > maxTranslateY) {
              const fallbackMin = headerHeight + 10 - baseScreenY;
              if (currentY < fallbackMin) currentY = fallbackMin;
         }
-
         yOffset = currentY;
         setTranslate(0, currentY, dragItem); 
     }
-
     function drag(e) {
         if (active) {
             e.preventDefault();
@@ -141,30 +115,25 @@ function initDraggableMenu() {
                 currentX = e.clientX - initialX;
                 currentY = e.clientY - initialY;
             }
-
             setTranslate(currentX, currentY, dragItem);
         }
     }
-
     function setTranslate(xPos, yPos, el) {
         el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
     }
 }
-
 function goHome() {
     if(confirm("確定要返回主目錄嗎？本次試煉進度將會中斷。")) {
         resetMenu();
         switchScreen("screen-menu");
     }
 }
-
 function backToMenuFromEnd() {
     stopLongSFX();
     resetMenu();
     switchScreen("screen-menu");
     playMusic('theme');
 }
-
 window.onload = function() {
     db = window.questionsDB || {};
     loadGame();
@@ -186,13 +155,19 @@ window.onload = function() {
         }, 1000 * 60);
     });
 };
-
 document.addEventListener('click', function(e) {
     const floatContainer = document.getElementById("floatingMenuContainer");
     const subMenu = document.getElementById("floatingSubMenu");
     if (floatContainer && subMenu && subMenu.classList.contains("visible")) {
         if (!floatContainer.contains(e.target)) {
             subMenu.classList.remove("visible");
+        }
+    }
+    const radialMenu = document.getElementById("radialMenu");
+    const radialBtn = document.getElementById("radialToggleBtn");
+    if (radialMenu && radialMenu.classList.contains("active")) {
+        if (!radialMenu.contains(e.target) && e.target !== radialBtn) {
+            radialMenu.classList.remove("active");
         }
     }
     const target = e.target.closest('button') || e.target.closest('.pokedex-card') || e.target.closest('.mix-blue-wrapper');
@@ -202,7 +177,6 @@ document.addEventListener('click', function(e) {
         playSFX('click');
     }
 });
-
 document.addEventListener('contextmenu', e => {
     if (e.target.tagName === 'IMG') {
         e.preventDefault();
@@ -213,15 +187,12 @@ document.addEventListener('dragstart', e => {
         e.preventDefault();
     }
 });
-
 document.getElementById("answerInput").addEventListener("keypress", function(e) {
     if(e.key === "Enter") submitSeniorAnswer();
 });
-
 let footerClickCount = 0;
 let devModeActive = false;
 let backupGameState = null;
-
 function handleFooterClick() {
     footerClickCount++;
     if (!devModeActive) {
@@ -242,7 +213,6 @@ function handleFooterClick() {
         }
     }
 }
-
 function activateGodMode() {
     window.godModeActive = true;
     backupGameState = JSON.parse(JSON.stringify(gameState));
@@ -272,7 +242,6 @@ function activateGodMode() {
     updateLevel();
     alert("⚡ 上帝模式已啟動 ⚡\n所有能力已全滿！(點擊底部 3 次可還原)");
 }
-
 function revertGodMode() {
     if(backupGameState) {
         gameState = JSON.parse(JSON.stringify(backupGameState));
@@ -285,7 +254,6 @@ function revertGodMode() {
         alert("已回復至凡人模式。");
     }
 }
-
 setTimeout(() => {
     const footer = document.querySelector('.footer-bar');
     if(footer) {

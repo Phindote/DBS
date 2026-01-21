@@ -1,34 +1,37 @@
 const audioFiles = {
-    // Main Theme
     theme: new Audio('audio/bgm/bgm_theme.mp3'),
     
-    // Feature BGMs
-    bgm_shop: new Audio('audio/bgm/bgm_shop.mp3'),
+    bgm_daily: new Audio('audio/bgm/bgm_shop.mp3'),
+    bgm_store: new Audio('audio/bgm/bgm_store.mp3'),
+    bgm_inventory: new Audio('audio/bgm/bgm_inventory.mp3'),
+    bgm_smelt: new Audio('audio/bgm/bgm_smelt.mp3'),
+    bgm_pet: new Audio('audio/bgm/bgm_pet.mp3'),
+    
     bgm_pokedex: new Audio('audio/bgm/bgm_pokedex.mp3'),
     bgm_achievements: new Audio('audio/bgm/bgm_achievements.mp3'),
     
-    // Battle & Result BGMs (Moved to BGM category as requested)
     bgm_battle_jr: new Audio('audio/bgm/bgm_battle_jr.mp3'),
     bgm_battle_sr: new Audio('audio/bgm/bgm_battle_sr.mp3'),
     bgm_victory: new Audio('audio/bgm/bgm_victory.mp3'), 
     bgm_success: new Audio('audio/bgm/bgm_success.mp3'), 
     bgm_defeat: new Audio('audio/bgm/bgm_defeat.mp3'),   
     
-    // SFX
     click: new Audio('audio/sfx/sfx_click.mp3'),
     correct: new Audio('audio/sfx/sfx_correct.mp3'),
     wrong: new Audio('audio/sfx/sfx_wrong.mp3')
 };
 
-// Loop settings
 audioFiles.theme.loop = true;
-audioFiles.bgm_shop.loop = true;
+audioFiles.bgm_daily.loop = true;
+audioFiles.bgm_store.loop = true;
+audioFiles.bgm_inventory.loop = true;
+audioFiles.bgm_smelt.loop = true;
+audioFiles.bgm_pet.loop = true;
 audioFiles.bgm_pokedex.loop = true;
 audioFiles.bgm_achievements.loop = true;
 audioFiles.bgm_battle_jr.loop = true;
 audioFiles.bgm_battle_sr.loop = true;
 
-// Result music plays once (unless you want it to loop, set to true)
 audioFiles.bgm_victory.loop = false;
 audioFiles.bgm_success.loop = false;
 audioFiles.bgm_defeat.loop = false;
@@ -47,13 +50,11 @@ function toggleMusic() {
     
     if (isMusicOn) {
         btn.classList.remove('off');
-        // Resume if something is set
         if (currentBGM) {
             currentBGM.play().catch(e=>{});
         }
     } else {
         btn.classList.add('off');
-        // Pause current BGM
         if (currentBGM) currentBGM.pause();
     }
 }
@@ -69,7 +70,6 @@ function toggleSFX() {
 }
 
 function stopAllMusic() {
-    // FORCE STOP every audio file to prevent overlapping
     Object.values(audioFiles).forEach(a => {
         a.pause();
         a.currentTime = 0;
@@ -79,9 +79,12 @@ function stopAllMusic() {
 function playMusic(type) {
     let target = null;
     
-    // Map types
     if (type === 'theme') target = audioFiles.theme;
-    else if (type === 'bgm_shop') target = audioFiles.bgm_shop;
+    else if (type === 'bgm_daily') target = audioFiles.bgm_daily;
+    else if (type === 'bgm_store') target = audioFiles.bgm_store;
+    else if (type === 'bgm_inventory') target = audioFiles.bgm_inventory;
+    else if (type === 'bgm_smelt') target = audioFiles.bgm_smelt;
+    else if (type === 'bgm_pet') target = audioFiles.bgm_pet;
     else if (type === 'bgm_pokedex') target = audioFiles.bgm_pokedex;
     else if (type === 'bgm_achievements') target = audioFiles.bgm_achievements;
     else if (type === 'bgm_battle_jr') target = audioFiles.bgm_battle_jr;
@@ -90,12 +93,10 @@ function playMusic(type) {
     else if (type === 'bgm_success') target = audioFiles.bgm_success;
     else if (type === 'bgm_defeat') target = audioFiles.bgm_defeat;
     
-    // SEAMLESS CHECK: If the target is ALREADY playing, DO NOTHING.
     if (currentBGM === target && !target.paused) {
         return; 
     }
     
-    // Otherwise, stop everything and play new
     stopAllMusic();
     
     currentBGM = target;
@@ -111,13 +112,11 @@ function playMusic(type) {
 }
 
 function stopLongSFX() {
-    // Deprecated logic, handled by stopAllMusic now
 }
 
 function playSFX(name) {
     if (!isSFXEnabled) return;
     
-    // Stop overlapping SFX
     if (name === 'correct') {
         if (audioFiles.wrong) { audioFiles.wrong.pause(); audioFiles.wrong.currentTime = 0; }
     }

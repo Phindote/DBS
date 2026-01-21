@@ -1,37 +1,33 @@
+let currentInvTab = 'all';
+let itemToDeleteIndex = -1;
+let smeltSlots = [null, null, null, null];
+
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    // Toggle Floating Shop Button Visibility
-    // Only visible on Main Menu (screen-menu) initially
-    // Detailed logic for sub-menus is handled in showSubMenu/resetMenu
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if (shopBtn) {
+    const radialContainer = document.getElementById("radialMenuContainer");
+    if (radialContainer) {
         if (id === 'screen-menu') {
-            shopBtn.style.display = 'block';
+            radialContainer.style.display = 'block';
         } else {
-            shopBtn.style.display = 'none';
+            radialContainer.style.display = 'none';
         }
+        closeRadialMenu();
     }
 
     if (id === 'screen-game') {
         resizeCanvas();
-        // Music handled in initGame
     } else if (id === 'screen-result') {
-        // Music handled in endGame
     } else {
-        // Handle BGM
-        if (id === 'screen-shop') {
-            playMusic('bgm_shop');
-        } else if (id === 'screen-pokedex') {
-            playMusic('bgm_pokedex');
-        } else if (id === 'screen-achievements') {
-            playMusic('bgm_achievements');
-        } else if (id === 'screen-menu' || id === 'screen-login') {
-            playMusic('theme'); 
-        } else {
-            playMusic('theme'); 
-        }
+        if (id === 'screen-daily') playMusic('bgm_daily');
+        else if (id === 'screen-shop') playMusic('bgm_store');
+        else if (id === 'screen-inventory') playMusic('bgm_inventory');
+        else if (id === 'screen-smelt') playMusic('bgm_smelt');
+        else if (id === 'screen-pet') playMusic('bgm_pet');
+        else if (id === 'screen-pokedex') playMusic('bgm_pokedex');
+        else if (id === 'screen-achievements') playMusic('bgm_achievements');
+        else playMusic('theme'); 
         
         if (id === 'screen-menu') checkAchievements();
     }
@@ -90,9 +86,8 @@ function showSubMenu(type) {
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "none";
     
-    // CRITICAL FIX: Hide Shop Button in Sub-menus
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if (shopBtn) shopBtn.style.display = 'none';
+    const radialContainer = document.getElementById("radialMenuContainer");
+    if (radialContainer) radialContainer.style.display = 'none';
 
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
@@ -110,9 +105,8 @@ function resetMenu() {
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
     
-    // CRITICAL FIX: Show Shop Button again when back to Main Menu
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if (shopBtn) shopBtn.style.display = 'block';
+    const radialContainer = document.getElementById("radialMenuContainer");
+    if (radialContainer) radialContainer.style.display = 'block';
 
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
@@ -272,6 +266,9 @@ function showDragonSeal() {
 
 function showTitlesModal() {
     document.getElementById("titlesModal").style.display = "flex";
+    const radial = document.getElementById("radialMenuContainer");
+    if(radial) radial.style.display = 'none';
+    
     const container = document.getElementById("titleRoadContainer");
     container.innerHTML = "";
     
@@ -307,6 +304,14 @@ function showTitlesModal() {
         const activeNode = container.querySelector(".title-node.active");
         if(activeNode) activeNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
+}
+
+function closeTitlesModal() {
+    document.getElementById('titlesModal').style.display='none';
+    const menuScreen = document.getElementById("screen-menu");
+    if (menuScreen.classList.contains('active')) {
+        document.getElementById("radialMenuContainer").style.display = 'block';
+    }
 }
 
 function renderSingleList() {
@@ -402,28 +407,34 @@ function editProfile() {
 
 function showHelp() {
     document.getElementById("helpModal").style.display = "flex";
-    // CRITICAL FIX: Hide shop button when Guide is open
-    const shopBtn = document.getElementById("floatingShopBtn");
-    if (shopBtn) shopBtn.style.display = 'none';
+    const radialContainer = document.getElementById("radialMenuContainer");
+    if (radialContainer) radialContainer.style.display = 'none';
 }
 function closeHelp() {
     document.getElementById("helpModal").style.display = "none";
-    // CRITICAL FIX: Restore shop button if we are on Menu screen
-    const shopBtn = document.getElementById("floatingShopBtn");
+    const radialContainer = document.getElementById("radialMenuContainer");
     const menuScreen = document.getElementById("screen-menu");
-    // Check if Menu is active AND we are not in a sub-menu (check layout display)
-    if (menuScreen.classList.contains('active') && shopBtn) {
-        // Also check if menu-layout is visible (meaning not in single/mix mode)
+    if (menuScreen.classList.contains('active') && radialContainer) {
         const menuLayout = document.querySelector(".menu-layout");
         if (menuLayout && menuLayout.style.display !== 'none') {
-             shopBtn.style.display = 'block';
+             radialContainer.style.display = 'block';
         }
     }
 }
 
 function showStatsModal() {
     document.getElementById("statsModal").style.display = "flex";
+    const radial = document.getElementById("radialMenuContainer");
+    if(radial) radial.style.display = 'none';
     drawRadarChartSVG();
+}
+
+function closeStatsModal() {
+    document.getElementById('statsModal').style.display='none';
+    const menuScreen = document.getElementById("screen-menu");
+    if (menuScreen.classList.contains('active')) {
+        document.getElementById("radialMenuContainer").style.display = 'block';
+    }
 }
 
 function calculateStats() {
@@ -660,15 +671,13 @@ function showUnlockNotification(newIds) {
 }
 
 function showShop() {
-    switchScreen("screen-shop");
     renderShop();
 }
 
 function renderShop() {
+    switchScreen("screen-shop");
     const container = document.getElementById("shopContainer");
     container.innerHTML = "";
-    document.getElementById("btnTabShop").classList.add("active");
-    document.getElementById("btnTabInventory").classList.remove("active");
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
     SHOP_ITEMS.forEach(item => {
@@ -684,21 +693,39 @@ function renderShop() {
     });
 }
 
+function filterInventory(type, btn) {
+    currentInvTab = type;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderInventory();
+}
+
 function renderInventory() {
-    const container = document.getElementById("shopContainer");
+    switchScreen("screen-inventory");
+    const container = document.getElementById("inventoryContainer");
     container.innerHTML = "";
-    document.getElementById("btnTabShop").classList.remove("active");
-    document.getElementById("btnTabInventory").classList.add("active");
-    document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
     
-    for(let i=0; i<100; i++) {
+    let filteredItems = gameState.inventory.map((item, index) => ({...item, originalIndex: index}));
+    
+    if (currentInvTab !== 'all') {
+        filteredItems = filteredItems.filter(item => item && item.type === currentInvTab);
+    }
+    
+    const slots = 48;
+    
+    for(let i=0; i<slots; i++) {
         const card = document.createElement("div");
         card.className = "pokedex-card"; 
         
-        if(gameState.inventory[i]) {
+        if(i < filteredItems.length && filteredItems[i]) {
+            const item = filteredItems[i];
+            const realIndex = item.originalIndex;
+            
              card.innerHTML = `
-                <img src="images/items/${gameState.inventory[i].img}" class="pokedex-img">
-                <div class="pokedex-title">${gameState.inventory[i].name}</div>
+                <img src="images/items/${item.img}" class="pokedex-img">
+                <div class="pokedex-title">${item.name}</div>
+                <div class="inv-count-badge">x${item.count}</div>
+                <button class="btn-inv-delete" onclick="promptDeleteItem(${realIndex})">×</button>
              `;
         } else {
              card.style.opacity = "0.5";
@@ -709,4 +736,173 @@ function renderInventory() {
         }
         container.appendChild(card);
     }
+    
+    if (gameState.inventory.length > 48) {
+        alert("警告：背包已滿，請清理物品！");
+    }
 }
+
+function promptDeleteItem(index) {
+    itemToDeleteIndex = index;
+    const item = gameState.inventory[index];
+    document.getElementById("deleteItemName").innerText = item.name + " (擁有: " + item.count + ")";
+    document.getElementById("deleteCount").value = 1;
+    document.getElementById("deleteCount").max = item.count;
+    document.getElementById("deleteModal").style.display = "flex";
+}
+
+function confirmDelete() {
+    if (itemToDeleteIndex === -1) return;
+    const count = parseInt(document.getElementById("deleteCount").value);
+    const item = gameState.inventory[itemToDeleteIndex];
+    if (count >= item.count) {
+        gameState.inventory.splice(itemToDeleteIndex, 1);
+    } else {
+        item.count -= count;
+    }
+    saveGame();
+    renderInventory();
+    document.getElementById("deleteModal").style.display = "none";
+}
+
+function renderDailyTasks() {
+    switchScreen("screen-daily");
+    const container = document.getElementById("dailyContainer");
+    container.innerHTML = "";
+    
+    const tasks = [
+        { id: 1, desc: "完成 1 次任意試煉", progress: "0/1", complete: false, claimed: false },
+        { id: 2, desc: "獲得 100 點經驗值", progress: "0/100", complete: false, claimed: false },
+        { id: 3, desc: "溫習 5 分鐘", progress: "0/5", complete: false, claimed: false },
+        { id: 4, desc: "在商店購買 1 件物品", progress: "0/1", complete: false, claimed: false },
+        { id: 5, desc: "完美通關 1 次", progress: "0/1", complete: false, claimed: false }
+    ];
+
+    tasks.forEach(t => {
+        const row = document.createElement("div");
+        row.className = "task-row" + (t.complete ? " completed" : "");
+        
+        let btnClass = "btn-claim";
+        let btnText = "領取";
+        let disabled = "disabled";
+        
+        if (t.claimed) {
+            btnText = "已領取";
+        } else if (t.complete) {
+            btnClass += " ready";
+            disabled = "";
+        }
+        
+        row.innerHTML = `
+            <div style="display:flex; flex-direction:column;">
+                <span class="task-desc">${t.desc}</span>
+                <span class="task-status">${t.progress}</span>
+            </div>
+            <button class="${btnClass}" ${disabled} onclick="claimTaskReward(${t.id})">${btnText}</button>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function claimTaskReward(id) {
+    alert("領取了獎勵！(金幣/碎片)");
+}
+
+function renderSmelting() {
+    switchScreen("screen-smelt");
+    const container = document.getElementById("smeltContainer");
+    container.innerHTML = "";
+    
+    for(let i=0; i<4; i++) {
+        const slot = document.createElement("div");
+        slot.className = "smelt-slot" + (smeltSlots[i] ? " filled" : "");
+        
+        if (smeltSlots[i]) {
+            slot.innerHTML = `
+                <img src="images/items/${smeltSlots[i].img}" style="width:60%; height:60%; object-fit:contain;">
+                <div style="font-size:0.8rem; font-weight:bold;">${smeltSlots[i].name}</div>
+            `;
+        } else {
+            slot.innerHTML = `<div class="smelt-plus">+</div>`;
+        }
+        
+        slot.onclick = () => {
+            if(!smeltSlots[i]) {
+                alert("請從背包選擇物品添加 (功能開發中: 預設添加鐵線)");
+                smeltSlots[i] = { name: "鐵線", img: "item_wire.PNG", count: 1 };
+                renderSmelting();
+            } else {
+                smeltSlots[i] = null;
+                renderSmelting();
+            }
+        };
+        container.appendChild(slot);
+    }
+}
+
+function initSmelt() {
+    if (smeltSlots.every(s => s === null)) return alert("請先添加材料！");
+    document.getElementById("smeltConfirmModal").style.display = "flex";
+}
+
+function executeSmelt() {
+    document.getElementById("smeltConfirmModal").style.display = "none";
+    smeltSlots = [null, null, null, null];
+    renderSmelting();
+    alert("熔煉成功！(獲得: 未知物品)");
+}
+
+function showRecipes() {
+    document.getElementById("recipeModal").style.display = "flex";
+}
+
+function renderPets() {
+    switchScreen("screen-pet");
+    const container = document.getElementById("petContainer");
+    container.innerHTML = "";
+    
+    for(let i=0; i<20; i++) {
+        const card = document.createElement("div");
+        card.className = "pokedex-card";
+        
+        if(gameState.pets[i]) {
+            card.innerHTML = `
+                <img src="images/pets/${gameState.pets[i].img}" class="pokedex-img">
+                <div class="pokedex-title">${gameState.pets[i].name}</div>
+            `;
+        } else {
+            card.style.opacity = "0.5";
+            card.innerHTML = `
+                <div style="width:100%; height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">?</div>
+                <div class="shop-title">寵物位 ${i+1}</div>
+            `;
+        }
+        container.appendChild(card);
+    }
+}
+
+function toggleRadialMenu() {
+    const container = document.getElementById("radialMenuContainer");
+    if (container.classList.contains("open")) {
+        closeRadialMenu();
+    } else {
+        container.classList.add("open");
+        playSFX('click');
+    }
+}
+
+function closeRadialMenu() {
+    const container = document.getElementById("radialMenuContainer");
+    if (container) container.classList.remove("open");
+}
+
+document.addEventListener('click', function(e) {
+    const radialContainer = document.getElementById("radialMenuContainer");
+    const mainBtn = document.getElementById("radialMainBtn");
+    
+    if (radialContainer && radialContainer.classList.contains("open")) {
+        if (!radialContainer.contains(e.target) && e.target !== mainBtn && !mainBtn.contains(e.target)) {
+            closeRadialMenu();
+        }
+    }
+});
