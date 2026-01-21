@@ -208,6 +208,13 @@ function closeContentModal() {
         gameState.stats.totalStudyMins += minutes;
         gameState.stats.energyRecovered += earned;
         checkAchievements();
+        
+        let quest2 = gameState.dailyTasks.find(t => t.id === 2);
+        if(quest2) {
+            quest2.progress += minutes;
+            saveGame();
+        }
+
         saveGame();
         updateUserDisplay();
         alert(`溫習了 ${minutes} 分鐘，浩然之氣 +${earned}！`);
@@ -684,7 +691,7 @@ function renderShop() {
         const card = document.createElement("div");
         card.className = "shop-card";
         card.innerHTML = `
-            <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_shop.PNG'">
+            <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="shop-title">${item.name}</div>
             <div class="shop-price">$${item.price}</div>
             <button class="btn-secondary" style="width:100%; margin:5px 0 0 0;" onclick="alert('功能開發中...')">購買</button>
@@ -770,42 +777,69 @@ function renderDailyTasks() {
     const container = document.getElementById("dailyContainer");
     container.innerHTML = "";
     
-    const tasks = [
-        { id: 1, desc: "完成 1 次任意試煉", progress: "0/1", complete: false, claimed: false },
-        { id: 2, desc: "獲得 100 點經驗值", progress: "0/100", complete: false, claimed: false },
-        { id: 3, desc: "溫習 5 分鐘", progress: "0/5", complete: false, claimed: false },
-        { id: 4, desc: "在商店購買 1 件物品", progress: "0/1", complete: false, claimed: false },
-        { id: 5, desc: "完美通關 1 次", progress: "0/1", complete: false, claimed: false }
-    ];
+    DAILY_QUESTS.forEach(quest => {
+        let userState = gameState.dailyTasks.find(t => t.id === quest.id);
+        
+        if (!userState) {
+            userState = { id: quest.id, progress: 0, complete: false, claimed: false };
+            gameState.dailyTasks.push(userState);
+        }
 
-    tasks.forEach(t => {
+        let descText = quest.desc;
+        if(quest.id === 6 || quest.id === 7) {
+            const chapterKey = userState.targetKey;
+            const chapterName = (chapterKey && db[chapterKey]) ? db[chapterKey].title : "隨機篇章";
+            descText = descText.replace("指定篇章", chapterName);
+        }
+
         const row = document.createElement("div");
-        row.className = "task-row" + (t.complete ? " completed" : "");
+        const isComplete = userState.progress >= quest.target;
+        
+        let rowClass = "task-row";
+        if (userState.claimed) rowClass += " completed"; 
+        else if (isComplete) rowClass += " can-claim";
+        
+        row.className = rowClass;
         
         let btnClass = "btn-claim";
-        let btnText = "領取";
+        let btnText = "未完成";
         let disabled = "disabled";
         
-        if (t.claimed) {
+        if (userState.claimed) {
             btnText = "已領取";
-        } else if (t.complete) {
-            btnClass += " ready";
+            btnClass += " yellow";
+        } else if (isComplete) {
+            btnText = "領取";
+            btnClass += " red";
             disabled = "";
+        } else {
+            btnClass += " gray";
         }
         
         row.innerHTML = `
             <div style="display:flex; flex-direction:column;">
-                <span class="task-desc">${t.desc}</span>
-                <span class="task-status">${t.progress}</span>
+                <span class="task-desc">${descText}</span>
+                <span class="task-reward-info">獎勵: ${quest.reward} 金幣</span>
+                <span style="font-size:0.8rem; color:#7f8c8d;">進度: ${userState.progress}/${quest.target}</span>
             </div>
-            <button class="${btnClass}" ${disabled} onclick="claimTaskReward(${t.id})">${btnText}</button>
+            <button class="${btnClass}" ${disabled} onclick="claimTaskReward(${quest.id})">${btnText}</button>
         `;
         container.appendChild(row);
     });
 }
 
 function claimTaskReward(id) {
-    alert("領取了獎勵！(金幣/碎片)");
+    const quest = DAILY_QUESTS.find(q => q.id === id);
+    const userState = gameState.dailyTasks.find(t => t.id === id);
+    
+    if(quest && userState && !userState.claimed && userState.progress >= quest.target) {
+        userState.claimed = true;
+        gameState.user.coins = Math.min(gameState.user.coins + quest.reward, GAME_CONFIG.MAX_COINS);
+        saveGame();
+        playSFX('success');
+        renderDailyTasks();
+        alert(`成功領取獎勵：${quest.reward} 金幣！`);
+    }
 }
 
 function renderSmelting() {

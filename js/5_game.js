@@ -4,12 +4,34 @@ function handleLogin() {
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
     
-    // FORCE PLAY MUSIC IMMEDIATELY
     playMusic('theme'); 
 
     const c = g + l;
     gameState.user.name = n;
     gameState.user.class = c;
+    
+    const today = new Date().toDateString();
+    if(gameState.user.lastLoginDate !== today) {
+        gameState.user.lastLoginDate = today;
+        gameState.dailyTasks = [];
+        
+        for(let i=1; i<=5; i++) {
+            gameState.dailyTasks.push({ id: i, progress: 0, complete: false, claimed: false });
+        }
+        
+        const keys = Object.keys(db);
+        if(keys.length > 0) {
+            const randomKey1 = keys[Math.floor(Math.random() * keys.length)];
+            const randomKey2 = keys[Math.floor(Math.random() * keys.length)];
+            
+            gameState.dailyTasks.push({ id: 6, progress: 0, complete: false, claimed: false, targetKey: randomKey1 });
+            gameState.dailyTasks.push({ id: 7, progress: 0, complete: false, claimed: false, targetKey: randomKey2 });
+        }
+    }
+    
+    let loginTask = gameState.dailyTasks.find(t => t.id === 1);
+    if(loginTask && loginTask.progress < 1) loginTask.progress = 1;
+
     saveGame();
     updateUserDisplay();
     
@@ -37,406 +59,322 @@ function updateLevel() {
 
 function confirmSingleGame() {
     if (!pendingSingleChapterKey) return;
-    const k = pendingSingleChapterKey;
-    gameState.mode = 'single';
-    gameState.currentChapterKey = k;
-    switchScreen("screen-difficulty");
-    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
-    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
-    document.getElementById("energyCostInfo").innerText = `消耗浩然之氣：初階 ${jrCost} / 高階 ${srCost}`;
-}
-
-function randomSelectMix() {
-    deselectAllMix();
-    const countVal = document.getElementById("mixRandomCount").value;
-    const count = parseInt(countVal, 10);
-    const allCheckboxes = Array.from(document.querySelectorAll("#mixChapterList input[type='checkbox']"));
-    const totalChapters = allCheckboxes.length;
-    if (totalChapters < 2) return;
-    
-    for (let i = totalChapters - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [allCheckboxes[i], allCheckboxes[j]] = [allCheckboxes[j], allCheckboxes[i]];
-    }
-    
-    for (let i = 0; i < count; i++) {
-        allCheckboxes[i].checked = true;
-    }
-    confirmMixMode(); 
+    initGame('single');
 }
 
 function confirmMixMode() {
-    const chks = document.querySelectorAll("#mixChapterList input:checked");
-    if(chks.length < 2) return alert("最少選擇 2 篇！");
-    gameState.mode = 'mix';
-    gameState.currentChapterKey = "mix";
-    gameState.mixSelectedKeys = Array.from(chks).map(c => c.value);
-    switchScreen("screen-difficulty");
-    const count = gameState.mixSelectedKeys.length;
-    const jrCost = count * GAME_CONFIG.ENERGY_COST_JR_SINGLE;
-    const srCost = count * GAME_CONFIG.ENERGY_COST_SR_SINGLE;
-    document.getElementById("energyCostInfo").innerText = `消耗浩然之氣：初階 ${jrCost} / 高階 ${srCost}`;
+    const count = document.querySelectorAll("#mixChapterList input:checked").length;
+    if (count < 2) return alert("請至少選擇 2 篇範文！");
+    
+    gameState.mixSelectedKeys = [];
+    document.querySelectorAll("#mixChapterList input:checked").forEach(chk => {
+        gameState.mixSelectedKeys.push(chk.value);
+    });
+    initGame('mix');
 }
 
-function initGame(diff) {
-    let cost = 0;
-    if (gameState.mode === 'single') {
-        cost = (diff === 'junior') ? GAME_CONFIG.ENERGY_COST_JR_SINGLE : GAME_CONFIG.ENERGY_COST_SR_SINGLE;
-    } else {
-        const count = gameState.mixSelectedKeys.length;
-        cost = (diff === 'junior') ? count * GAME_CONFIG.ENERGY_COST_JR_SINGLE : count * GAME_CONFIG.ENERGY_COST_SR_SINGLE;
-    }
-    if (gameState.user.energy < cost) {
-        alert("浩然之氣不足！請前往惡龍圖鑑溫習。");
-        return;
-    }
+function randomSelectMix() {
+    const count = parseInt(document.getElementById("mixRandomCount").value);
+    const keys = Object.keys(db);
+    if (count > keys.length) return alert("選擇數量超過現有篇章總數！");
+    
+    deselectAllMix();
+    const shuffled = keys.sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, count);
+    
+    selected.forEach(k => {
+        const chk = document.querySelector(`#mixChapterList input[value='${k}']`);
+        if (chk) chk.checked = true;
+    });
+    checkMixCount();
+}
+
+function initGame(mode) {
+    gameState.mode = mode;
+    gameState.pool = [];
+    gameState.history = [];
+    gameState.wrongCount = 0;
+    gameState.currentIndex = 0;
+    
+    const diff = document.querySelector("#screen-difficulty");
+    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
+    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    
+    document.getElementById("energyCostInfo").innerText = `消耗：初階 ${jrCost} / 高階 ${srCost}`;
+    switchScreen('screen-difficulty');
+}
+
+function initGame(difficulty) {
+    const mode = gameState.mode; 
+    let cost = (difficulty === 'junior') ? GAME_CONFIG.ENERGY_COST_JR_SINGLE : GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    
+    if (gameState.user.energy < cost) return alert("浩然之氣不足！請前往圖鑑溫習。");
+    
     gameState.user.energy -= cost;
-    gameState.stats.totalAttempts++; 
-    saveGame();
-    gameState.difficulty = diff;
-    gameState.user.hp = 100;
+    gameState.difficulty = difficulty;
+    
+    let selectedChapters = [];
+    if (mode === 'single') {
+        selectedChapters.push(pendingSingleChapterKey);
+    } else {
+        selectedChapters = gameState.mixSelectedKeys;
+    }
+    
+    gameState.currentChapterKey = (mode === 'single') ? pendingSingleChapterKey : "mix"; 
+    
+    let allQs = [];
+    selectedChapters.forEach(key => {
+        const list = db[key][difficulty];
+        if(list) allQs = allQs.concat(list);
+    });
+    
+    if (allQs.length === 0) return alert("該模式暫無題目數據！");
+    
+    gameState.pool = allQs.sort(() => 0.5 - Math.random()).slice(0, 10); 
+    
     gameState.currentIndex = 0;
     gameState.wrongCount = 0;
     gameState.history = [];
-    let rawPool = [];
-    if (gameState.mode === 'single') {
-        const k = gameState.currentChapterKey;
-        let arr = [];
-        if (diff === 'junior') {
-            arr = db[k].junior || [];
-        } else {
-            arr = db[k].senior || [];
-        }
-        rawPool = arr.map(q => ({...q, chapterTitle: db[k].title}));
-        gameState.currentDragon = "images/dragons/" + db[k].img;
-    } else {
-        gameState.mixSelectedKeys.forEach(k => {
-            let arr = [];
-            if (diff === 'junior') {
-                arr = db[k].junior || [];
-            } else {
-                arr = db[k].senior || [];
-            }
-            let tagged = arr.map(q => ({...q, chapterTitle: db[k].title}));
-            rawPool = rawPool.concat(tagged);
-        });
-        gameState.currentDragon = "images/dragons/dragon_mix.jpg";
-    }
-    if (rawPool.length === 0) {
-        alert("此模式/難度暫無題目！請檢查資料庫檔案。");
-        return;
-    }
-    gameState.pool = JSON.parse(JSON.stringify(rawPool));
-    for (let i = gameState.pool.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [gameState.pool[i], gameState.pool[j]] = [gameState.pool[j], gameState.pool[i]];
-    }
-    document.getElementById("bossImage").src = gameState.currentDragon;
-    updateUserDisplay();
-    updateBars();
-    updateCrackStage();
-    switchScreen("screen-game");
-    renderQuestion();
     
-    // Play correct battle BGM
-    if (diff === 'junior') playMusic('bgm_battle_jr');
-    else playMusic('bgm_battle_sr');
+    if (mode === 'single') {
+        gameState.currentDragon = db[pendingSingleChapterKey].img || "dragon_unknown.jpg";
+    } else {
+        gameState.currentDragon = "dragon_mix.jpg";
+    }
+    
+    document.getElementById("bossImage").src = "images/dragons/" + gameState.currentDragon;
+    
+    const titleText = (mode === 'single') ? db[pendingSingleChapterKey].title : "混合試煉";
+    document.getElementById("battleChapterText").innerText = `${titleText} (${difficulty === 'junior' ? '初階' : '高階'})`;
+    
+    playMusic(difficulty === 'junior' ? 'bgm_battle_jr' : 'bgm_battle_sr');
+    switchScreen("screen-game");
+    updateBars();
+    renderQuestion();
 }
 
 function renderQuestion() {
-    inputLock = false;
-    gameState.wrongGuesses = [];
-    const input = document.getElementById("answerInput");
-    const mcDiv = document.getElementById("inputAreaJunior");
-    input.value = "";
-    input.classList.remove("correct-flash");
-    mcDiv.innerHTML = "";
-    document.getElementById("msgBox").innerText = "";
-    const bossImg = document.getElementById("bossImage");
-    bossImg.classList.remove("dragon-attack");
-    bossImg.classList.remove("boss-damage");
-    const qBox = document.getElementById("questionBox");
-    qBox.classList.remove("player-attack");
-    qBox.classList.remove("shake-box");
-    if(gameState.currentIndex >= gameState.pool.length) {
-        endGame(true);
+    if (gameState.currentIndex >= gameState.pool.length) {
+        endGame();
         return;
     }
-    document.getElementById("gameProgress").innerText = `進度：${gameState.currentIndex + 1} / ${gameState.pool.length}`;
+    
     const q = gameState.pool[gameState.currentIndex];
-    document.getElementById("battleChapterText").innerText = q.chapterTitle;
+    document.getElementById("gameProgress").innerText = `進度：${gameState.currentIndex + 1} / ${gameState.pool.length}`;
     document.getElementById("qLine").innerText = q.line;
     document.getElementById("qWord").innerText = q.word;
-    gameState.wrongCount = 0;
-    if(gameState.difficulty === 'senior') {
-        document.getElementById("inputAreaSenior").style.display = "block";
-        document.getElementById("inputAreaJunior").style.display = "none";
-        input.focus();
+    document.getElementById("msgBox").innerText = "";
+    
+    updateCrackStage();
+    
+    const jrArea = document.getElementById("inputAreaJunior");
+    const srArea = document.getElementById("inputAreaSenior");
+    
+    if (gameState.difficulty === 'junior') {
+        srArea.style.display = 'none';
+        jrArea.style.display = 'grid';
+        jrArea.innerHTML = "";
+        
+        let opts = [...q.options];
+        opts = opts.sort(() => 0.5 - Math.random());
+        
+        opts.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "mc-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, btn);
+            jrArea.appendChild(btn);
+        });
     } else {
-        document.getElementById("inputAreaSenior").style.display = "none";
-        document.getElementById("inputAreaJunior").style.display = "grid";
-        generateMC(q);
+        jrArea.style.display = 'none';
+        srArea.style.display = 'block';
+        document.getElementById("answerInput").value = "";
+        document.getElementById("answerInput").focus();
+        inputLock = false;
     }
-}
-
-function generateMC(q) {
-    const div = document.getElementById("inputAreaJunior");
-    div.innerHTML = "";
-    let opts = [];
-    if (q.options && q.options.length > 0) {
-        opts = [...q.options];
-    } else {
-        opts = [q.answer]; 
-    }
-    opts.sort(() => Math.random() - 0.5);
-    opts.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "mc-btn";
-        btn.innerText = opt;
-        btn.onclick = (e) => checkAnswer(opt, e.target);
-        div.appendChild(btn);
-    });
 }
 
 function submitSeniorAnswer() {
-    const input = document.getElementById("answerInput");
-    const val = input.value.trim();
-    if(!/^[\u4e00-\u9fa5]+$/.test(val)) {
-        const msg = document.getElementById("msgBox");
-        msg.innerText = "請輸入純中文字，不可包含符號或英文！";
-        triggerAnimation(document.querySelector(".question-box"), "shake-box");
-        return;
-    }
-    checkAnswer(val, input);
+    if(inputLock) return;
+    const input = document.getElementById("answerInput").value.trim();
+    if(!input) return;
+    inputLock = true;
+    checkAnswer(input, null);
 }
 
-function getCenter(element) {
-    const rect = element.getBoundingClientRect();
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-}
-
-function checkAnswer(userVal, uiElement) {
-    if (inputLock) return;
-    if (gameState.difficulty === 'senior' && gameState.wrongGuesses.includes(userVal)) {
-        document.getElementById("msgBox").innerText = "此答案已嘗試過，請嘗試其他答案！";
-        document.getElementById("msgBox").style.color = "var(--primary-blue)";
-        return;
-    }
-    const currentQ = gameState.pool[gameState.currentIndex];
-    const bossImg = document.getElementById("bossImage");
-    const qBox = document.getElementById("questionBox");
-    const correctAnswers = currentQ.answer.split('/').map(s => s.trim());
-
-    gameState.stats.tryCount++;
-
-    if(correctAnswers.includes(userVal)) {
-        inputLock = true;
-        playSFX('correct'); 
-        triggerAnimation(uiElement, "correct-flash");
-        triggerAnimation(qBox, "player-attack");
-        setTimeout(() => {
-            triggerAnimation(bossImg, "boss-damage");
-            if (!gameState.solvedQuestionIds.includes(currentQ.id) || gameState.user.unlockedReplayXP) {
-                gameState.user.xp += GAME_CONFIG.XP_WIN;
-                document.getElementById("msgBox").innerText = `正確！+${GAME_CONFIG.XP_WIN} XP`;
-            } else {
-                document.getElementById("msgBox").innerText = "正確！(已獲得過經驗)";
-            }
-            if (!gameState.solvedQuestionIds.includes(currentQ.id)) {
-                gameState.solvedQuestionIds.push(currentQ.id);
-            }
-            if(gameState.difficulty === 'senior') {
-                if (!gameState.solvedSeniorQuestionIds.includes(currentQ.id)) {
-                    gameState.solvedSeniorQuestionIds.push(currentQ.id);
-                }
-            }
-            gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
-            updateLevel(); 
-            updateCrackStage();
-            recordHistory(userVal, true);
-            document.getElementById("msgBox").style.color = "var(--primary-blue)";
-            setTimeout(() => {
-                gameState.currentIndex++;
-                renderQuestion();
-            }, 800);
-        }, 300);
+function checkAnswer(userAns, btnElement) {
+    const q = gameState.pool[gameState.currentIndex];
+    const isCorrect = (userAns === q.answer);
+    
+    gameState.history.push({ q: q, userAns: userAns, isCorrect: isCorrect });
+    
+    if (isCorrect) {
+        playSFX('correct');
+        document.getElementById("msgBox").innerText = "正確！";
+        document.getElementById("msgBox").style.color = "var(--hp-green)";
+        gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
+        triggerAnimation(document.getElementById("questionBox"), "correct-flash");
+        
+        if(!gameState.solvedQuestionIds.includes(q.id)) {
+            gameState.solvedQuestionIds.push(q.id);
+        }
+        
+        gameState.stats.totalCorrect++;
+        if(gameState.difficulty === 'senior') gameState.stats.srCorrect++;
+        
     } else {
         playSFX('wrong');
+        document.getElementById("msgBox").innerText = `錯誤！正確答案：${q.answer}`;
+        document.getElementById("msgBox").style.color = "var(--primary-red)";
+        gameState.user.hp -= GAME_CONFIG.HP_PENALTY;
+        gameState.wrongCount++;
         gameState.stats.wrongCountTotal++;
-
-        if (gameState.difficulty === 'junior') {
-            uiElement.disabled = true;
-        } else {
-            gameState.wrongGuesses.push(userVal);
+        gameState.stats.tryCount++;
+        
+        triggerAnimation(document.getElementById("bossImage"), "dragon-attack");
+        triggerAnimation(document.getElementById("questionBox"), "shake-box");
+        
+        if (gameState.difficulty === 'junior' && btnElement) {
+            btnElement.style.background = "#e74c3c"; 
+            btnElement.style.color = "white";
         }
-        const bossRect = bossImg.getBoundingClientRect();
-        const startX = bossRect.left + bossRect.width / 2;
-        const startY = bossRect.bottom - 20; 
-        const end = getCenter(qBox);
-        fireBeam(startX, startY, end.x, end.y, '#e74c3c');
+        
+        if (!gameState.wrongGuesses.includes(q.id)) gameState.wrongGuesses.push(q.id);
+    }
+    
+    updateBars();
+    
+    if (gameState.user.hp <= 0) {
+        setTimeout(endGame, 1000); 
+    } else {
         setTimeout(() => {
-            for(let i=0; i<10; i++) createParticle(end.x, end.y, '#e74c3c', 'spark');
-            gameState.wrongCount++;
-            gameState.stats.totalWrong++;
-            gameState.user.hp -= GAME_CONFIG.HP_PENALTY;
-            updateBars();
-            updateCrackStage();
-            const overlay = document.getElementById("damageOverlay");
-            overlay.style.opacity = 1;
-            setTimeout(() => overlay.style.opacity = 0, 200);
-            triggerAnimation(bossImg, "dragon-attack");
-            triggerAnimation(qBox, "shake-box");
-            if(gameState.user.hp <= 0) {
-                inputLock = true;
-                qBox.classList.add("anim-explode");
-                recordHistory(userVal, false);
-                setTimeout(() => endGame(false), 600);
-                return;
-            }
-            if(gameState.wrongCount >= 3) {
-                inputLock = true;
-                recordHistory(userVal, false);
-                document.getElementById("msgBox").innerText = "錯誤次數過多！跳過此題";
-                document.getElementById("msgBox").style.color = "var(--primary-red)";
-                setTimeout(() => {
-                    gameState.currentIndex++;
-                    renderQuestion();
-                }, 1000);
-            } else {
-                document.getElementById("msgBox").innerText = `錯誤！-${GAME_CONFIG.HP_PENALTY} HP (剩餘機會：${3 - gameState.wrongCount})`;
-                document.getElementById("msgBox").style.color = "var(--primary-red)";
-            }
-        }, 300);
+            gameState.currentIndex++;
+            renderQuestion();
+        }, 1500);
     }
 }
 
-function recordHistory(val, isCorrect) {
-    gameState.history.push({
-        q: gameState.pool[gameState.currentIndex],
-        userAns: val,
-        isCorrect: isCorrect
-    });
+function goHome() {
+    if(confirm("確定要逃跑嗎？這將視為戰敗！")) {
+        switchScreen("screen-menu");
+    }
 }
 
-function endGame(completed) {
-    // Determine Result Logic
-    // Defeat if: 
-    // 1. HP <= 0 (Died)
-    // 2. Correct answers = 0 (Total failure)
-    // 3. Correct answers < 50% of total
+function endGame() {
+    const isDead = gameState.user.hp <= 0;
+    const isPerfect = (gameState.wrongCount === 0 && !isDead);
+    let resultImg = "img_defeat.PNG";
+    let title = "挑戰失敗";
+    let gainedXP = 0;
+    let earnedCoins = 0;
     
-    const correctCount = gameState.history.filter(h => h.isCorrect).length;
-    const totalQuestions = gameState.pool.length;
-    const isAlive = gameState.user.hp > 0;
-    
-    let resultType = 'defeat';
-
-    if (!isAlive) {
-        resultType = 'defeat';
-    } else if (correctCount === 0) {
-        resultType = 'defeat';
-    } else if (correctCount < (totalQuestions / 2)) {
-        resultType = 'defeat';
-    } else {
-        if (correctCount === totalQuestions && gameState.user.hp === 100) {
-             resultType = 'perfect';
-        } else {
-             resultType = 'success';
-        }
-    }
-
-    if (resultType === 'perfect') {
-        playMusic('bgm_victory');
-        document.getElementById("resultImg").src = "images/results/img_perfect.PNG";
-        document.getElementById("endTitle").innerText = "完美通關！";
-        document.getElementById("endTitle").style.color = "#f1c40f";
-        gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_PERFECT);
-
-        const currentChapKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
-        if (currentChapKey !== 'mix') { 
-            if (gameState.stats.lastPerfectChapter !== currentChapKey) {
-                gameState.stats.consecutivePerfect++; 
-                gameState.stats.lastPerfectChapter = currentChapKey;
-            } else {
-                gameState.stats.consecutivePerfect = 0; 
-                gameState.stats.lastPerfectChapter = ""; 
-            }
-        }
-        
-        if (!gameState.stats.perfectChapterIds) gameState.stats.perfectChapterIds = [];
-        
-        if (!gameState.stats.perfectChapterIds.includes(currentChapKey) && currentChapKey !== 'mix') {
-            gameState.stats.perfectChapterIds.push(currentChapKey);
-        }
-
-    } else if (resultType === 'success') {
-        playMusic('bgm_success');
-        document.getElementById("resultImg").src = "images/results/img_success.PNG";
-        document.getElementById("endTitle").innerText = "順利通關！";
-        document.getElementById("endTitle").style.color = "#2ecc71";
-        gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_SUCCESS);
-        gameState.stats.consecutivePerfect = 0;
-        gameState.stats.lastPerfectChapter = "";
-    } else {
+    if (isDead) {
         playMusic('bgm_defeat');
-        document.getElementById("resultImg").src = "images/results/img_defeat.PNG";
-        document.getElementById("endTitle").innerText = "力竭戰敗...";
-        document.getElementById("endTitle").style.color = "#e74c3c";
-        gameState.stats.consecutivePerfect = 0;
-        gameState.stats.lastPerfectChapter = "";
-    }
-
-    if(resultType === 'perfect' && !gameState.unlockedAchievements.includes("ach_7")) {
-        if(gameState.stats.perfectChapterIds && gameState.stats.perfectChapterIds.length >= 3) gameState.unlockedAchievements.push("ach_7");
-    }
-    
-    if(resultType !== 'defeat') {
-        if(gameState.user.hp < 10 && !gameState.unlockedAchievements.includes("ach_8")) gameState.unlockedAchievements.push("ach_8");
-        if(gameState.user.hp < 5 && !gameState.unlockedAchievements.includes("ach_9")) gameState.unlockedAchievements.push("ach_9");
-    }
-
-    if (gameState.mode === 'mix' && resultType !== 'defeat') {
-        gameState.stats.mixWinCount++;
-        const count = gameState.mixSelectedKeys.length;
-        if(count >= 5) gameState.stats.mixWinCount5++;
-        if(count >= 10) gameState.stats.mixWinCount10++;
-        if(count >= 16) gameState.stats.mixWinCount16++;
-    }
-
-    if(document.getElementById("mixRandomCount").value && gameState.mode === 'mix' && resultType !== 'defeat') {
-       gameState.stats.randomWinCount++;
-    }
-
-    if (gameState.mode === 'mix' && gameState.mixSelectedKeys.length === 16 && (resultType === 'perfect' || resultType === 'success')) {
-        if (!gameState.user.unlockedReplayXP) {
-            gameState.user.unlockedReplayXP = true;
-            alert("恭喜！您已通過16篇混合試煉，解鎖「無限經驗」模式！重複答題現在也可獲得經驗值。");
-        }
-    }
-    checkAchievements();
-    saveGame();
-    switchScreen("screen-result");
-    if(resultType === 'perfect') {
-        if (gameState.mode === 'single') {
-            const key = gameState.currentChapterKey + '_' + gameState.difficulty;
-            if (!gameState.masteredChapters.includes(key)) {
-                gameState.masteredChapters.push(key);
-                saveGame();
+        title = "勝敗乃兵家常事...";
+    } else {
+        const totalQ = gameState.pool.length;
+        const correctCount = gameState.history.filter(h => h.isCorrect).length;
+        
+        let baseCoins = correctCount * GAME_CONFIG.COIN_PER_Q;
+        let multiplier = (correctCount === totalQ) ? 2 : 1;
+        earnedCoins = baseCoins * multiplier;
+        
+        gameState.user.coins = Math.min(gameState.user.coins + earnedCoins, GAME_CONFIG.MAX_COINS);
+        
+        gainedXP = GAME_CONFIG.XP_WIN;
+        if (isPerfect) gainedXP += 5; 
+        
+        gameState.user.xp = Math.min(gameState.user.xp + gainedXP, GAME_CONFIG.MAX_XP);
+        gameState.stats.totalPlayTime += 1; 
+        
+        if (isPerfect) {
+            resultImg = "img_perfect.PNG";
+            title = "完美通關！";
+            playMusic('bgm_victory');
+            gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_PERFECT);
+            
+            gameState.stats.consecutivePerfect++;
+            if (gameState.stats.consecutivePerfect >= 5) checkAchievements();
+            
+            const modeKey = gameState.mode === 'single' ? pendingSingleChapterKey : 'mix';
+            if (modeKey !== 'mix') {
+                let diffKey = modeKey + '_' + gameState.difficulty;
+                if (!gameState.masteredChapters.includes(diffKey)) {
+                    gameState.masteredChapters.push(diffKey);
+                    saveGame();
+                }
             }
-        } else if (gameState.mode === 'mix') {
-            if (gameState.mixSelectedKeys.length === Object.keys(db).length) {
+            
+            // Quest Logic
+            if(gameState.difficulty === 'junior') {
+                if(gameState.dailyTasks[2].progress < 5) {
+                    if(!gameState.stats.perfectChapterIds.includes(modeKey + "_jr")) {
+                        gameState.dailyTasks[2].progress++;
+                        gameState.stats.perfectChapterIds.push(modeKey + "_jr"); 
+                    }
+                }
+                const targetJr = gameState.dailyTasks.find(t => t.id === 6);
+                if(targetJr && targetJr.targetKey === modeKey) {
+                    targetJr.progress = 1;
+                }
+            } else {
+                if(gameState.dailyTasks[3].progress < 5) {
+                    if(!gameState.stats.perfectChapterIds.includes(modeKey + "_sr")) {
+                        gameState.dailyTasks[3].progress++;
+                        gameState.stats.perfectChapterIds.push(modeKey + "_sr"); 
+                    }
+                }
+                const targetSr = gameState.dailyTasks.find(t => t.id === 7);
+                if(targetSr && targetSr.targetKey === modeKey) {
+                    targetSr.progress = 1;
+                }
+            }
+
+        } else {
+            resultImg = "img_success.PNG";
+            title = "挑戰成功！";
+            playMusic('bgm_success');
+            gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_SUCCESS);
+            gameState.stats.consecutivePerfect = 0;
+        }
+        
+        if (gameState.mode === 'mix') {
+            gameState.stats.mixWinCount++;
+            if(gameState.mixSelectedKeys.length >= 5) gameState.stats.mixWinCount5++;
+            if(gameState.mixSelectedKeys.length >= 10) gameState.stats.mixWinCount10++;
+            if(gameState.mixSelectedKeys.length === Object.keys(db).length) gameState.stats.mixWinCount16++;
+            
+            // Quest 5
+            const q5 = gameState.dailyTasks.find(t => t.id === 5);
+            if(q5 && q5.progress < 2) q5.progress++;
+            
+            if (gameState.mixSelectedKeys.length === Object.keys(db).length && isPerfect) {
                 if (!gameState.masteredChapters.includes('mix')) {
                     gameState.masteredChapters.push('mix');
                     saveGame();
                     alert("恭喜！混合試煉完美通關，成功解鎖混合試煉惡龍！");
                 }
             }
+        } else {
+            // Random check logic if needed
         }
     }
+    
+    updateLevel();
+    
+    switchScreen("screen-result");
+    document.getElementById("resultImg").src = "images/results/" + resultImg;
+    document.getElementById("endTitle").innerText = title;
+    
+    let extraMsg = "";
+    if(!isDead) extraMsg = ` (+${earnedCoins} 金幣)`;
+    
     document.getElementById("endLevel").innerText = gameState.user.level;
-    document.getElementById("endXP").innerText = gameState.user.xp;
+    document.getElementById("endXP").innerText = `${gameState.user.xp} (+${gainedXP})${extraMsg}`;
+    
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
+    
     gameState.pool.forEach(q => {
         let record = null;
         for(let i=gameState.history.length-1; i>=0; i--) {
@@ -445,17 +383,24 @@ function endGame(completed) {
                 break;
             }
         }
+        
         const tr = document.createElement("tr");
         let userAnsCell = `<td style="color:gray;">未作答</td>`;
         if (record) {
             const cls = record.isCorrect ? 'res-correct' : 'res-wrong';
             userAnsCell = `<td class="${cls}">${record.userAns}</td>`;
         }
+        
         tr.innerHTML = `
         <td>${q.line} <br><small>(${q.word})</small></td>
         ${userAnsCell}
-        <td class="res-correct">${q.answer}</td>
+        <td>${q.answer}</td>
         `;
         tbody.appendChild(tr);
     });
+}
+
+function backToMenuFromEnd() {
+    switchScreen("screen-menu");
+    updateUserDisplay();
 }

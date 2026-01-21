@@ -1,6 +1,6 @@
 let db = window.questionsDB || {};
 let gameState = {
-    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 0 },
+    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 0, lastLoginDate: "" },
     stats: {
         totalCorrect: 0,
         srCorrect: 0,
@@ -22,6 +22,7 @@ let gameState = {
     },
     inventory: [], 
     pets: [],
+    dailyTasks: [],
     mode: "",
     difficulty: "",
     pool: [],
@@ -51,6 +52,7 @@ function saveGame() {
         stats: gameState.stats,
         inventory: gameState.inventory,
         pets: gameState.pets,
+        dailyTasks: gameState.dailyTasks,
         masteredChapters: gameState.masteredChapters,
         solvedQuestionIds: gameState.solvedQuestionIds,
         unlockedAchievements: gameState.unlockedAchievements
@@ -78,6 +80,7 @@ function applyGameData(parsed) {
     if (typeof gameState.user.energy === 'undefined') gameState.user.energy = 100;
     if (typeof gameState.user.unlockedReplayXP === 'undefined') gameState.user.unlockedReplayXP = false;
     if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 0;
+    if (typeof gameState.user.lastLoginDate === 'undefined') gameState.user.lastLoginDate = "";
     
     gameState.stats = parsed.stats || {};
     ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5', 
@@ -92,6 +95,7 @@ function applyGameData(parsed) {
 
     gameState.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : []; 
     gameState.pets = Array.isArray(parsed.pets) ? parsed.pets : [];
+    gameState.dailyTasks = Array.isArray(parsed.dailyTasks) ? parsed.dailyTasks : [];
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
@@ -101,6 +105,7 @@ function applyGameData(parsed) {
         gameState.solvedQuestionIds = [];
         gameState.unlockedAchievements = [];
         gameState.pets = [];
+        gameState.dailyTasks = [];
     }
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();

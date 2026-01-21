@@ -1,7 +1,7 @@
 const audioFiles = {
     theme: new Audio('audio/bgm/bgm_theme.mp3'),
     
-    bgm_daily: new Audio('audio/bgm/bgm_shop.mp3'),
+    bgm_daily: new Audio('audio/bgm/bgm_daily.mp3'),
     bgm_store: new Audio('audio/bgm/bgm_store.mp3'),
     bgm_inventory: new Audio('audio/bgm/bgm_inventory.mp3'),
     bgm_smelt: new Audio('audio/bgm/bgm_smelt.mp3'),

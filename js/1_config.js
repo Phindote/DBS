@@ -9,7 +9,9 @@ const GAME_CONFIG = {
     ENERGY_REWARD_STUDY: 1,
     MAX_STUDY_MINS: 10,
     MAX_LEVEL: 99,
-    MAX_XP: 9999
+    MAX_XP: 9999,
+    COIN_PER_Q: 10,
+    MAX_COINS: 9999999
 };
 const TITLES = [
     "初心新手", "鐵劍勇者", "龍影覓者", "鱗甲獵手", "龍息破者",
@@ -59,15 +61,20 @@ const ACHIEVEMENTS = [
     {id: "ach_39", title: "浩然正氣", desc: "溫習累計回復 600 點能量"},
     {id: "ach_40", title: "龍脈覺醒", desc: "解鎖前 39 個成就"}
 ];
-const SHOP_ITEMS = [
-    { id: "item_hp_potion", name: "生命藥水", price: 100, desc: "戰鬥中恢復 50 HP", img: "item_potion.PNG", type: "material" },
-    { id: "item_energy_drink", name: "浩然特飲", price: 200, desc: "立即恢復 20 能量", img: "item_drink.PNG", type: "material" },
-    { id: "item_shield", name: "護身符", price: 500, desc: "抵擋一次致命傷害", img: "item_shield.PNG", type: "material" },
-    { id: "item_exp_book", name: "經驗書", price: 1000, desc: "獲得 500 經驗值", img: "item_book.PNG", type: "material" }
+const DAILY_QUESTS = [
+    { id: 1, desc: "每日登入", target: 1, reward: 50, type: "login" },
+    { id: 2, desc: "溫習惡龍圖鑑 10 分鐘", target: 10, reward: 80, type: "study" },
+    { id: 3, desc: "初階完美通關 5 次 (不同篇)", target: 5, reward: 100, type: "perfect_jr_diff" },
+    { id: 4, desc: "高階完美通關 5 次 (不同篇)", target: 5, reward: 150, type: "perfect_sr_diff" },
+    { id: 5, desc: "混合篇章順利通關 2 次", target: 2, reward: 180, type: "mix_win" },
+    { id: 6, desc: "指定篇章初階完美通關 1 次", target: 1, reward: 50, type: "target_jr" },
+    { id: 7, desc: "指定篇章高階完美通關 1 次", target: 1, reward: 80, type: "target_sr" }
 ];
-const PETS = [
-    { id: "pet_001", name: "幼龍", img: "pet_001.PNG" },
-    { id: "pet_002", name: "炎靈", img: "pet_002.PNG" },
+const SHOP_ITEMS = [
+    { id: "item_hp_potion", name: "生命藥水", price: 100, desc: "戰鬥中恢復 50 HP", img: "item_potion.PNG" },
+    { id: "item_energy_drink", name: "浩然特飲", price: 200, desc: "立即恢復 20 能量", img: "item_drink.PNG" },
+    { id: "item_shield", name: "護身符", price: 500, desc: "抵擋一次致命傷害", img: "item_shield.PNG" },
+    { id: "item_exp_book", name: "經驗書", price: 1000, desc: "獲得 500 經驗值", img: "item_book.PNG" }
 ];
 const ASSETS_TO_LOAD = [
     'images/ui/banner.jpg',
@@ -82,7 +89,7 @@ const ASSETS_TO_LOAD = [
     'images/ui/icon_mix.PNG',
     'images/ui/icon_book.PNG',
     'images/ui/icon_trophy.PNG',
-    'images/ui/icon_shop.PNG',
+    'images/ui/icon_core.PNG',
     'images/ui/btn_daily.PNG',
     'images/ui/btn_store.PNG',
     'images/ui/btn_inventory.PNG',
@@ -98,7 +105,4 @@ const ASSETS_TO_LOAD = [
 for(let i=1; i<=40; i++) ASSETS_TO_LOAD.push(`images/achievements/ach_${i}.PNG`);
 SHOP_ITEMS.forEach(item => {
     // ASSETS_TO_LOAD.push(`images/items/${item.img}`);
-});
-PETS.forEach(pet => {
-    // ASSETS_TO_LOAD.push(`images/pets/${pet.img}`);
 });
