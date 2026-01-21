@@ -219,8 +219,13 @@
     position: relative;
     z-index: 20;
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
-    margin-bottom: 5px;
+    margin-bottom: 5px; /* ADJUSTED: Reduced from 5px to 2px to pull footer button up */
 }
+/* ADJUSTED: Force Attack button to stick closer to input */
+.question-box .btn-main {
+    margin-top: 0 !important; /* Removes default top margin, relying on input's bottom margin */
+}
+
 .crack-stage-1 { border-color: #f39c12; border-style: dashed; }
 .crack-stage-2 { border-color: #e67e22; border-style: dashed; transform: rotate(-1deg); }
 .crack-stage-3 { border-color: #d35400; border-style: double; border-width: 4px; transform: rotate(1deg); }
@@ -238,9 +243,8 @@
     border-radius: 5px;
     text-align: center;
     transition: all 0.3s;
-    margin-bottom: 5px; /* Minimal space */
+    margin-bottom: 8px; 
 }
-/* Updated for tighter Senior mode */
 #inputAreaSenior {
     margin-top: 5px;
     margin-bottom: 0;
@@ -492,15 +496,15 @@
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
-    right: 20px; /* Sticks to right */
+    right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row; /* [SubMenu] [MainBtn] */
+    flex-direction: row; 
     align-items: center;
     gap: 15px; 
     touch-action: none;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    justify-content: flex-end; /* Align right */
+    justify-content: flex-end; 
 }
 #floatingMainBtn {
     width: 50px;
@@ -512,7 +516,7 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
-    order: 2; /* Main button on the right */
+    order: 2; 
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -524,7 +528,7 @@
     display: none;
     flex-direction: row; 
     gap: 10px;
-    order: 1; /* Submenu on the left */
+    order: 1; 
 }
 #floatingSubMenu.visible {
     display: flex;
@@ -547,7 +551,7 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: all 0.2s;
     padding: 5px;
-    position: relative; /* For red line positioning */
+    position: relative; 
 }
 .btn-control-float:hover { transform: scale(1.1); }
 .btn-control-float img { width: 100%; height: 100%; object-fit: contain; }
@@ -558,12 +562,12 @@
     position: absolute;
     top: 50%; 
     left: 50%; 
-    width: 60%; /* 60% width */
-    height: 3px; /* Slightly thicker for visibility */
+    width: 60%; 
+    height: 3px; 
     background-color: #e74c3c;
     transform: translate(-50%, -50%) rotate(-45deg);
     border-radius: 2px;
     box-shadow: 0 0 2px rgba(255,255,255,0.8);
     pointer-events: none;
-    z-index: 10; /* Ensure it is above the icon image */
+    z-index: 10; 
 }
