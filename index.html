@@ -190,13 +190,38 @@
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
 <div id="screen-shop" class="screen">
-<h2 style="color:var(--primary-blue); margin-bottom:5px;">補給站</h2>
-<div style="display:flex; justify-content:center; gap:10px; margin-bottom:10px; width:100%;">
-<button id="btnTabShop" class="btn-secondary" onclick="renderShop()">商店</button>
-<button id="btnTabInventory" class="btn-secondary" onclick="renderInventory()">背包</button>
-</div>
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">資源商店</h2>
 <div id="coinDisplay" style="width:100%; text-align:right; color:#d35400; font-weight:bold; padding:0 10px;">金幣：0</div>
 <div class="pokedex-grid" id="shopContainer" style="margin-top:5px;"></div>
+<button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+</div>
+<div id="screen-inventory" class="screen">
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">勇者背包</h2>
+<div class="inventory-tabs">
+<button class="tab-btn active" onclick="filterInventory('all', this)">全部</button>
+<button class="tab-btn" onclick="filterInventory('fragment', this)">碎片</button>
+<button class="tab-btn" onclick="filterInventory('item', this)">成品</button>
+</div>
+<div class="pokedex-grid" id="inventoryContainer" style="margin-top:5px;"></div>
+<button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+</div>
+<div id="screen-daily" class="screen">
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">每日任務</h2>
+<div class="pokedex-grid" id="dailyContainer" style="margin-top:5px; display:block;"></div>
+<button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+</div>
+<div id="screen-smelt" class="screen">
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">熔煉匠堂</h2>
+<div class="smelt-grid-container" id="smeltContainer"></div>
+<div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
+<button class="btn-main" style="margin:0; background:#8e44ad;" onclick="showRecipes()">合成功式</button>
+<button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
+</div>
+<button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+</div>
+<div id="screen-pet" class="screen">
+<h2 style="color:var(--primary-blue); margin-bottom:5px;">龍魄靈獸</h2>
+<div class="pokedex-grid" id="petContainer" style="margin-top:5px;"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
 <div id="screen-difficulty" class="screen">
@@ -292,7 +317,7 @@
 <div class="modal-content" style="max-width:500px; background:#fff; border-radius:15px; overflow:hidden;">
 <div class="modal-header">
 <span>能力屬性</span>
-<span class="modal-close" onclick="document.getElementById('statsModal').style.display='none'">×</span>
+<span class="modal-close" onclick="closeStatsModal()">×</span>
 </div>
 <div style="padding:20px; display:flex; justify-content:center; align-items:center; background:#f9f9f9;">
 <div id="radarContainer"></div>
@@ -306,7 +331,7 @@
 <div class="modal-content">
 <div class="modal-header">
 <span>歷煉之路</span>
-<span class="modal-close" onclick="document.getElementById('titlesModal').style.display='none'">×</span>
+<span class="modal-close" onclick="closeTitlesModal()">×</span>
 </div>
 <div class="modal-body">
 <div class="title-road-container" id="titleRoadContainer"></div>
@@ -353,9 +378,69 @@
 </div>
 </div>
 </div>
-<button id="floatingShopBtn" onclick="showShop()">
-<img src="images/ui/icon_shop.PNG" alt="Shop" onerror="this.src='images/ui/btn_menu.PNG'">
-</button>
+
+<div id="deleteModal" class="modal-backdrop" style="display:none;">
+<div class="modal-content" style="max-width:300px;">
+<div class="modal-header">刪除物品</div>
+<div class="modal-body" style="text-align:center;">
+<p id="deleteItemName">物品名稱</p>
+<input type="number" id="deleteCount" value="1" min="1" style="width:80%; padding:10px; font-size:1.2rem; text-align:center; margin:10px 0;">
+<div style="display:flex; justify-content:center; gap:10px;">
+<button class="btn-secondary" style="background:#e74c3c;" onclick="confirmDelete()">確認刪除</button>
+<button class="btn-secondary" onclick="document.getElementById('deleteModal').style.display='none'">取消</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="smeltConfirmModal" class="modal-backdrop" style="display:none;">
+<div class="modal-content" style="max-width:300px;">
+<div class="modal-header">確認合成</div>
+<div class="modal-body" style="text-align:center;">
+<p>確定要進行熔煉嗎？<br>原材料將會消耗。</p>
+<div style="display:flex; justify-content:center; gap:10px;">
+<button class="btn-secondary" style="background:#27ae60;" onclick="executeSmelt()">確定</button>
+<button class="btn-secondary" onclick="document.getElementById('smeltConfirmModal').style.display='none'">取消</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="recipeModal" class="modal-backdrop" style="display:none;">
+<div class="modal-content">
+<div class="modal-header">
+<span>合成功式</span>
+<span class="modal-close" onclick="document.getElementById('recipeModal').style.display='none'">×</span>
+</div>
+<div class="modal-body" id="recipeListBody">
+<div class="recipe-row">範例：鐵線 x2 + 晶石 x1 = 強化鐵線</div>
+</div>
+</div>
+</div>
+
+<div id="radialMenuContainer" class="radial-menu-container">
+    <div class="radial-items">
+        <button class="radial-sub-btn" onclick="renderDailyTasks()" style="--angle: 0;">
+            <img src="images/ui/btn_daily.PNG" alt="Daily">
+        </button>
+        <button class="radial-sub-btn" onclick="renderShop()" style="--angle: 1;">
+            <img src="images/ui/btn_store.PNG" alt="Store">
+        </button>
+        <button class="radial-sub-btn" onclick="renderInventory()" style="--angle: 2;">
+            <img src="images/ui/btn_inventory.PNG" alt="Inventory">
+        </button>
+        <button class="radial-sub-btn" onclick="renderSmelting()" style="--angle: 3;">
+            <img src="images/ui/btn_smelt.PNG" alt="Smelt">
+        </button>
+        <button class="radial-sub-btn" onclick="renderPets()" style="--angle: 4;">
+            <img src="images/ui/btn_pet.PNG" alt="Pet">
+        </button>
+    </div>
+    <button id="radialMainBtn" onclick="toggleRadialMenu()">
+        <img src="images/ui/icon_shop.PNG" alt="Menu">
+    </button>
+</div>
+
 <div id="floatingMenuContainer">
 <div id="floatingSubMenu" class="hidden">
 <button class="btn-control-float" onclick="showHelp()">
