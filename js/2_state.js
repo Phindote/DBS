@@ -1,6 +1,5 @@
-let db = window.questionsDB || {};
 let gameState = {
-    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 0, lastLoginDate: "" },
+    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 50, lastLoginDate: "" },
     stats: {
         totalCorrect: 0,
         srCorrect: 0,
@@ -27,6 +26,8 @@ let gameState = {
     difficulty: "",
     pool: [],
     currentIndex: 0,
+    currentAttempts: 0,
+    wrongAnswersHistory: [],
     wrongCount: 0,
     history: [], 
     currentDragon: "",
@@ -79,7 +80,7 @@ function applyGameData(parsed) {
     gameState.user = parsed.user;
     if (typeof gameState.user.energy === 'undefined') gameState.user.energy = 100;
     if (typeof gameState.user.unlockedReplayXP === 'undefined') gameState.user.unlockedReplayXP = false;
-    if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 0;
+    if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 50;
     if (typeof gameState.user.lastLoginDate === 'undefined') gameState.user.lastLoginDate = "";
     
     gameState.stats = parsed.stats || {};
@@ -112,6 +113,7 @@ function applyGameData(parsed) {
 }
 
 function checkAchievements() {
+    const db = window.questionsDB || {};
     const u = gameState.user;
     const s = gameState.stats;
     const unlocked = gameState.unlockedAchievements;

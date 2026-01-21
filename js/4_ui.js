@@ -1,20 +1,33 @@
 let currentInvTab = 'all';
 let itemToDeleteIndex = -1;
 let smeltSlots = [null, null, null, null];
+let achievementQueue = [];
+
+function updateCoreButtonVisibility() {
+    const coreBtn = document.getElementById("radialMenuContainer");
+    const menuScreen = document.getElementById("screen-menu");
+    
+    // Logic: Only show if on screen-menu AND NO modals are open
+    // Modals: contentModal, statsModal, titlesModal, helpModal, unlockModal, deleteModal, smeltConfirmModal, recipeModal
+    const modals = document.querySelectorAll(".modal-backdrop, #contentModal, #statsModal, #titlesModal, #helpModal, #unlockModal");
+    let isAnyModalOpen = false;
+    modals.forEach(m => {
+        if(m.style.display === 'flex' || m.style.display === 'block') isAnyModalOpen = true;
+    });
+
+    if (menuScreen.classList.contains('active') && !isAnyModalOpen) {
+        if(coreBtn) coreBtn.style.display = 'block';
+    } else {
+        if(coreBtn) coreBtn.style.display = 'none';
+        closeRadialMenu();
+    }
+}
 
 function switchScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     
-    const radialContainer = document.getElementById("radialMenuContainer");
-    if (radialContainer) {
-        if (id === 'screen-menu') {
-            radialContainer.style.display = 'block';
-        } else {
-            radialContainer.style.display = 'none';
-        }
-        closeRadialMenu();
-    }
+    updateCoreButtonVisibility();
 
     if (id === 'screen-game') {
         resizeCanvas();
@@ -86,8 +99,7 @@ function showSubMenu(type) {
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "none";
     
-    const radialContainer = document.getElementById("radialMenuContainer");
-    if (radialContainer) radialContainer.style.display = 'none';
+    updateCoreButtonVisibility(); // Hide core button
 
     if(type === 'single') {
         document.getElementById("subMenuSingle").style.display = "flex";
@@ -105,8 +117,10 @@ function resetMenu() {
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
     
-    const radialContainer = document.getElementById("radialMenuContainer");
-    if (radialContainer) radialContainer.style.display = 'block';
+    // Core button logic handled inside switchScreen('screen-menu') usually, 
+    // but here we are just resetting states within the menu.
+    // Explicitly call update to ensure it shows up.
+    setTimeout(updateCoreButtonVisibility, 50);
 
     document.getElementById("singleConfirmArea").style.display = "none";
     document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
@@ -120,6 +134,7 @@ function resetMenu() {
 function showPokedex() {
     switchScreen("screen-pokedex");
     checkAchievements();
+    const db = window.questionsDB || {};
     const container = document.getElementById("pokedexContainer");
     container.innerHTML = "";
     Object.keys(db).forEach(key => {
@@ -170,10 +185,13 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
 }
 
 function showChapterContent(key) {
+    const db = window.questionsDB || {};
     const item = db[key];
     document.getElementById("modalTitle").innerText = item.title;
     document.getElementById("modalBody").innerText = item.content || "暫無內容";
     document.getElementById("contentModal").style.display = "flex";
+    updateCoreButtonVisibility();
+    
     pokedexSeconds = 0;
     updatePokedexBar();
     pokedexTimer = setInterval(() => {
@@ -200,6 +218,8 @@ function updatePokedexBar() {
 
 function closeContentModal() {
     document.getElementById("contentModal").style.display = "none";
+    updateCoreButtonVisibility();
+    
     clearInterval(pokedexTimer);
     const minutes = Math.floor(pokedexSeconds / 60);
     if (minutes >= 1) { 
@@ -273,8 +293,7 @@ function showDragonSeal() {
 
 function showTitlesModal() {
     document.getElementById("titlesModal").style.display = "flex";
-    const radial = document.getElementById("radialMenuContainer");
-    if(radial) radial.style.display = 'none';
+    updateCoreButtonVisibility();
     
     const container = document.getElementById("titleRoadContainer");
     container.innerHTML = "";
@@ -315,13 +334,11 @@ function showTitlesModal() {
 
 function closeTitlesModal() {
     document.getElementById('titlesModal').style.display='none';
-    const menuScreen = document.getElementById("screen-menu");
-    if (menuScreen.classList.contains('active')) {
-        document.getElementById("radialMenuContainer").style.display = 'block';
-    }
+    updateCoreButtonVisibility();
 }
 
 function renderSingleList() {
+    const db = window.questionsDB || {};
     const div = document.getElementById("singleChapterList");
     div.innerHTML = "";
     document.getElementById("singleConfirmArea").style.display = "none";
@@ -343,6 +360,7 @@ function selectSingleChapter(key, title, btnElement) {
 }
 
 function renderMixList() {
+    const db = window.questionsDB || {};
     const div = document.getElementById("mixChapterList");
     div.innerHTML = "";
     Object.keys(db).forEach(k => {
@@ -414,37 +432,26 @@ function editProfile() {
 
 function showHelp() {
     document.getElementById("helpModal").style.display = "flex";
-    const radialContainer = document.getElementById("radialMenuContainer");
-    if (radialContainer) radialContainer.style.display = 'none';
+    updateCoreButtonVisibility();
 }
 function closeHelp() {
     document.getElementById("helpModal").style.display = "none";
-    const radialContainer = document.getElementById("radialMenuContainer");
-    const menuScreen = document.getElementById("screen-menu");
-    if (menuScreen.classList.contains('active') && radialContainer) {
-        const menuLayout = document.querySelector(".menu-layout");
-        if (menuLayout && menuLayout.style.display !== 'none') {
-             radialContainer.style.display = 'block';
-        }
-    }
+    updateCoreButtonVisibility();
 }
 
 function showStatsModal() {
     document.getElementById("statsModal").style.display = "flex";
-    const radial = document.getElementById("radialMenuContainer");
-    if(radial) radial.style.display = 'none';
+    updateCoreButtonVisibility();
     drawRadarChartSVG();
 }
 
 function closeStatsModal() {
     document.getElementById('statsModal').style.display='none';
-    const menuScreen = document.getElementById("screen-menu");
-    if (menuScreen.classList.contains('active')) {
-        document.getElementById("radialMenuContainer").style.display = 'block';
-    }
+    updateCoreButtonVisibility();
 }
 
 function calculateStats() {
+    const db = window.questionsDB || {};
     const mapping = [
         {name: "唐詩三首", keys: ["p_shanshu", "p_yuexia", "p_denglou"]}, 
         {name: "儒家思想", keys: ["p_lunyu", "p_mengzi", "p_quanxue", "p_shishuo"]}, 
@@ -656,25 +663,45 @@ function triggerAnimation(element, className) {
 }
 
 function showUnlockNotification(newIds) {
-    const body = document.getElementById("unlockModalBody");
-    body.innerHTML = "";
+    if(!Array.isArray(newIds) || newIds.length === 0) return;
     
     newIds.forEach(id => {
-        const ach = ACHIEVEMENTS.find(a => a.id === id);
-        if(ach) {
-            const div = document.createElement("div");
-            div.style.marginBottom = "30px";
-            div.innerHTML = `
-                <img src="images/achievements/${ach.id}.PNG" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
-                <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${ach.title}</div>
-                <div style="font-size:1rem; color:#555;">${ach.desc}</div>
-            `;
-            body.appendChild(div);
+        if(!achievementQueue.includes(id)) {
+            achievementQueue.push(id);
         }
     });
     
-    document.getElementById("unlockModal").style.display = "flex";
-    playSFX('success');
+    const modal = document.getElementById("unlockModal");
+    if(modal.style.display !== 'flex') {
+        processNextUnlock();
+    }
+}
+
+function processNextUnlock() {
+    const modal = document.getElementById("unlockModal");
+    const body = document.getElementById("unlockModalBody");
+    
+    if(achievementQueue.length === 0) {
+        modal.style.display = 'none';
+        updateCoreButtonVisibility();
+        return;
+    }
+    
+    const id = achievementQueue.shift();
+    const ach = ACHIEVEMENTS.find(a => a.id === id);
+    
+    if(ach) {
+        body.innerHTML = `
+            <img src="images/achievements/${ach.id}.PNG" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));">
+            <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${ach.title}</div>
+            <div style="font-size:1rem; color:#555;">${ach.desc}</div>
+        `;
+        modal.style.display = 'flex';
+        updateCoreButtonVisibility();
+        playSFX('success');
+    } else {
+        processNextUnlock();
+    }
 }
 
 function showShop() {
@@ -756,6 +783,7 @@ function promptDeleteItem(index) {
     document.getElementById("deleteCount").value = 1;
     document.getElementById("deleteCount").max = item.count;
     document.getElementById("deleteModal").style.display = "flex";
+    updateCoreButtonVisibility();
 }
 
 function confirmDelete() {
@@ -770,12 +798,15 @@ function confirmDelete() {
     saveGame();
     renderInventory();
     document.getElementById("deleteModal").style.display = "none";
+    updateCoreButtonVisibility();
 }
 
 function renderDailyTasks() {
     switchScreen("screen-daily");
     const container = document.getElementById("dailyContainer");
     container.innerHTML = "";
+    
+    const db = window.questionsDB || {};
     
     DAILY_QUESTS.forEach(quest => {
         let userState = gameState.dailyTasks.find(t => t.id === quest.id);
@@ -877,6 +908,7 @@ function renderSmelting() {
 function initSmelt() {
     if (smeltSlots.every(s => s === null)) return alert("請先添加材料！");
     document.getElementById("smeltConfirmModal").style.display = "flex";
+    updateCoreButtonVisibility();
 }
 
 function executeSmelt() {
@@ -884,10 +916,12 @@ function executeSmelt() {
     smeltSlots = [null, null, null, null];
     renderSmelting();
     alert("熔煉成功！(獲得: 未知物品)");
+    updateCoreButtonVisibility();
 }
 
 function showRecipes() {
     document.getElementById("recipeModal").style.display = "flex";
+    updateCoreButtonVisibility();
 }
 
 function renderPets() {
@@ -921,7 +955,6 @@ function toggleRadialMenu() {
         closeRadialMenu();
     } else {
         container.classList.add("open");
-        // Removed manual playSFX('click') here to avoid double sound
     }
 }
 
@@ -940,3 +973,22 @@ document.addEventListener('click', function(e) {
         }
     }
 });
+
+function randomSelectMix() {
+    const count = parseInt(document.getElementById("mixRandomCount").value);
+    const db = window.questionsDB || {};
+    const keys = Object.keys(db);
+    
+    if (count > keys.length) return alert("選擇數量超過現有篇章總數！");
+    
+    gameState.mixSelectedKeys = [];
+    const shuffled = keys.sort(() => 0.5 - Math.random());
+    gameState.mixSelectedKeys = shuffled.slice(0, count);
+    
+    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
+    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    document.getElementById("energyCostInfo").innerText = `消耗：初階 ${jrCost} / 高階 ${srCost}`;
+    
+    gameState.mode = 'mix';
+    switchScreen('screen-difficulty');
+}
