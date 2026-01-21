@@ -632,7 +632,7 @@
 
 .task-row {
     background: linear-gradient(90deg, #fdfdfd, #f4f6f7);
-    border-left: 5px solid #bdc3c7;
+    border-left: 5px solid #95a5a6;
     border-radius: 8px;
     padding: 15px 20px;
     margin-bottom: 10px;
@@ -648,35 +648,50 @@
     transform: translateX(2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
+.task-row.can-claim {
+    border-left-color: #e74c3c;
+    background: linear-gradient(90deg, #fff5f5, #fff);
+}
 .task-row.completed {
     border-left-color: #f1c40f;
     background: linear-gradient(90deg, #fffbeb, #fff);
 }
 .task-desc {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #2c3e50;
     font-weight: bold;
 }
+.task-reward-info {
+    font-size: 0.85rem;
+    color: #e67e22;
+    margin-top: 2px;
+}
 .btn-claim {
-    background: #3498db;
-    color: white;
     border: none;
-    padding: 6px 15px;
+    padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    min-width: 80px;
+    text-align: center;
 }
-.btn-claim:disabled {
+.btn-claim.gray {
     background: #bdc3c7;
+    color: #fff;
     cursor: not-allowed;
     box-shadow: none;
 }
-.btn-claim.ready {
+.btn-claim.red {
+    background: #e74c3c;
+    color: white;
+    animation: pulse 1s infinite;
+}
+.btn-claim.yellow {
     background: #f1c40f;
     color: #d35400;
-    animation: pulse 1s infinite;
+    cursor: not-allowed;
 }
 
 .inventory-tabs {
