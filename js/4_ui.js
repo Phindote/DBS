@@ -921,7 +921,7 @@ function toggleRadialMenu() {
         closeRadialMenu();
     } else {
         container.classList.add("open");
-        playSFX('click');
+        // Removed manual playSFX('click') here to avoid double sound
     }
 }
 
