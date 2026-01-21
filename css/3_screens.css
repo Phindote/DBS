@@ -9,9 +9,9 @@
     width: 100%;
     box-sizing: border-box;
     height: 100%;
-    /* CRITICAL FIX: Lock horizontal scroll globally */
+    /* CRITICAL: Lock horizontal scroll globally */
     overflow-x: hidden;
-    overflow-y: hidden; /* Only specific inner containers should scroll */
+    overflow-y: hidden; 
 }
 .screen.active {
     display: flex;
@@ -131,15 +131,13 @@
     overflow-y: auto; 
     overflow-x: hidden; 
 }
-/* FIXED CONTAINERS: Single, Mix, Shop, Pokedex, Achievements */
 #singleChapterList, #mixChapterList, #shopContainer, #pokedexContainer, #sealContainer {
     flex: 1;
-    /* Use flex grow to fill available height */
     min-height: 0; 
     overflow-y: auto;
     overflow-x: hidden;
     border: none;
-    padding: 5px;
+    padding: 10px 5px;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -156,6 +154,7 @@
 #screen-difficulty {
     justify-content: center;
 }
+/* ----- BATTLE SCREEN ----- */
 #screen-game {
     display: none; 
     flex-direction: column;
@@ -211,7 +210,7 @@
 }
 .question-box {
     background: #fff;
-    padding: 15px;
+    padding: 15px 15px 5px 15px;
     border-radius: 12px;
     border: 2px solid var(--primary-blue);
     width: 100%;
@@ -229,6 +228,8 @@
 .crack-stage-5 { border-color: #ff0000; border-style: ridge; border-width: 6px; transform: rotate(2deg); background: #ffe6e6; }
 .poem-line { font-size: 1.3rem; margin-bottom: 10px; font-family: 'Kaiti', 'STKaiti', serif; }
 .target-word { color: var(--primary-red); font-weight: bold; font-size: 1.4rem; margin: 0 5px; }
+
+/* INPUT & MC AREA */
 #answerInput {
     width: 90%;
     padding: 10px;
@@ -237,12 +238,19 @@
     border-radius: 5px;
     text-align: center;
     transition: all 0.3s;
+    margin-bottom: 5px; /* Minimal space */
 }
-.mc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+/* Updated for tighter Senior mode */
+#inputAreaSenior {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+.mc-container { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; margin-bottom: 5px; }
 .mc-btn {
     background: var(--white);
     border: 1px solid var(--primary-blue);
-    padding: 12px;
+    padding: 10px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1.1rem;
@@ -251,7 +259,8 @@
 .mc-btn:hover:not(:disabled) { background: var(--primary-blue); color: white; }
 .mc-btn:disabled { background: #e0e0e0; color: #aaa; border-color: #ccc; cursor: not-allowed; transform: none; }
 .error-msg { color: var(--primary-red); margin-top: 5px; font-weight: bold; min-height: 20px; font-size: 0.9rem; }
-.game-footer-btn { margin-top: auto; width: 100%; text-align: center; padding-top: 5px; flex-shrink: 0; }
+.game-footer-btn { margin-top: 0; width: 100%; text-align: center; padding-top: 0; flex-shrink: 0; }
+
 #resultImageContainer {
     width: 100%;
     display: flex;
@@ -479,18 +488,19 @@
     color: var(--primary-red);
     font-weight: bold;
 }
-/* ----- FLOATING MENU UPDATED: ROW-REVERSE for Left Expansion ----- */
+/* ----- FLOATING MENU: Row based, LEFT Expansion ----- */
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
-    right: 0px;
+    right: 20px; /* Sticks to right */
     z-index: 10000;
     display: flex;
-    flex-direction: row-reverse; /* Main button on right, menu expands left */
+    flex-direction: row; /* [SubMenu] [MainBtn] */
     align-items: center;
     gap: 15px; 
     touch-action: none;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    justify-content: flex-end; /* Align right */
 }
 #floatingMainBtn {
     width: 50px;
@@ -502,6 +512,7 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
+    order: 2; /* Main button on the right */
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -510,18 +521,18 @@
     object-fit: contain;
 }
 #floatingSubMenu {
-    display: flex;
-    flex-direction: row-reverse; /* Items inside sub-menu also flow left */
+    display: none;
+    flex-direction: row; 
     gap: 10px;
-    transition: opacity 0.3s, transform 0.3s;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(20px); /* Start slightly to the right */
+    order: 1; /* Submenu on the left */
 }
 #floatingSubMenu.visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateX(0);
+    display: flex;
+    animation: slideInLeft 0.3s ease forwards;
+}
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 .btn-control-float {
     width: 40px;
@@ -536,16 +547,23 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: all 0.2s;
     padding: 5px;
+    position: relative; /* For red line positioning */
 }
 .btn-control-float:hover { transform: scale(1.1); }
 .btn-control-float img { width: 100%; height: 100%; object-fit: contain; }
+
+/* RED LINE FIX: Clearer, on top, 60% width */
 .btn-control-float.off::after {
     content: '';
     position: absolute;
-    top: 50%; left: 50%; width: 80%; height: 3px;
+    top: 50%; 
+    left: 50%; 
+    width: 60%; /* 60% width */
+    height: 3px; /* Slightly thicker for visibility */
     background-color: #e74c3c;
     transform: translate(-50%, -50%) rotate(-45deg);
     border-radius: 2px;
     box-shadow: 0 0 2px rgba(255,255,255,0.8);
     pointer-events: none;
+    z-index: 10; /* Ensure it is above the icon image */
 }

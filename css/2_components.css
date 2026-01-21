@@ -164,10 +164,16 @@ select.form-input {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Removed fixed height/min-height/justify-content to restore original look */
     z-index: 1;
+    /* Auto height for natural flow */
+    height: auto; 
 }
-/* Hover effect with z-index fix */
+/* FORCE SQUARE ASPECT RATIO ONLY FOR SHOP CARDS */
+.shop-card {
+    aspect-ratio: 1 / 1;
+    justify-content: center; /* Center content vertically */
+}
+
 .pokedex-card:hover, .shop-card:hover { 
     transform: translateY(-5px); 
     z-index: 100;
@@ -184,7 +190,6 @@ select.form-input {
 }
 .unlocked .pokedex-img { filter: none; opacity: 1; }
 
-/* UPDATED: Title styling for auto-adjust/single line */
 .pokedex-title, .shop-title {
     font-size: 0.85rem;
     font-weight: bold;
@@ -194,21 +199,6 @@ select.form-input {
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Force single line with ellipsis */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%; /* Ensure it takes full width to calc overflow */
-    padding: 0 2px;
-    box-sizing: border-box;
-}
-
-/* Responsive adjustment for very small screens */
-@media screen and (max-width: 400px) {
-    .pokedex-title, .shop-title {
-        font-size: 0.75rem; /* Smaller font on small screens */
-    }
 }
 
 .shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
@@ -329,7 +319,7 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* Battle HUD - Optimized for longer titles */
+/* Battle HUD - Expanded Left Side */
 .battle-hud {
     width: 100%;
     display: grid;
