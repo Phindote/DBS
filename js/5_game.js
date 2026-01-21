@@ -59,7 +59,7 @@ function updateLevel() {
 
 function confirmSingleGame() {
     if (!pendingSingleChapterKey) return;
-    initGame('single');
+    prepareGameMode('single');
 }
 
 function confirmMixMode() {
@@ -70,7 +70,7 @@ function confirmMixMode() {
     document.querySelectorAll("#mixChapterList input:checked").forEach(chk => {
         gameState.mixSelectedKeys.push(chk.value);
     });
-    initGame('mix');
+    prepareGameMode('mix');
 }
 
 function randomSelectMix() {
@@ -89,14 +89,13 @@ function randomSelectMix() {
     checkMixCount();
 }
 
-function initGame(mode) {
+function prepareGameMode(mode) {
     gameState.mode = mode;
     gameState.pool = [];
     gameState.history = [];
     gameState.wrongCount = 0;
     gameState.currentIndex = 0;
     
-    const diff = document.querySelector("#screen-difficulty");
     const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
     const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
     
@@ -124,11 +123,13 @@ function initGame(difficulty) {
     
     let allQs = [];
     selectedChapters.forEach(key => {
-        const list = db[key][difficulty];
-        if(list) allQs = allQs.concat(list);
+        if (db[key] && db[key][difficulty]) {
+            const list = db[key][difficulty];
+            if(list) allQs = allQs.concat(list);
+        }
     });
     
-    if (allQs.length === 0) return alert("該模式暫無題目數據！");
+    if (allQs.length === 0) return alert("該模式暫無題目數據！請檢查題庫檔案是否正確載入。");
     
     gameState.pool = allQs.sort(() => 0.5 - Math.random()).slice(0, 10); 
     
@@ -305,7 +306,6 @@ function endGame() {
                 }
             }
             
-            // Quest Logic
             if(gameState.difficulty === 'junior') {
                 if(gameState.dailyTasks[2].progress < 5) {
                     if(!gameState.stats.perfectChapterIds.includes(modeKey + "_jr")) {
@@ -344,7 +344,6 @@ function endGame() {
             if(gameState.mixSelectedKeys.length >= 10) gameState.stats.mixWinCount10++;
             if(gameState.mixSelectedKeys.length === Object.keys(db).length) gameState.stats.mixWinCount16++;
             
-            // Quest 5
             const q5 = gameState.dailyTasks.find(t => t.id === 5);
             if(q5 && q5.progress < 2) q5.progress++;
             
@@ -355,8 +354,6 @@ function endGame() {
                     alert("恭喜！混合試煉完美通關，成功解鎖混合試煉惡龍！");
                 }
             }
-        } else {
-            // Random check logic if needed
         }
     }
     
