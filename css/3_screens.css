@@ -483,7 +483,7 @@
 #floatingMenuContainer {
     position: absolute;
     bottom: 60px;
-    right: 20px;
+    right: 0px;
     z-index: 10000;
     display: flex;
     flex-direction: row-reverse; /* Main button on right, menu expands left */
