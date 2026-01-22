@@ -28,7 +28,6 @@
     50% { transform: translateY(50px) scale(1.2); }
     100% { transform: translateY(0) scale(1); }
 }
-/* 強制覆蓋 float 動畫 */
 .dragon-attack { animation: dragonCrash 0.4s ease-in-out forwards !important; }
 
 @keyframes bossDamage {
@@ -42,12 +41,24 @@
 .boss-damage { animation: bossDamage 0.5s ease-in-out forwards; }
 
 @keyframes playerAttack {
-    0% { transform: translateY(0) rotate(0deg); }
-    30% { transform: translateY(50px) rotate(-5deg); }
-    50% { transform: translateY(-350px) rotate(5deg) scale(1.2); }
-    100% { transform: translateY(0) rotate(0deg); }
+    0% { transform: translateY(0) scale(1); }
+    20% { transform: translateY(50px) scale(0.9); }
+    45% { transform: translateY(-400px) scale(1.2); }
+    65% { transform: translateY(-400px) scale(1.2); }
+    100% { transform: translateY(0) scale(1); }
 }
-.player-attack { animation: playerAttack 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+.player-attack { animation: playerAttack 0.7s cubic-bezier(0.25, 0.1, 0.25, 1.5) forwards; }
+
+@keyframes marioStarFlash {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    25% { filter: hue-rotate(90deg) brightness(2); }
+    50% { filter: hue-rotate(180deg) brightness(1.5); }
+    75% { filter: hue-rotate(270deg) brightness(2); }
+    100% { filter: hue-rotate(360deg) brightness(1); }
+}
+.boss-hit-flash {
+    animation: marioStarFlash 0.3s linear infinite !important;
+}
 
 @keyframes float {
     0%, 100% { transform: translateY(0); }
