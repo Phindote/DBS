@@ -1,6 +1,3 @@
-/* =========================================
-   1. 基礎元件 (按鈕、輸入框)
-   ========================================= */
 .btn-main {
     background-color: var(--primary-blue);
     color: white;
@@ -96,9 +93,6 @@ select.form-input {
     width: 100%;
 }
 
-/* =========================================
-   2. 個人資料卡 (Profile Card)
-   ========================================= */
 .profile-card {
     background: #f8f9fa;
     border: 2px solid var(--primary-blue);
@@ -144,9 +138,6 @@ select.form-input {
 }
 .profile-row strong { color: var(--primary-blue); }
 
-/* =========================================
-   3. 卡片網格 (Pokedex/Shop/Items)
-   ========================================= */
 .pokedex-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -207,9 +198,6 @@ select.form-input {
 .stat-jr { color: #2980b9; background: #eaf6ff; }
 .stat-sr { color: #c0392b; background: #f9ebea; }
 
-/* =========================================
-   4. 篇章選擇與混合按鈕
-   ========================================= */
 .chapter-btn {
     width: 100%;
     padding: 12px 15px;
@@ -316,9 +304,6 @@ select.form-input {
 .btn-junior { background: linear-gradient(135deg, #3498db, #2980b9); }
 .btn-senior { background: linear-gradient(135deg, #e74c3c, #c0392b); }
 
-/* =========================================
-   5. 戰鬥 HUD 與狀態條
-   ========================================= */
 .battle-hud {
     width: 100%;
     display: grid;
@@ -384,15 +369,12 @@ select.form-input {
     color: var(--primary-blue);
 }
 
-/* =========================================
-   6. 核心選單 (Radial Menu) - 4按鈕修正版
-   ========================================= */
 .radial-menu-container {
     position: absolute;
     bottom: 60px;
     left: 20px;
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     z-index: 10000;
     display: none;
     pointer-events: none;
@@ -400,57 +382,93 @@ select.form-input {
 .radial-menu-container.open .radial-items {
     pointer-events: auto;
 }
+
 #radialMainBtn {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 100px;
-    height: 100px;
+    width: 70px;
+    height: 70px;
     border: none;
     background: transparent;
     cursor: pointer;
     padding: 0;
     z-index: 10002;
-    transition: transform 0.2s;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
     pointer-events: auto;
 }
 #radialMainBtn:active { transform: scale(0.95); }
-#radialMainBtn img { width: 100%; height: 100%; object-fit: contain; }
+#radialMainBtn img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; }
 
-.radial-sub-btn {
+.pulse-ring {
     position: absolute;
-    bottom: 25px;
-    left: 25px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background-color: rgba(255, 255, 255, 0.9);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; height: 90%;
+    border-radius: 50%;
+    background: rgba(52, 152, 219, 0.3);
+    z-index: 1;
+    animation: softPulse 3s infinite;
+}
+@keyframes softPulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+}
+
+.stack-item {
+    position: absolute;
+    bottom: 10px;
+    left: 5px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    z-index: 10001;
+    transform: translateX(-20px);
+}
+.radial-menu-container.open .stack-item {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+}
+
+.stack-btn {
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-    opacity: 0;
-    z-index: 10001;
-    padding: 5px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    padding: 0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transition: transform 0.1s;
 }
-.radial-sub-btn img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-/* 角度計算 */
-.radial-menu-container.open .radial-sub-btn {
-    opacity: 1;
-    transform: rotate(calc(var(--angle) * 30deg)) translateY(-90px) rotate(calc(var(--angle) * -30deg));
+.stack-btn:hover { transform: scale(1.05); }
+.stack-btn img { width: 70%; height: 70%; object-fit: contain; }
+
+.stack-label {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* =========================================
-   7. 每日任務列表
-   ========================================= */
+.radial-menu-container.open .stack-item:nth-child(1) { bottom: 300px; transition-delay: 0.15s; }
+.radial-menu-container.open .stack-item:nth-child(2) { bottom: 230px; transition-delay: 0.1s; }
+.radial-menu-container.open .stack-item:nth-child(3) { bottom: 160px; transition-delay: 0.05s; }
+.radial-menu-container.open .stack-item:nth-child(4) { bottom: 90px; transition-delay: 0s; }
+
 .task-row {
     background: linear-gradient(90deg, #fdfdfd, #f4f6f7);
     border-left: 5px solid #95a5a6;
@@ -515,9 +533,6 @@ select.form-input {
     cursor: not-allowed;
 }
 
-/* =========================================
-   8. 背包與熔煉
-   ========================================= */
 .inventory-tabs {
     display: flex;
     width: 100%;
@@ -605,20 +620,24 @@ select.form-input {
     color: #333;
 }
 
-/* =========================================
-   9. 新增：商店 Tab 與 Gacha
-   ========================================= */
-.shop-tabs {
+.shop-header-row {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
     padding: 0 10px 10px 10px;
     border-bottom: 1px solid #eee;
     margin-bottom: 10px;
+    gap: 10px;
+}
+.shop-tabs {
+    display: flex;
+    gap: 8px;
+    flex: 1;
 }
 .tab-btn-pill {
     flex: 1;
     border: none;
-    padding: 8px;
+    padding: 8px 5px;
     border-radius: 20px;
     font-weight: bold;
     cursor: pointer;
@@ -626,6 +645,8 @@ select.form-input {
     opacity: 0.6;
     transition: all 0.2s;
     background: #bdc3c7;
+    font-size: 0.9rem;
+    white-space: nowrap;
 }
 .tab-btn-pill:hover { opacity: 0.8; transform: translateY(-1px); }
 .tab-btn-pill.active { opacity: 1; transform: scale(1.05); box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
@@ -634,6 +655,25 @@ select.form-input {
 #tabSmelt.active { background: #3498db; } 
 #tabGacha.active { background: #f1c40f; } 
 
+.coin-capsule {
+    display: flex;
+    align-items: center;
+    background: #2c3e50;
+    color: #f1c40f;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}
+.coin-icon-img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    margin-right: 6px;
+}
+
 .gacha-container {
     display: flex;
     flex-direction: column;
@@ -641,7 +681,6 @@ select.form-input {
     padding: 20px;
 }
 
-/* 純 CSS 黃金龍蛋 */
 .css-golden-egg {
     width: 120px;
     height: 160px;
@@ -653,7 +692,6 @@ select.form-input {
     box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset -10px -10px 20px rgba(0,0,0,0.2);
     position: relative;
 }
-/* 高光效果 */
 .css-golden-egg::after {
     content: '';
     position: absolute;
@@ -695,11 +733,15 @@ select.form-input {
     100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
 }
 
-/* =========================================
-   10. 紅色 Header 樣式 (幸運掉落專用)
-   ========================================= */
 .modal-header-red {
-    background: #e74c3c !important; /* 強制紅色 */
+    background: #e74c3c !important; 
+    color: white !important;
+    font-weight: bold;
+    padding: 15px;
+    font-size: 1.2rem;
+}
+.modal-header-green {
+    background: #2ecc71 !important;
     color: white !important;
     font-weight: bold;
     padding: 15px;
