@@ -394,41 +394,38 @@ select.form-input {
     cursor: pointer;
     padding: 0;
     z-index: 10002;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
     pointer-events: auto;
 }
-#radialMainBtn:active { transform: scale(0.95); }
 #radialMainBtn img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; }
 
 .pulse-ring {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%; height: 90%;
+    width: 110%; height: 110%;
     border-radius: 50%;
-    background: rgba(52, 152, 219, 0.3);
+    background: rgba(52, 152, 219, 0.2);
     z-index: 1;
     animation: softPulse 3s infinite;
 }
 @keyframes softPulse {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
 }
 
 .stack-item {
     position: absolute;
-    bottom: 10px;
-    left: 5px;
+    left: 85px; 
     display: flex;
     align-items: center;
     gap: 15px;
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     z-index: 10001;
-    transform: translateX(-20px);
+    transform: translateX(-30px);
 }
 .radial-menu-container.open .stack-item {
     opacity: 1;
@@ -448,9 +445,8 @@ select.form-input {
     justify-content: center;
     padding: 0;
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-    transition: transform 0.1s;
+    flex-shrink: 0;
 }
-.stack-btn:hover { transform: scale(1.05); }
 .stack-btn img { width: 70%; height: 70%; object-fit: contain; }
 
 .stack-label {
@@ -464,10 +460,10 @@ select.form-input {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.radial-menu-container.open .stack-item:nth-child(1) { bottom: 300px; transition-delay: 0.15s; }
-.radial-menu-container.open .stack-item:nth-child(2) { bottom: 230px; transition-delay: 0.1s; }
-.radial-menu-container.open .stack-item:nth-child(3) { bottom: 160px; transition-delay: 0.05s; }
-.radial-menu-container.open .stack-item:nth-child(4) { bottom: 90px; transition-delay: 0s; }
+.stack-item:nth-child(1) { bottom: 225px; } 
+.stack-item:nth-child(2) { bottom: 150px; } 
+.stack-item:nth-child(3) { bottom: 75px; }  
+.stack-item:nth-child(4) { bottom: 0px; }   
 
 .task-row {
     background: linear-gradient(90deg, #fdfdfd, #f4f6f7);
