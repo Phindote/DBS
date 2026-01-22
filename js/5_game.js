@@ -52,6 +52,9 @@ function updateLevel() {
         if (titleIndex >= TITLES.length) titleIndex = TITLES.length - 1;
         gameState.user.title = TITLES[titleIndex];
     }
+    if (gameState.user.level >= 99) {
+        gameState.user.unlockedReplayXP = true;
+    }
     checkAchievements();
     saveGame();
     updateUserDisplay();
@@ -82,8 +85,14 @@ function initGame(modeOrDifficulty) {
         gameState.wrongCount = 0;
         gameState.currentIndex = 0;
         
-        const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
-        const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+        let jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
+        let srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+
+        if (modeOrDifficulty === 'mix') {
+            const count = gameState.mixSelectedKeys.length;
+            jrCost *= count;
+            srCost *= count;
+        }
         
         document.getElementById("energyCostInfo").innerText = `消耗：初階 ${jrCost} / 高階 ${srCost}`;
         switchScreen('screen-difficulty');
@@ -94,7 +103,14 @@ function initGame(modeOrDifficulty) {
     const mode = gameState.mode; 
     const db = window.questionsDB || {};
     
-    let cost = (difficulty === 'junior') ? GAME_CONFIG.ENERGY_COST_JR_SINGLE : GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    let cost = 0;
+    let unitCost = (difficulty === 'junior') ? GAME_CONFIG.ENERGY_COST_JR_SINGLE : GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    
+    if (mode === 'single') {
+        cost = unitCost;
+    } else {
+        cost = unitCost * gameState.mixSelectedKeys.length;
+    }
     
     if (gameState.user.energy < cost) return alert("浩然之氣不足！請前往圖鑑溫習。");
     
@@ -127,8 +143,8 @@ function initGame(modeOrDifficulty) {
     gameState.currentAttempts = 0;
     gameState.wrongAnswersHistory = [];
     gameState.history = [];
+    gameState.currentSessionXP = 0;
     
-    // HP Reset Logic
     gameState.user.hp = 100;
     
     if (mode === 'single') {
@@ -169,7 +185,10 @@ function renderQuestion() {
     
     const box = document.getElementById("questionBox");
     box.classList.remove("correct-flash", "shake-box", "player-attack");
-    document.getElementById("bossImage").classList.remove("dragon-attack");
+    void box.offsetWidth; 
+    const boss = document.getElementById("bossImage");
+    boss.classList.remove("dragon-attack");
+    boss.style.filter = ""; 
     updateCrackStage();
     
     const jrArea = document.getElementById("inputAreaJunior");
@@ -187,14 +206,20 @@ function renderQuestion() {
             const btn = document.createElement("button");
             btn.className = "mc-btn";
             btn.innerText = opt;
+            btn.disabled = false;
+            btn.style.background = "";
+            btn.style.color = "";
             btn.onclick = () => checkAnswer(opt, btn);
             jrArea.appendChild(btn);
         });
     } else {
         jrArea.style.display = 'none';
         srArea.style.display = 'block';
-        document.getElementById("answerInput").value = "";
-        document.getElementById("answerInput").focus();
+        const inputField = document.getElementById("answerInput");
+        inputField.value = "";
+        inputField.disabled = false;
+        document.querySelector(".btn-attack").disabled = false;
+        inputField.focus();
     }
 }
 
@@ -217,11 +242,18 @@ function submitSeniorAnswer() {
         return;
     }
 
-    inputLock = true;
     checkAnswer(input, null);
 }
 
 function checkAnswer(userAns, btnElement) {
+    if(inputLock) return;
+    inputLock = true;
+
+    const btns = document.querySelectorAll(".mc-btn");
+    btns.forEach(b => b.disabled = true);
+    document.getElementById("answerInput").disabled = true;
+    document.querySelector(".btn-attack").disabled = true;
+
     const q = gameState.pool[gameState.currentIndex];
     
     let isCorrect = false;
@@ -233,18 +265,26 @@ function checkAnswer(userAns, btnElement) {
     }
     
     if (isCorrect) {
-        inputLock = true;
         gameState.history.push({ q: q, userAns: userAns, isCorrect: true });
         
         playSFX('correct');
-        document.getElementById("msgBox").innerText = "正確！";
+
+        if (btnElement) {
+            btnElement.style.background = "#2ecc71";
+            btnElement.style.color = "white";
+        }
+        
+        let gain = 0;
+        if(!gameState.solvedQuestionIds.includes(q.id) || gameState.user.unlockedReplayXP) {
+            gain = 9;
+            gameState.user.xp = Math.min(gameState.user.xp + gain, GAME_CONFIG.MAX_XP);
+            gameState.currentSessionXP += gain;
+        }
+
+        document.getElementById("msgBox").innerText = "正確！(+" + gain + " XP)";
         document.getElementById("msgBox").style.color = "var(--hp-green)";
         
         gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
-        
-        if(!gameState.solvedQuestionIds.includes(q.id) || gameState.user.unlockedReplayXP) {
-            gameState.user.xp = Math.min(gameState.user.xp + 9, GAME_CONFIG.MAX_XP);
-        }
         
         if(!gameState.solvedQuestionIds.includes(q.id)) {
             gameState.solvedQuestionIds.push(q.id);
@@ -253,15 +293,32 @@ function checkAnswer(userAns, btnElement) {
         gameState.stats.totalCorrect++;
         if(gameState.difficulty === 'senior') gameState.stats.srCorrect++;
         
-        triggerAnimation(document.getElementById("questionBox"), "correct-flash");
-        triggerAnimation(document.getElementById("questionBox"), "player-attack");
+        const box = document.getElementById("questionBox");
+        box.classList.remove("player-attack");
+        void box.offsetWidth;
+        box.classList.add("player-attack", "correct-flash");
         
+        const boss = document.getElementById("bossImage");
+        let flashCount = 0;
+        const flashInterval = setInterval(() => {
+            flashCount++;
+            if(flashCount % 2 === 1) {
+                boss.style.filter = "brightness(2.5) hue-rotate(90deg)";
+            } else {
+                boss.style.filter = "brightness(1) hue-rotate(0deg)";
+            }
+            if(flashCount >= 6) {
+                clearInterval(flashInterval);
+                boss.style.filter = ""; 
+            }
+        }, 100);
+
         updateBars();
         
         setTimeout(() => {
             gameState.currentIndex++;
             renderQuestion();
-        }, 1500);
+        }, 2000);
         
     } else {
         playSFX('wrong');
@@ -275,14 +332,22 @@ function checkAnswer(userAns, btnElement) {
         if(!gameState.wrongGuesses.includes(q.id)) gameState.wrongGuesses.push(q.id);
         if(gameState.difficulty === 'senior') gameState.wrongAnswersHistory.push(userAns);
 
+        const dragonRect = document.getElementById("bossImage").getBoundingClientRect();
+        const boxRect = document.getElementById("questionBox").getBoundingClientRect();
+        
+        const startX = dragonRect.left + dragonRect.width / 2;
+        const startY = dragonRect.bottom - 50; 
+        const endX = boxRect.left + boxRect.width / 2;
+        const endY = boxRect.top + boxRect.height / 2;
+
         triggerAnimation(document.getElementById("bossImage"), "dragon-attack"); 
-        fireBeam(window.innerWidth/2, 200, window.innerWidth/2, window.innerHeight - 200, '#e74c3c'); 
+        fireBeam(startX, startY, endX, endY, '#e74c3c'); 
         triggerAnimation(document.getElementById("questionBox"), "shake-box");
         updateCrackStage();
         updateBars();
 
         if (gameState.user.hp <= 0) {
-            endGame(); 
+            setTimeout(endGame, 1000); 
             return;
         }
 
@@ -292,31 +357,39 @@ function checkAnswer(userAns, btnElement) {
             gameState.history.push({ q: q, userAns: userAns, isCorrect: false });
             
             if (gameState.difficulty === 'junior' && btnElement) {
-                btnElement.disabled = true;
-                btnElement.style.background = "#bdc3c7";
+                btnElement.style.background = "#e74c3c";
+                btnElement.style.color = "white";
             }
             
-            inputLock = true; 
             setTimeout(() => {
                 gameState.currentIndex++;
                 renderQuestion();
-            }, 1500);
+            }, 2000);
         } else {
             const remaining = 3 - gameState.currentAttempts;
             document.getElementById("msgBox").innerText = `錯誤！剩餘機會：${remaining}`;
             document.getElementById("msgBox").style.color = "var(--primary-red)";
             
             if (gameState.difficulty === 'junior' && btnElement) {
-                btnElement.disabled = true;
                 btnElement.style.background = "#e74c3c";
                 btnElement.style.color = "white";
-                inputLock = false; 
             }
             
-            if (gameState.difficulty === 'senior') {
+            setTimeout(() => {
                 inputLock = false;
-                document.getElementById("answerInput").focus();
-            }
+                if(gameState.difficulty === 'junior') {
+                    const allBtns = document.querySelectorAll(".mc-btn");
+                    allBtns.forEach(b => {
+                        if(b.style.background !== "rgb(231, 76, 60)" && b.style.background !== "#e74c3c" && b.style.background !== "rgb(46, 204, 113)" && b.style.background !== "#2ecc71") { 
+                            b.disabled = false;
+                        }
+                    });
+                } else {
+                    document.getElementById("answerInput").disabled = false;
+                    document.querySelector(".btn-attack").disabled = false;
+                    document.getElementById("answerInput").focus();
+                }
+            }, 1000);
         }
     }
 }
@@ -329,15 +402,18 @@ function goHome() {
 
 function endGame() {
     const isDead = gameState.user.hp <= 0;
-    const isPerfect = (gameState.wrongCount === 0 && !isDead);
+    const isTooManyWrong = gameState.wrongCount > (gameState.pool.length / 2);
+    const isFail = isDead || isTooManyWrong;
+    const isPerfect = (!isFail && gameState.wrongCount === 0);
+    
     let resultImg = "img_defeat.PNG";
     let title = "挑戰失敗";
-    let gainedXP = 0; 
     let earnedCoins = 0;
+    let gainedEnergy = 0;
     
     const db = window.questionsDB || {};
     
-    if (isDead) {
+    if (isFail) {
         playMusic('bgm_defeat');
         title = "勝敗乃兵家常事...";
     } else {
@@ -350,17 +426,26 @@ function endGame() {
         
         gameState.user.coins = Math.min(gameState.user.coins + earnedCoins, GAME_CONFIG.MAX_COINS);
         
-        gainedXP = GAME_CONFIG.XP_WIN; 
-        if (isPerfect) gainedXP += 5; 
-        
-        gameState.user.xp = Math.min(gameState.user.xp + gainedXP, GAME_CONFIG.MAX_XP);
         gameState.stats.totalPlayTime += 1; 
-        
+
+        let chapterCount = 1;
+        if(gameState.mode === 'mix') {
+            chapterCount = gameState.mixSelectedKeys.length;
+        }
+
+        let energyPerChapter = 0;
+        if(gameState.difficulty === 'junior') {
+            energyPerChapter = isPerfect ? 3 : 2;
+        } else {
+            energyPerChapter = isPerfect ? 6 : 4;
+        }
+        gainedEnergy = energyPerChapter * chapterCount;
+        gameState.user.energy = Math.min(100, gameState.user.energy + gainedEnergy);
+
         if (isPerfect) {
             resultImg = "img_perfect.PNG";
             title = "完美通關！";
             playMusic('bgm_victory');
-            gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_PERFECT);
             
             gameState.stats.consecutivePerfect++;
             if (gameState.stats.consecutivePerfect >= 5) checkAchievements();
@@ -402,7 +487,6 @@ function endGame() {
             resultImg = "img_success.PNG";
             title = "挑戰成功！";
             playMusic('bgm_success');
-            gameState.user.energy = Math.min(100, gameState.user.energy + GAME_CONFIG.ENERGY_REWARD_SUCCESS);
             gameState.stats.consecutivePerfect = 0;
         }
         
@@ -431,11 +515,7 @@ function endGame() {
     document.getElementById("resultImg").src = "images/results/" + resultImg;
     document.getElementById("endTitle").innerText = title;
     
-    let extraMsg = "";
-    if(!isDead) extraMsg = ` (+${earnedCoins} 金幣)`;
-    
-    document.getElementById("endLevel").innerText = gameState.user.level;
-    document.getElementById("endXP").innerText = `${gameState.user.xp} (+${gainedXP} 額外)${extraMsg}`;
+    document.getElementById("endStatsRow").innerText = `獲得${gameState.currentSessionXP}點經驗，${earnedCoins}個金幣，回復${gainedEnergy}點浩然之氣！`;
     
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
