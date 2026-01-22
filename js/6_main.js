@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (gameState.user.name === "DBS_Chinese" && !window.godModeActive) {
             initGodMode();
         }
+        
         const canvas = document.getElementById('particleCanvas');
         if (canvas) {
             particleCtx = canvas.getContext('2d');
@@ -12,10 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
             window.addEventListener('resize', resizeCanvas);
             loopParticles();
         }
+        
         const bgmBtn = document.getElementById("btnBGM");
         if(bgmBtn && !isMusicOn) bgmBtn.classList.add("off");
         const sfxBtn = document.getElementById("btnSFX");
         if(sfxBtn && !isSFXEnabled) sfxBtn.classList.add("off");
+        
         const inputName = document.getElementById("inputName");
         if(inputName) {
             inputName.addEventListener("keyup", function(event) {
@@ -25,19 +28,52 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     });
+    
+    // [DROP SYSTEM] 情況 7, 8 & 6: 時間相關掉落檢查器 (每分鐘)
+    setInterval(() => {
+        if(typeof triggerDrop === 'function') {
+            // 7. 遊玩時間
+            triggerDrop('ON_PLAY_TIME_10MIN'); 
+            
+            // 8. 特定時間 (例如 12:00 - 13:00)
+            const h = new Date().getHours();
+            if(h === 12) triggerDrop('SPECIFIC_TIME_BONUS');
+            
+            // 6. 溫習時間補丁 (如果在溫習介面)
+            const modal = document.getElementById('contentModal');
+            if(modal && modal.style.display === 'flex') {
+                triggerDrop('ON_STUDY_MINUTE');
+            }
+        }
+    }, 60000); // 60秒檢查一次
 });
 
+// GLOBAL CLICK LISTENER: SFX & MENU CLOSING
 document.addEventListener('click', (e) => {
-    const target = e.target.closest('button, .menu-btn, .shop-card, .pokedex-card, .title-node, .smelt-slot, .radial-sub-btn, #floatingMainBtn, .btn-main, .btn-secondary, .btn-edit, .btn-claim, .btn-inv-delete, .tab-btn, .difficulty-btn');
+    // [DROP SYSTEM] 情況 1: 點擊任何按鈕掉落
+    if(typeof triggerDrop === 'function') {
+        // 為了避免太頻繁，可以加一點隨機性或冷卻，但這裡直接交給 triggerDrop 內的機率控制
+        triggerDrop('ON_CLICK_ANY');
+    }
+
+    // 1. Handle Global Click SFX
+    // Target any clickable element (buttons, cards, nodes)
+    const target = e.target.closest('button, .menu-btn, .shop-card, .pokedex-card, .title-node, .smelt-slot, .radial-sub-btn, #floatingMainBtn, .btn-main, .btn-secondary, .btn-edit, .btn-claim, .btn-inv-delete, .tab-btn, .difficulty-btn, .gacha-egg');
+    
     if (target) {
+        // Exclude Answer Buttons (Junior MC & Senior Attack) as they have specific logic sounds
         if (!target.classList.contains('mc-btn') && !target.classList.contains('btn-attack')) {
             playSFX('click');
         }
     }
+
+    // 2. Handle Floating Menu Auto-Close
     const floatContainer = document.getElementById("floatingMenuContainer");
     const subMenu = document.getElementById("floatingSubMenu");
     const mainBtn = document.getElementById("floatingMainBtn");
+    
     if (subMenu && subMenu.classList.contains("visible")) {
+        // If clicking outside the floating container (and not on the main button itself which toggles it)
         if (!floatContainer.contains(e.target) && !mainBtn.contains(e.target)) {
             subMenu.classList.remove("visible");
             subMenu.classList.add("hidden");
@@ -59,9 +95,11 @@ function preloadAssets(callback) {
         if (loadedCount >= totalAssets) {
             setTimeout(() => {
                 document.getElementById('screen-loading').classList.remove('active');
+                
                 document.getElementById('screen-login').classList.add('active');
                 if (gameState.user.name) {
                     document.getElementById("inputName").value = gameState.user.name;
+                    
                     const cls = gameState.user.class;
                     if (cls.length >= 2) {
                         let grade, letter;
@@ -79,6 +117,7 @@ function preloadAssets(callback) {
                         if(lSelect) lSelect.value = letter;
                     }
                 }
+                
                 callback();
             }, 500);
         }
@@ -135,8 +174,10 @@ function initDraggableMenu() {
         initialX = currentX;
         initialY = currentY;
         active = false;
+        
         let targetX = 0;
         let targetY = 0;
+        
         xOffset = targetX;
         yOffset = targetY;
         setTranslate(targetX, targetY, container);
@@ -164,6 +205,7 @@ function initDraggableMenu() {
     
     let subMenuVisible = false;
     dragItem.addEventListener('click', (e) => {
+        // Only toggle if not dragging
         if(Math.abs(xOffset) < 5 && Math.abs(yOffset) < 5) {
             subMenuVisible = !document.getElementById("floatingSubMenu").classList.contains("visible");
             const sub = document.getElementById("floatingSubMenu");
@@ -187,10 +229,12 @@ function handleFooterClick() {
     window.footerClickCount++;
     if (window.footerClickCount === 5) {
         const pass = prompt("請輸入開發者密碼：");
+        
         if (pass === null) {
             window.footerClickCount = 0;
             return;
         }
+
         if (pass === "DBS_Chinese") {
             initGodMode();
         } else {
@@ -214,15 +258,19 @@ function initGodMode() {
     if(!backupGameState) {
         backupGameState = JSON.parse(JSON.stringify(gameState));
     }
+    
+    const db = window.questionsDB || {};
+
     window.godModeActive = true;
     gameState.user.level = 99;
     gameState.user.xp = 9999;
     gameState.user.energy = 100;
     gameState.user.coins = 9999999;
     gameState.user.title = TITLES[TITLES.length - 1];
+    
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
-    const db = window.questionsDB || {};
+    
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
@@ -230,9 +278,11 @@ function initGodMode() {
         if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
         if(db[k].senior) db[k].senior.forEach(q => gameState.solvedQuestionIds.push(q.id));
     });
+    
     gameState.unlockedAchievements = ACHIEVEMENTS.map(a => a.id);
     gameState.stats.totalPlayTime = 99999;
     gameState.stats.mixWinCount = 999;
+    
     DAILY_QUESTS.forEach(quest => {
         let task = gameState.dailyTasks.find(t => t.id === quest.id);
         if(!task) {
@@ -243,6 +293,7 @@ function initGodMode() {
         task.complete = false; 
         task.claimed = false; 
     });
+
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
     alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，每日任務已可領取！(點擊底部 3 次可還原)");

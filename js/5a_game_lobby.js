@@ -27,6 +27,14 @@ function handleLogin() {
             gameState.dailyTasks.push({ id: 6, progress: 0, complete: false, claimed: false, targetKey: randomKey1 });
             gameState.dailyTasks.push({ id: 7, progress: 0, complete: false, claimed: false, targetKey: randomKey2 });
         }
+
+        // [DROP SYSTEM] 情況9: 每日特定時間登入掉落 (例如 7-9點, 18-20點)
+        const hour = new Date().getHours();
+        if ((hour >= 7 && hour <= 9) || (hour >= 18 && hour <= 20)) {
+            setTimeout(() => {
+                if (typeof triggerDrop === 'function') triggerDrop('LOGIN_MOMENT_BONUS');
+            }, 1000);
+        }
     }
     
     let loginTask = gameState.dailyTasks.find(t => t.id === 1);
@@ -79,6 +87,6 @@ function confirmMixMode() {
 function goHome() {
     if(confirm("確定要逃跑嗎？這將視為戰敗！")) {
         switchScreen("screen-menu");
-        updateUserDisplay(); // 確保立即更新浩然之氣顯示
+        updateUserDisplay(); 
     }
 }

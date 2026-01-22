@@ -13,6 +13,51 @@ const GAME_CONFIG = {
     COIN_PER_Q: 10,
     MAX_COINS: 9999999
 };
+
+const GACHA_CONFIG = {
+    COST: 100,
+    RATES: { SSR: 0.05, SR: 0.20, R: 0.75 }
+};
+
+// 在地化映射
+const RARITY_MAP = {
+    SSR: "【傳說之光】",
+    SR: "【稀有之光】",
+    R: "【普通之光】"
+};
+
+const DROP_SYSTEM_CONFIG = {
+    ON_CLICK_ANY: 0.001,       
+    ON_ANSWER_WRONG: 0.01,     
+    ON_ANSWER_CORRECT: 0.05,   
+    ON_CLEAR_NORMAL: 0.15,     
+    ON_CLEAR_PERFECT: 0.30,    
+    ON_CLEAR_MIX: 0.50,        
+    ON_DAILY_LOGIN: 1.0,       
+    ON_STUDY_MINUTE: 0.10,     
+    ON_PLAY_TIME_10MIN: 0.20,  
+    SPECIFIC_TIME_BONUS: 0.50, 
+    LOGIN_MOMENT_BONUS: 0.80   
+};
+
+const DROP_ITEMS_POOL = {
+    SSR: [
+        { id: "item_dragon_scale", name: "真龍逆鱗", img: "item_scale.PNG", type: "material" },
+        { id: "item_ancient_gem", name: "太古晶石", img: "item_gem.PNG", type: "material" },
+        { id: "item_gold_bar", name: "大金條 (500G)", img: "item_goldbar.PNG", type: "coin", value: 500 }
+    ],
+    SR: [
+        { id: "item_iron_wire", name: "精製鐵線", img: "item_wire.PNG", type: "material" },
+        { id: "item_leather", name: "硬化皮革", img: "item_leather.PNG", type: "material" },
+        { id: "item_silver_coin", name: "銀幣袋 (100G)", img: "item_silver.PNG", type: "coin", value: 100 }
+    ],
+    R: [
+        { id: "item_herb", name: "止血草", img: "item_herb.PNG", type: "material" },
+        { id: "item_stone", name: "普通石塊", img: "item_stone.PNG", type: "material" },
+        { id: "item_copper_coin", name: "銅板 (20G)", img: "item_copper.PNG", type: "coin", value: 20 }
+    ]
+};
+
 const TITLES = [
     "初心新手", "鐵劍勇者", "龍影覓者", "鱗甲獵手", "龍息破者",
     "血爪鬥士", "翼刃騎士", "獵心守護", "龍牙勇將", "雷霆屠夫",
@@ -100,9 +145,9 @@ const ASSETS_TO_LOAD = [
     'images/results/img_perfect.PNG',
     'images/results/img_success.PNG',
     'images/results/img_defeat.PNG',
-    'images/achievements/ach_locked.PNG'
+    'images/achievements/ach_locked.PNG',
+    'images/items/item_egg.PNG',
+    'images/items/item_egg_crack.PNG',
+    'images/items/item_light.PNG'
 ];
 for(let i=1; i<=40; i++) ASSETS_TO_LOAD.push(`images/achievements/ach_${i}.PNG`);
-SHOP_ITEMS.forEach(item => {
-    // ASSETS_TO_LOAD.push(`images/items/${item.img}`);
-});

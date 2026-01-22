@@ -15,7 +15,6 @@ function initGame(modeOrDifficulty) {
             srCost *= count;
         }
         
-        // --- 修改部分：青色主題 + 藍色初階 + 完美對齊 ---
         const infoBox = document.getElementById("energyCostInfo");
         infoBox.innerHTML = `
             <div style="display:inline-flex; align-items:center; justify-content:center; gap:15px; background:white; padding:10px 25px; border-radius:50px; border:2px solid #1abc9c; box-shadow:0 5px 15px rgba(26, 188, 156, 0.2);">
@@ -23,9 +22,7 @@ function initGame(modeOrDifficulty) {
                     <div style="width:12px; height:12px; background:#1abc9c; border-radius:50%; box-shadow:0 0 8px #1abc9c;"></div>
                     <span style="font-weight:bold; color:#16a085; font-size:1.1rem;">浩然之氣</span>
                 </div>
-                
                 <div style="height:20px; width:2px; background:#eee;"></div>
-                
                 <div style="display:flex; gap:15px;">
                     <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#2980b9;">
                         <span style="font-size:1rem;">初階</span>
@@ -38,7 +35,6 @@ function initGame(modeOrDifficulty) {
                 </div>
             </div>
         `;
-        // --- 修改結束 ---
 
         switchScreen('screen-difficulty');
         return;
@@ -59,7 +55,6 @@ function initGame(modeOrDifficulty) {
     
     if (gameState.user.energy < cost) return alert("浩然之氣不足！請前往圖鑑溫習。");
     
-    // 立即扣除並保存，防止刷新後數值回滾
     gameState.user.energy -= cost;
     saveGame();
 
@@ -133,7 +128,6 @@ function renderQuestion() {
     document.getElementById("msgBox").innerText = "";
     
     const box = document.getElementById("questionBox");
-    // 確保移除所有動效 Class
     box.classList.remove("correct-flash", "shake-box", "player-attack");
     void box.offsetWidth; 
     const boss = document.getElementById("bossImage");
@@ -178,7 +172,7 @@ function submitSeniorAnswer() {
     if(!input) return;
     
     if(!/^[\u4e00-\u9fa5]+$/.test(input)) {
-        document.getElementById("msgBox").innerText = "請輸入純中文答案！";
+        document.getElementById("msgBox").innerText = "請輸入純中文答案！(不可包含符號/數字/英文)";
         document.getElementById("msgBox").style.color = "var(--primary-red)";
         playSFX('wrong');
         return;
@@ -223,6 +217,9 @@ function checkAnswer(userAns, btnElement) {
             btnElement.style.color = "white";
         }
         
+        // [DROP SYSTEM] 情況3: 答對掉落
+        if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_CORRECT');
+        
         let gain = 0;
         if(!gameState.solvedQuestionIds.includes(q.id) || gameState.user.unlockedReplayXP) {
             gain = 9;
@@ -242,14 +239,11 @@ function checkAnswer(userAns, btnElement) {
         gameState.stats.totalCorrect++;
         if(gameState.difficulty === 'senior') gameState.stats.srCorrect++;
         
-        // --- 視覺修正：只閃爍，不飛出 ---
         const box = document.getElementById("questionBox");
         box.classList.remove("correct-flash"); 
         void box.offsetWidth;
         box.classList.add("correct-flash"); 
-        // -----------------------------
         
-        // --- 觸發刀痕特效 ---
         const vfxLayer = document.getElementById("vfxLayer");
         if(vfxLayer) {
             vfxLayer.innerHTML = '';
@@ -260,7 +254,6 @@ function checkAnswer(userAns, btnElement) {
                  slash.remove();
             }, 600);
         }
-        // ------------------
 
         const boss = document.getElementById("bossImage");
         let flashCount = 0;
@@ -286,6 +279,10 @@ function checkAnswer(userAns, btnElement) {
         
     } else {
         playSFX('wrong');
+        
+        // [DROP SYSTEM] 情況2: 答錯掉落
+        if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_WRONG');
+
         gameState.user.hp = Math.max(0, gameState.user.hp - GAME_CONFIG.HP_PENALTY);
         
         gameState.wrongCount++;

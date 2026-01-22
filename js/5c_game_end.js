@@ -25,6 +25,14 @@ function endGame() {
         gameState.user.coins = Math.min(gameState.user.coins + earnedCoins, GAME_CONFIG.MAX_COINS);
         gameState.stats.totalPlayTime += 1;
 
+        // [DROP SYSTEM] 情況4: 通關狀態掉落
+        if (typeof triggerDrop === 'function') {
+            if (isPerfect) triggerDrop('ON_CLEAR_PERFECT');
+            else triggerDrop('ON_CLEAR_NORMAL');
+            
+            if (gameState.mode === 'mix') triggerDrop('ON_CLEAR_MIX');
+        }
+
         let chapterCount = 1;
         if (gameState.mode === 'mix') {
             chapterCount = gameState.mixSelectedKeys.length;

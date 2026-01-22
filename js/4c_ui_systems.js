@@ -1,3 +1,52 @@
+let currentShopTab = 'buy'; 
+
+function triggerDrop(scenario) {
+    const rate = DROP_SYSTEM_CONFIG[scenario] || 0;
+    if (Math.random() > rate) return; 
+
+    const rand = Math.random();
+    let rarity = 'R';
+    if (rand < 0.05) rarity = 'SSR';
+    else if (rand < 0.30) rarity = 'SR';
+
+    const pool = DROP_ITEMS_POOL[rarity];
+    if (!pool || pool.length === 0) return;
+    const itemTemplate = pool[Math.floor(Math.random() * pool.length)];
+
+    let msg = "";
+    if (itemTemplate.type === 'coin') {
+        gameState.user.coins = Math.min(gameState.user.coins + itemTemplate.value, GAME_CONFIG.MAX_COINS);
+        msg = `獲得：${itemTemplate.name} (+${itemTemplate.value}G)`;
+    } else {
+        const existing = gameState.inventory.find(i => i.id === itemTemplate.id);
+        if (existing) {
+            existing.count++;
+        } else {
+            gameState.inventory.push({ ...itemTemplate, count: 1 });
+        }
+        msg = `獲得：${itemTemplate.name} x1`;
+    }
+    
+    saveGame();
+    showDropModal(itemTemplate.img, msg);
+}
+
+function showDropModal(img, text) {
+    const modal = document.getElementById("dropModal");
+    const body = document.getElementById("dropModalBody");
+    
+    // 如果圖片也是 "undefined.PNG" 或者沒有，可以用默認圖
+    const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
+
+    body.innerHTML = `
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(255,215,0,0.6));">
+        <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
+    `;
+    modal.style.display = 'flex';
+    updateCoreButtonVisibility(); // 隱藏 core button
+    playSFX('success');
+}
+
 function showPokedex() {
     switchScreen("screen-pokedex");
     checkAchievements();
@@ -117,21 +166,23 @@ function closeContentModal() {
 function showAchievements() {
     switchScreen("screen-achievements");
     const list = document.getElementById("achievementList");
-    list.innerHTML = "";
-    TITLES.forEach((title, index) => {
-        const div = document.createElement("div");
-        const isCurrent = gameState.user.title === title;
-        div.className = "achievement-item" + (isCurrent ? " active" : "");
-        const startLv = Math.floor(index * 5.5) + 1;
-        let endLv = Math.floor((index + 1) * 5.5);
-        if (index === TITLES.length - 1) endLv = 99;
-        let desc = `等級 ${startLv} - ${endLv}`;
-        if (index === TITLES.length - 1) {
-            desc = "等級 99 及 9999 經驗值";
-        }
-        div.innerHTML = `<span>${desc}</span><span>${title}</span>`;
-        list.appendChild(div);
-    });
+    if(list) {
+        list.innerHTML = "";
+        TITLES.forEach((title, index) => {
+            const div = document.createElement("div");
+            const isCurrent = gameState.user.title === title;
+            div.className = "achievement-item" + (isCurrent ? " active" : "");
+            const startLv = Math.floor(index * 5.5) + 1;
+            let endLv = Math.floor((index + 1) * 5.5);
+            if (index === TITLES.length - 1) endLv = 99;
+            let desc = `等級 ${startLv} - ${endLv}`;
+            if (index === TITLES.length - 1) {
+                desc = "等級 99 及 9999 經驗值";
+            }
+            div.innerHTML = `<span>${desc}</span><span>${title}</span>`;
+            list.appendChild(div);
+        });
+    }
 }
 
 function showDragonSeal() {
@@ -246,15 +297,37 @@ function processNextUnlock() {
     }
 }
 
-function showShop() {
-    renderShop();
-}
+// === 商店系統重構 ===
 
 function renderShop() {
     switchScreen("screen-shop");
-    const container = document.getElementById("shopContainer");
-    container.innerHTML = "";
     document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
+    
+    // 更新 Tab 狀態
+    ['tabBuy', 'tabSmelt', 'tabGacha'].forEach(id => document.getElementById(id).classList.remove('active'));
+    
+    if (currentShopTab === 'buy') {
+        document.getElementById('tabBuy').classList.add('active');
+        renderShopBuy();
+    } else if (currentShopTab === 'smelt') {
+        document.getElementById('tabSmelt').classList.add('active');
+        renderShopSmelt();
+    } else if (currentShopTab === 'gacha') {
+        document.getElementById('tabGacha').classList.add('active');
+        renderShopGacha();
+    }
+}
+
+function switchShopTab(tab) {
+    currentShopTab = tab;
+    renderShop();
+    playSFX('click');
+}
+
+function renderShopBuy() {
+    const container = document.getElementById("shopContentArea");
+    container.innerHTML = `<div class="pokedex-grid" id="shopGrid"></div>`;
+    const grid = document.getElementById("shopGrid");
     
     SHOP_ITEMS.forEach(item => {
         const card = document.createElement("div");
@@ -265,8 +338,113 @@ function renderShop() {
             <div class="shop-price">$${item.price}</div>
             <button class="btn-secondary" style="width:100%; margin:5px 0 0 0;" onclick="alert('功能開發中...')">購買</button>
         `;
-        container.appendChild(card);
+        grid.appendChild(card);
     });
+}
+
+function renderShopSmelt() {
+    const container = document.getElementById("shopContentArea");
+    container.innerHTML = `
+        <div class="smelt-grid-container" id="smeltContainer" style="margin-top:10px;"></div>
+        <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
+            <button class="btn-main" style="margin:0; background:#8e44ad;" onclick="showRecipes()">合成功式</button>
+            <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
+        </div>
+    `;
+    const grid = document.getElementById("smeltContainer");
+    
+    for(let i=0; i<4; i++) {
+        const slot = document.createElement("div");
+        slot.className = "smelt-slot" + (smeltSlots[i] ? " filled" : "");
+        if (smeltSlots[i]) {
+            slot.innerHTML = `
+                <img src="images/items/${smeltSlots[i].img}" style="width:60%; height:60%; object-fit:contain;">
+                <div style="font-size:0.8rem; font-weight:bold;">${smeltSlots[i].name}</div>
+            `;
+        } else {
+            slot.innerHTML = `<div class="smelt-plus">+</div>`;
+        }
+        slot.onclick = () => {
+            if(!smeltSlots[i]) {
+                alert("請從背包選擇物品添加 (預設添加鐵線)");
+                smeltSlots[i] = { name: "鐵線", img: "item_wire.PNG", count: 1 };
+                renderShop(); // Re-render to update slot
+            } else {
+                smeltSlots[i] = null;
+                renderShop();
+            }
+        };
+        grid.appendChild(slot);
+    }
+}
+
+function renderShopGacha() {
+    const container = document.getElementById("shopContentArea");
+    // 使用純 CSS 金蛋
+    container.innerHTML = `
+        <div class="gacha-container">
+            <div id="gachaEgg" class="css-golden-egg"></div>
+            <div id="gachaFlash" class="gacha-flash"></div>
+            <div style="text-align:center; color:var(--primary-blue); font-weight:bold; margin-bottom:10px;">
+                龍蛋祈願 (花費: ${GACHA_CONFIG.COST} G)
+            </div>
+            <button class="btn-main" style="background:#f1c40f; color:#d35400;" onclick="playGacha()">立即祈願</button>
+        </div>
+    `;
+}
+
+function playGacha() {
+    if (gameState.user.coins < GACHA_CONFIG.COST) {
+        return alert("金幣不足！");
+    }
+    
+    gameState.user.coins -= GACHA_CONFIG.COST;
+    saveGame();
+    renderShop(); // Update coin display
+    
+    const egg = document.getElementById("gachaEgg");
+    const flash = document.getElementById("gachaFlash");
+    
+    egg.classList.add("gacha-shake");
+    playSFX('click'); 
+    
+    setTimeout(() => {
+        egg.classList.remove("gacha-shake");
+        flash.classList.add("active");
+        playSFX('correct'); 
+        
+        // Calculate Result
+        const rand = Math.random();
+        let rarity = 'R';
+        if (rand < GACHA_CONFIG.RATES.SSR) rarity = 'SSR';
+        else if (rand < (GACHA_CONFIG.RATES.SSR + GACHA_CONFIG.RATES.SR)) rarity = 'SR';
+        
+        const pool = DROP_ITEMS_POOL[rarity];
+        const item = pool[Math.floor(Math.random() * pool.length)];
+        const rarityText = RARITY_MAP[rarity]; // 使用中文標籤
+
+        let msg = "";
+        // Add to inventory
+        if (item.type === 'coin') {
+            gameState.user.coins += item.value;
+            msg = `${rarityText}\n恭喜獲得：${item.name} (+${item.value}G)`;
+        } else {
+            const existing = gameState.inventory.find(i => i.id === item.id);
+            if (existing) existing.count++;
+            else gameState.inventory.push({ ...item, count: 1 });
+            msg = `${rarityText}\n恭喜獲得：${item.name}`;
+        }
+        
+        saveGame();
+        renderShop();
+        showDropModal(item.img, msg.replace('\n', '<br>')); // 顯示彈窗而不是 alert
+    }, 1500);
+}
+
+// 兼容舊函數調用 (將其指向新的商店分頁)
+function renderSmelting() {
+    currentShopTab = 'smelt';
+    renderShop();
 }
 
 function filterInventory(type, btn) {
@@ -415,57 +593,6 @@ function claimTaskReward(id) {
     }
 }
 
-function renderSmelting() {
-    switchScreen("screen-smelt");
-    const container = document.getElementById("smeltContainer");
-    container.innerHTML = "";
-    
-    for(let i=0; i<4; i++) {
-        const slot = document.createElement("div");
-        slot.className = "smelt-slot" + (smeltSlots[i] ? " filled" : "");
-        
-        if (smeltSlots[i]) {
-            slot.innerHTML = `
-                <img src="images/items/${smeltSlots[i].img}" style="width:60%; height:60%; object-fit:contain;">
-                <div style="font-size:0.8rem; font-weight:bold;">${smeltSlots[i].name}</div>
-            `;
-        } else {
-            slot.innerHTML = `<div class="smelt-plus">+</div>`;
-        }
-        
-        slot.onclick = () => {
-            if(!smeltSlots[i]) {
-                alert("請從背包選擇物品添加 (功能開發中: 預設添加鐵線)");
-                smeltSlots[i] = { name: "鐵線", img: "item_wire.PNG", count: 1 };
-                renderSmelting();
-            } else {
-                smeltSlots[i] = null;
-                renderSmelting();
-            }
-        };
-        container.appendChild(slot);
-    }
-}
-
-function initSmelt() {
-    if (smeltSlots.every(s => s === null)) return alert("請先添加材料！");
-    document.getElementById("smeltConfirmModal").style.display = "flex";
-    updateCoreButtonVisibility();
-}
-
-function executeSmelt() {
-    document.getElementById("smeltConfirmModal").style.display = "none";
-    smeltSlots = [null, null, null, null];
-    renderSmelting();
-    alert("熔煉成功！(獲得: 未知物品)");
-    updateCoreButtonVisibility();
-}
-
-function showRecipes() {
-    document.getElementById("recipeModal").style.display = "flex";
-    updateCoreButtonVisibility();
-}
-
 function renderPets() {
     switchScreen("screen-pet");
     const container = document.getElementById("petContainer");
@@ -489,4 +616,23 @@ function renderPets() {
         }
         container.appendChild(card);
     }
+}
+
+function initSmelt() {
+    if (smeltSlots.every(s => s === null)) return alert("請先添加材料！");
+    document.getElementById("smeltConfirmModal").style.display = "flex";
+    updateCoreButtonVisibility();
+}
+
+function executeSmelt() {
+    document.getElementById("smeltConfirmModal").style.display = "none";
+    smeltSlots = [null, null, null, null];
+    renderShop(); // Refresh shop view
+    alert("熔煉成功！(獲得: 未知物品)");
+    updateCoreButtonVisibility();
+}
+
+function showRecipes() {
+    document.getElementById("recipeModal").style.display = "flex";
+    updateCoreButtonVisibility();
 }

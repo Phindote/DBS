@@ -1,23 +1,10 @@
 let gameState = {
     user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 50, lastLoginDate: "" },
     stats: {
-        totalCorrect: 0,
-        srCorrect: 0,
-        consecutivePerfect: 0,
-        mixWinCount: 0,
-        mixWinCount5: 0,
-        mixWinCount10: 0,
-        mixWinCount16: 0,
-        mixPerfect16: 0,
-        randomWinCount: 0,
-        totalStudyMins: 0,
-        energyRecovered: 0,
-        totalPlayTime: 0,
-        tryCount: 0,
-        wrongCountTotal: 0,
-        perfectHistory: [],
-        perfectChapterIds: [],
-        lastPerfectChapter: ""
+        totalCorrect: 0, srCorrect: 0, consecutivePerfect: 0,
+        mixWinCount: 0, mixWinCount5: 0, mixWinCount10: 0, mixWinCount16: 0, mixPerfect16: 0, randomWinCount: 0,
+        totalStudyMins: 0, energyRecovered: 0, totalPlayTime: 0, tryCount: 0, wrongCountTotal: 0,
+        perfectHistory: [], perfectChapterIds: [], lastPerfectChapter: ""
     },
     inventory: [], 
     pets: [],
@@ -39,12 +26,9 @@ let gameState = {
     unlockedAchievements: []
 };
 let pendingSingleChapterKey = ""; 
-let inputLock = false;
-let particleCtx = null;
-let particles = [];
+let inputLock = false; // 戰鬥鎖，防止連點
 let pokedexTimer = null;
 let pokedexSeconds = 0;
-let gamePlayTimer = null;
 
 function saveGame() {
     if (window.godModeActive) return;
@@ -81,18 +65,16 @@ function applyGameData(parsed) {
     if (typeof gameState.user.energy === 'undefined') gameState.user.energy = 100;
     if (typeof gameState.user.unlockedReplayXP === 'undefined') gameState.user.unlockedReplayXP = false;
     if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 50;
-    if (typeof gameState.user.lastLoginDate === 'undefined') gameState.user.lastLoginDate = "";
     
     gameState.stats = parsed.stats || {};
+    // 確保所有統計變數存在
     ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5', 
      'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins', 
      'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
         if (typeof gameState.stats[key] === 'undefined') gameState.stats[key] = 0;
     });
 
-    if(!Array.isArray(gameState.stats.perfectHistory)) gameState.stats.perfectHistory = [];
     if(!Array.isArray(gameState.stats.perfectChapterIds)) gameState.stats.perfectChapterIds = [];
-    if(typeof gameState.stats.lastPerfectChapter === 'undefined') gameState.stats.lastPerfectChapter = "";
 
     gameState.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : []; 
     gameState.pets = Array.isArray(parsed.pets) ? parsed.pets : [];
@@ -100,19 +82,15 @@ function applyGameData(parsed) {
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
-
-    if (gameState.stats.totalPlayTime === 0) {
-        gameState.masteredChapters = [];
-        gameState.solvedQuestionIds = [];
-        gameState.unlockedAchievements = [];
-        gameState.pets = [];
-        gameState.dailyTasks = [];
-    }
     
+    // 如果有 UI 更新函數，就執行
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
 }
 
 function checkAchievements() {
+    // 確保只在 UI 載入後執行
+    if (typeof window.questionsDB === 'undefined') return;
+    
     const db = window.questionsDB || {};
     const u = gameState.user;
     const s = gameState.stats;
@@ -130,7 +108,6 @@ function checkAchievements() {
     check(s.totalPlayTime >= 15, "ach_3");
     check(s.totalPlayTime >= 60, "ach_4");
     check(s.totalPlayTime >= 999, "ach_5");
-
     check(gameState.masteredChapters.length > 0, "ach_6"); 
     
     let jrCount = 0, srCount = 0, bothCount = 0;
@@ -147,36 +124,9 @@ function checkAchievements() {
     check(jrCount >= totalChapters, "ach_14");
     check(srCount >= totalChapters, "ach_15");
     check(bothCount >= totalChapters, "ach_16");
-
-    check(bothCount >= 1, "ach_17");
-    check(bothCount >= 8, "ach_18");
-    check(bothCount >= totalChapters, "ach_19");
-
     check(s.mixWinCount >= 1, "ach_20");
-    check(s.mixWinCount5 >= 1, "ach_21");
-    check(s.mixWinCount10 >= 1, "ach_22");
-    check(s.mixWinCount16 >= 1, "ach_23");
-    check(s.randomWinCount >= 1, "ach_24");
-    check(s.randomWinCount >= 10, "ach_25");
-
     check(s.totalCorrect >= 100, "ach_26");
-    check(s.totalCorrect >= 500, "ach_27");
-    check(s.totalCorrect >= 1000, "ach_28");
-    check(s.srCorrect >= 100, "ach_29");
-    check(s.srCorrect >= 300, "ach_30");
-    check(s.srCorrect >= 500, "ach_31");
-    check(s.tryCount >= 3000, "ach_32");
-    check(s.wrongCountTotal >= 111, "ach_33");
-
     check(s.energyRecovered >= 10, "ach_35");
-    check(s.energyRecovered >= 60, "ach_36");
-    check(s.energyRecovered >= 180, "ach_37");
-    check(s.energyRecovered >= 300, "ach_38");
-    check(s.energyRecovered >= 600, "ach_39");
-
-    if(unlocked.length + newUnlock.length >= 39 && !unlocked.includes("ach_40") && !newUnlock.includes("ach_40")) {
-        newUnlock.push("ach_40");
-    }
 
     if(newUnlock.length > 0) {
         newUnlock.forEach(id => gameState.unlockedAchievements.push(id));
