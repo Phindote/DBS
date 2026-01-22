@@ -31,30 +31,11 @@
 .dragon-attack { animation: dragonCrash 0.4s ease-in-out forwards !important; }
 
 @keyframes bossDamage {
-    0% { transform: scale(1); filter: brightness(1); }
-    20% { transform: scale(0.9) rotate(5deg); filter: brightness(2) hue-rotate(90deg); }
-    40% { transform: scale(1.1) rotate(-5deg); filter: brightness(2) hue-rotate(90deg); }
-    60% { transform: scale(0.95); filter: brightness(1.5); }
-    80% { transform: scale(1.05); }
-    100% { transform: scale(1); filter: brightness(1); }
-}
-.boss-damage { animation: bossDamage 0.5s ease-in-out forwards; }
-
-@keyframes playerAttack {
-    0% { transform: translateY(0) scale(1); }
-    20% { transform: translateY(50px) scale(0.9); }
-    45% { transform: translateY(-400px) scale(1.2); }
-    65% { transform: translateY(-400px) scale(1.2); }
-    100% { transform: translateY(0) scale(1); }
-}
-.player-attack { animation: playerAttack 0.7s cubic-bezier(0.25, 0.1, 0.25, 1.5) forwards; }
-
-@keyframes marioStarFlash {
-    0% { filter: hue-rotate(0deg) brightness(1); }
-    25% { filter: hue-rotate(90deg) brightness(2); }
-    50% { filter: hue-rotate(180deg) brightness(1.5); }
-    75% { filter: hue-rotate(270deg) brightness(2); }
-    100% { filter: hue-rotate(360deg) brightness(1); }
+    0% { transform: translateX(0); filter: brightness(1); }
+    25% { transform: translateX(-10px); filter: brightness(2) hue-rotate(90deg); }
+    50% { transform: translateX(10px); filter: brightness(3) hue-rotate(0deg); }
+    75% { transform: translateX(-10px); filter: brightness(2) hue-rotate(-90deg); }
+    100% { transform: translateX(0); filter: brightness(1); }
 }
 .boss-hit-flash {
     animation: marioStarFlash 0.3s linear infinite !important;
@@ -81,14 +62,65 @@
 .shake-box { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
 
 @keyframes correctPulse {
-    0% { background-color: var(--white); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); transform: scale(1); }
-    50% { background-color: #fff9c4; box-shadow: 0 0 20px 10px rgba(241, 196, 15, 0.5); transform: scale(1.05); }
-    100% { background-color: var(--white); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); transform: scale(1); }
+    0% { background-color: var(--white); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    50% { background-color: #fff9c4; box-shadow: 0 0 20px #f1c40f; transform: scale(1.02); }
+    100% { background-color: var(--white); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 }
-.correct-flash {
-    animation: correctPulse 0.6s ease-out forwards;
-    border-color: var(--xp-gold) !important;
-    background-color: #fff9c4 !important;
-    color: #000 !important;
-    font-weight: bold;
+.correct-flash { animation: correctPulse 0.5s ease-out; }
+
+@keyframes attackMove {
+    0% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(-400px) scale(0.5); opacity: 0.8; }
+    100% { transform: translateY(-800px) scale(0); opacity: 0; }
+}
+.player-attack { animation: attackMove 0.6s ease-in forwards; }
+
+@keyframes marioStarFlash {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    25% { filter: hue-rotate(90deg) brightness(2); }
+    50% { filter: hue-rotate(180deg) brightness(3); }
+    75% { filter: hue-rotate(270deg) brightness(2); }
+    100% { filter: hue-rotate(360deg) brightness(1); }
+}
+
+/* VFX LAYER */
+.vfx-layer {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.slash-cross {
+    position: absolute;
+    width: 200%; height: 200%;
+    background: transparent;
+    opacity: 0;
+}
+
+.slash-cross.active {
+    animation: crossSlash 0.4s ease-out forwards;
+}
+
+@keyframes crossSlash {
+    0% {
+        opacity: 1;
+        background: linear-gradient(45deg, transparent 45%, white 48%, white 52%, transparent 55%),
+                    linear-gradient(-45deg, transparent 45%, white 48%, white 52%, transparent 55%);
+        transform: scale(0.8);
+    }
+    20% {
+         background: linear-gradient(45deg, transparent 40%, #e74c3c 48%, #c0392b 52%, transparent 60%),
+                    linear-gradient(-45deg, transparent 40%, #e74c3c 48%, #c0392b 52%, transparent 60%);
+         transform: scale(1.1);
+         filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
+    }
+    100% {
+        opacity: 0;
+        background: linear-gradient(45deg, transparent 45%, black 48%, black 52%, transparent 55%),
+                    linear-gradient(-45deg, transparent 45%, black 48%, black 52%, transparent 55%);
+        transform: scale(1.4);
+    }
 }
