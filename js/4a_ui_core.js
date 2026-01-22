@@ -8,21 +8,18 @@ function updateCoreButtonVisibility() {
     const menuScreen = document.getElementById("screen-menu");
     if(!menuScreen) return; 
 
-    // 檢查是否有 Modal 開啟
     const modals = document.querySelectorAll(".modal-backdrop, #contentModal, #statsModal, #titlesModal, #helpModal, #unlockModal, #dropModal");
     let isAnyModalOpen = false;
     modals.forEach(m => {
         if(m.style.display === 'flex' || m.style.display === 'block') isAnyModalOpen = true;
     });
 
-    // 檢查是否有子選單 (選擇篇章) 開啟
     const subSingle = document.getElementById("subMenuSingle");
     const subMix = document.getElementById("subMenuMix");
     let isSubMenuOpen = false;
     if (subSingle && subSingle.style.display === 'flex') isSubMenuOpen = true;
     if (subMix && subMix.style.display === 'flex') isSubMenuOpen = true;
 
-    // 只有在 主選單畫面 + 無 Modal + 無子選單 時才顯示 Core Button
     if (menuScreen.classList.contains('active') && !isAnyModalOpen && !isSubMenuOpen) {
         if(coreBtn) coreBtn.style.display = 'block';
     } else {
@@ -36,6 +33,10 @@ function switchScreen(id) {
     const target = document.getElementById(id);
     if(target) target.classList.add('active');
     
+    if (id === 'screen-menu') {
+        smeltSlots = [null, null, null, null];
+    }
+
     updateCoreButtonVisibility();
 
     if (id === 'screen-game') {

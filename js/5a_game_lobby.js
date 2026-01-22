@@ -44,6 +44,13 @@ function handleLogin() {
     let loginTask = gameState.dailyTasks.find(t => t.id === 1);
     if(loginTask && loginTask.progress < 1) loginTask.progress = 1;
 
+    let t2 = gameState.dailyTasks.find(t => t.id === 2);
+    if(t2 && !t2.targetKey) {
+        const db = window.questionsDB || {};
+        const keys = Object.keys(db);
+        if(keys.length > 0) t2.targetKey = keys[Math.floor(Math.random() * keys.length)];
+    }
+
     saveGame();
     updateUserDisplay();
     

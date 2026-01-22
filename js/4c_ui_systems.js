@@ -44,9 +44,14 @@ function showDropModal(img, text) {
     const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(255,215,0,0.6));">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));">
         <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
     `;
+    const btn = modal.querySelector(".btn-main");
+    if(btn) {
+        btn.style.background = "#e74c3c";
+        btn.innerText = "馬上收下！";
+    }
     modal.style.display = 'flex';
     updateCoreButtonVisibility();
     playSFX('success');
@@ -368,7 +373,7 @@ function renderShopSmelt() {
         <div class="smelt-grid-container" id="smeltContainer" style="margin-top:10px;"></div>
         <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
             <button class="btn-main" style="margin:0; background:#8e44ad;" onclick="showRecipes()">合成功式</button>
-            <button class="btn-main" style="margin:0;" onclick="executeSmelt()">開始合成</button>
+            <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
         </div>
     `;
     const grid = document.getElementById("smeltContainer");
@@ -629,6 +634,7 @@ function claimTaskReward(id) {
         gameState.user.coins = Math.min(gameState.user.coins + quest.reward, GAME_CONFIG.MAX_COINS);
         saveGame();
         playSFX('success');
+        updateShopUI();
         renderDailyTasks();
         alert(`成功領取獎勵：${quest.reward} 金幣！`);
     }
