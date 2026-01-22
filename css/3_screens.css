@@ -10,7 +10,7 @@
     box-sizing: border-box;
     height: 100%;
     overflow-x: hidden;
-    overflow-y: hidden; 
+    overflow-y: hidden;
 }
 .screen.active {
     display: flex;
@@ -127,12 +127,12 @@
     margin-top: 5px;
     flex: 1;
     min-height: 0;
-    overflow-y: auto; 
-    overflow-x: hidden; 
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 #singleChapterList, #mixChapterList, #shopContainer, #pokedexContainer, #sealContainer, #inventoryContainer, #dailyContainer, #smeltContainer, #petContainer {
     flex: 1;
-    min-height: 0; 
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     border: none;
@@ -154,18 +154,18 @@
     justify-content: center;
 }
 #screen-game {
-    display: none; 
+    display: none;
     flex-direction: column;
     height: 100%;
     padding: 10px;
-    overflow-y: auto; 
+    overflow-y: auto;
 }
 #screen-game.active {
     display: flex;
 }
 .boss-area {
     width: 100%;
-    height: 250px; 
+    height: 250px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -174,10 +174,10 @@
     position: relative;
     z-index: 10;
     flex-shrink: 0;
-    overflow: hidden; 
+    overflow: hidden;
 }
 .boss-img {
-    max-height: 180px; 
+    max-height: 180px;
     max-width: 100%;
     width: auto;
     object-fit: contain;
@@ -217,10 +217,10 @@
     position: relative;
     z-index: 20;
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
-    margin-bottom: 2px; 
+    margin-bottom: 2px;
 }
 .question-box .btn-main {
-    margin-top: 0 !important; 
+    margin-top: 0 !important;
 }
 
 .crack-stage-1 { border-color: #f39c12; border-style: dashed; }
@@ -239,7 +239,7 @@
     border-radius: 5px;
     text-align: center;
     transition: all 0.3s;
-    margin-bottom: 8px; 
+    margin-bottom: 8px;
 }
 #inputAreaSenior {
     margin-top: 5px;
@@ -316,8 +316,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.85); 
-    z-index: 20000; 
+    background: rgba(0,0,0,0.85);
+    z-index: 20000;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -326,7 +326,7 @@
 #unlockModal .modal-content {
     background: #fff;
     width: 100%;
-    max-width: 380px; 
+    max-width: 380px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -498,12 +498,12 @@
     right: 20px;
     z-index: 10000;
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     align-items: center;
-    gap: 15px; 
+    gap: 15px;
     touch-action: none;
     transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    justify-content: flex-end; 
+    justify-content: flex-end;
 }
 #floatingMainBtn {
     width: 50px;
@@ -515,7 +515,7 @@
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
     transition: transform 0.2s;
     flex-shrink: 0;
-    order: 2; 
+    order: 2;
 }
 #floatingMainBtn:active { transform: scale(0.95); }
 #floatingMainBtn img {
@@ -525,9 +525,9 @@
 }
 #floatingSubMenu {
     display: none;
-    flex-direction: row; 
+    flex-direction: row;
     gap: 10px;
-    order: 1; 
+    order: 1;
 }
 #floatingSubMenu.visible {
     display: flex;
@@ -550,7 +550,7 @@
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     transition: all 0.2s;
     padding: 5px;
-    position: relative; 
+    position: relative;
 }
 .btn-control-float:hover { transform: scale(1.1); }
 .btn-control-float img { width: 100%; height: 100%; object-fit: contain; }
@@ -558,16 +558,16 @@
 .btn-control-float.off::after {
     content: '';
     position: absolute;
-    top: 50%; 
-    left: 50%; 
-    width: 60%; 
-    height: 3px; 
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 3px;
     background-color: #e74c3c;
     transform: translate(-50%, -50%) rotate(-45deg);
     border-radius: 2px;
     box-shadow: 0 0 2px rgba(255,255,255,0.8);
     pointer-events: none;
-    z-index: 10; 
+    z-index: 10;
 }
 
 .radial-menu-container {
@@ -603,12 +603,12 @@
 
 .radial-sub-btn {
     position: absolute;
-    bottom: 25px; 
-    left: 25px;   
-    width: 50px;  
-    height: 50px; 
+    bottom: 25px;
+    left: 25px;
+    width: 40px;
+    height: 40px;
     border: none;
-    background: transparent;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -617,8 +617,8 @@
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
     opacity: 0;
     z-index: 10001;
-    padding: 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    padding: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 .radial-sub-btn img {
     width: 100%;
