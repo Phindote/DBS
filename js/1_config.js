@@ -19,7 +19,6 @@ const GACHA_CONFIG = {
     RATES: { SSR: 0.05, SR: 0.20, R: 0.75 }
 };
 
-// 在地化映射
 const RARITY_MAP = {
     SSR: "【傳說之光】",
     SR: "【稀有之光】",
@@ -40,23 +39,27 @@ const DROP_SYSTEM_CONFIG = {
     LOGIN_MOMENT_BONUS: 0.80   
 };
 
-const DROP_ITEMS_POOL = {
-    SSR: [
-        { id: "item_dragon_scale", name: "真龍逆鱗", img: "item_scale.PNG", type: "material" },
-        { id: "item_ancient_gem", name: "太古晶石", img: "item_gem.PNG", type: "material" },
-        { id: "item_gold_bar", name: "大金條 (500G)", img: "item_goldbar.PNG", type: "coin", value: 500 }
-    ],
-    SR: [
-        { id: "item_iron_wire", name: "精製鐵線", img: "item_wire.PNG", type: "material" },
-        { id: "item_leather", name: "硬化皮革", img: "item_leather.PNG", type: "material" },
-        { id: "item_silver_coin", name: "銀幣袋 (100G)", img: "item_silver.PNG", type: "coin", value: 100 }
-    ],
-    R: [
-        { id: "item_herb", name: "止血草", img: "item_herb.PNG", type: "material" },
-        { id: "item_stone", name: "普通石塊", img: "item_stone.PNG", type: "material" },
-        { id: "item_copper_coin", name: "銅板 (20G)", img: "item_copper.PNG", type: "coin", value: 20 }
-    ]
-};
+// === 自動化數據處理工廠 ===
+// 這裡會自動從 0_items.js 的 MASTER_ITEMS 生成商店和掉落列表
+const SHOP_ITEMS = [];
+const DROP_ITEMS_POOL = { SSR: [], SR: [], R: [] };
+
+if (typeof MASTER_ITEMS !== 'undefined') {
+    MASTER_ITEMS.forEach(item => {
+        // 1. 如果有 price，加入商店
+        if (item.price && item.price > 0) {
+            SHOP_ITEMS.push(item);
+        }
+        
+        // 2. 如果有 drop 屬性，加入對應掉落池
+        if (item.drop && DROP_ITEMS_POOL[item.drop]) {
+            DROP_ITEMS_POOL[item.drop].push(item);
+        }
+    });
+} else {
+    console.error("錯誤：找不到 MASTER_ITEMS，請確保已載入 0_items.js");
+}
+// =========================
 
 const TITLES = [
     "初心新手", "鐵劍勇者", "龍影覓者", "鱗甲獵手", "龍息破者",
@@ -64,6 +67,7 @@ const TITLES = [
     "龍魂征服", "焚天劍豪", "滅鱗霸主", "龍血君王", "噬血龍將",
     "破空龍屠", "蒼穹滅士", "究極•屠龍者", "龍脈•降龍無悔"
 ];
+
 const ACHIEVEMENTS = [
     {id: "ach_1", title: "初入江湖", desc: "達到等級 5"},
     {id: "ach_2", title: "學富五車", desc: "獲得 5000 經驗值"},
@@ -106,6 +110,7 @@ const ACHIEVEMENTS = [
     {id: "ach_39", title: "浩然正氣", desc: "溫習累計回復 600 點能量"},
     {id: "ach_40", title: "龍脈覺醒", desc: "解鎖前 39 個成就"}
 ];
+
 const DAILY_QUESTS = [
     { id: 1, desc: "每日登入", target: 1, reward: 50, type: "login" },
     { id: 2, desc: "溫習惡龍圖鑑 10 分鐘", target: 10, reward: 80, type: "study" },
@@ -115,12 +120,8 @@ const DAILY_QUESTS = [
     { id: 6, desc: "指定篇章初階完美通關 1 次", target: 1, reward: 50, type: "target_jr" },
     { id: 7, desc: "指定篇章高階完美通關 1 次", target: 1, reward: 80, type: "target_sr" }
 ];
-const SHOP_ITEMS = [
-    { id: "item_hp_potion", name: "生命藥水", price: 100, desc: "戰鬥中恢復 50 HP", img: "item_potion.PNG" },
-    { id: "item_energy_drink", name: "浩然特飲", price: 200, desc: "立即恢復 20 能量", img: "item_drink.PNG" },
-    { id: "item_shield", name: "護身符", price: 500, desc: "抵擋一次致命傷害", img: "item_shield.PNG" },
-    { id: "item_exp_book", name: "經驗書", price: 1000, desc: "獲得 500 經驗值", img: "item_book.PNG" }
-];
+
+// 資產加載列表 (加入新物品圖)
 const ASSETS_TO_LOAD = [
     'images/ui/banner.jpg',
     'images/bg/login_bg.jpg',
@@ -145,9 +146,12 @@ const ASSETS_TO_LOAD = [
     'images/results/img_perfect.PNG',
     'images/results/img_success.PNG',
     'images/results/img_defeat.PNG',
-    'images/achievements/ach_locked.PNG',
-    'images/items/item_egg.PNG',
-    'images/items/item_egg_crack.PNG',
-    'images/items/item_light.PNG'
+    'images/achievements/ach_locked.PNG'
 ];
+// 自動加入物品圖片到預加載列表
+if (typeof MASTER_ITEMS !== 'undefined') {
+    MASTER_ITEMS.forEach(item => {
+        if(item.img) ASSETS_TO_LOAD.push('images/items/' + item.img);
+    });
+}
 for(let i=1; i<=40; i++) ASSETS_TO_LOAD.push(`images/achievements/ach_${i}.PNG`);

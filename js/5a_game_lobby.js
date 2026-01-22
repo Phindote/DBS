@@ -24,11 +24,15 @@ function handleLogin() {
         if(keys.length > 0) {
             const randomKey1 = keys[Math.floor(Math.random() * keys.length)];
             const randomKey2 = keys[Math.floor(Math.random() * keys.length)];
+            const randomKeyStudy = keys[Math.floor(Math.random() * keys.length)];
+            
+            let task2 = gameState.dailyTasks.find(t => t.id === 2);
+            if(task2) task2.targetKey = randomKeyStudy;
+
             gameState.dailyTasks.push({ id: 6, progress: 0, complete: false, claimed: false, targetKey: randomKey1 });
             gameState.dailyTasks.push({ id: 7, progress: 0, complete: false, claimed: false, targetKey: randomKey2 });
         }
 
-        // [DROP SYSTEM] 情況9: 每日特定時間登入掉落 (例如 7-9點, 18-20點)
         const hour = new Date().getHours();
         if ((hour >= 7 && hour <= 9) || (hour >= 18 && hour <= 20)) {
             setTimeout(() => {

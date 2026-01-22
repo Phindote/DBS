@@ -9,7 +9,7 @@ function updateCoreButtonVisibility() {
     if(!menuScreen) return; 
 
     // 檢查是否有 Modal 開啟
-    const modals = document.querySelectorAll(".modal-backdrop, #contentModal, #statsModal, #titlesModal, #helpModal, #unlockModal");
+    const modals = document.querySelectorAll(".modal-backdrop, #contentModal, #statsModal, #titlesModal, #helpModal, #unlockModal, #dropModal");
     let isAnyModalOpen = false;
     modals.forEach(m => {
         if(m.style.display === 'flex' || m.style.display === 'block') isAnyModalOpen = true;

@@ -1,4 +1,10 @@
 let currentShopTab = 'buy'; 
+let currentSmeltSlotIndex = -1;
+
+function updateShopUI() {
+    const coinEl = document.getElementById("coinDisplay");
+    if(coinEl) coinEl.innerText = gameState.user.coins;
+}
 
 function triggerDrop(scenario) {
     const rate = DROP_SYSTEM_CONFIG[scenario] || 0;
@@ -16,7 +22,7 @@ function triggerDrop(scenario) {
     let msg = "";
     if (itemTemplate.type === 'coin') {
         gameState.user.coins = Math.min(gameState.user.coins + itemTemplate.value, GAME_CONFIG.MAX_COINS);
-        msg = `獲得：${itemTemplate.name} (+${itemTemplate.value}G)`;
+        msg = `獲得：${itemTemplate.name} (+${itemTemplate.value}金幣)`;
     } else {
         const existing = gameState.inventory.find(i => i.id === itemTemplate.id);
         if (existing) {
@@ -28,14 +34,13 @@ function triggerDrop(scenario) {
     }
     
     saveGame();
+    updateShopUI();
     showDropModal(itemTemplate.img, msg);
 }
 
 function showDropModal(img, text) {
     const modal = document.getElementById("dropModal");
     const body = document.getElementById("dropModalBody");
-    
-    // 如果圖片也是 "undefined.PNG" 或者沒有，可以用默認圖
     const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
 
     body.innerHTML = `
@@ -43,7 +48,21 @@ function showDropModal(img, text) {
         <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
     `;
     modal.style.display = 'flex';
-    updateCoreButtonVisibility(); // 隱藏 core button
+    updateCoreButtonVisibility();
+    playSFX('success');
+}
+
+function showGachaModal(img, text) {
+    const modal = document.getElementById("gachaModal");
+    const body = document.getElementById("gachaModalBody");
+    const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
+
+    body.innerHTML = `
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));">
+        <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
+    `;
+    modal.style.display = 'flex';
+    updateCoreButtonVisibility();
     playSFX('success');
 }
 
@@ -100,9 +119,12 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
     container.appendChild(card);
 }
 
+let currentPokedexKey = null;
+
 function showChapterContent(key) {
     const db = window.questionsDB || {};
     const item = db[key];
+    currentPokedexKey = key;
     document.getElementById("modalTitle").innerText = item.title;
     document.getElementById("modalBody").innerText = item.content || "暫無內容";
     document.getElementById("contentModal").style.display = "flex";
@@ -146,7 +168,7 @@ function closeContentModal() {
         checkAchievements();
         
         let quest2 = gameState.dailyTasks.find(t => t.id === 2);
-        if(quest2) {
+        if(quest2 && quest2.targetKey === currentPokedexKey) {
             quest2.progress += minutes;
             saveGame();
         }
@@ -161,6 +183,7 @@ function closeContentModal() {
     } else {
         alert("溫習時間不足1分鐘，未獲得浩然之氣。");
     }
+    currentPokedexKey = null;
 }
 
 function showAchievements() {
@@ -297,13 +320,10 @@ function processNextUnlock() {
     }
 }
 
-// === 商店系統重構 ===
-
 function renderShop() {
     switchScreen("screen-shop");
-    document.getElementById("coinDisplay").innerText = `金幣：${gameState.user.coins}`;
+    updateShopUI();
     
-    // 更新 Tab 狀態
     ['tabBuy', 'tabSmelt', 'tabGacha'].forEach(id => document.getElementById(id).classList.remove('active'));
     
     if (currentShopTab === 'buy') {
@@ -348,7 +368,7 @@ function renderShopSmelt() {
         <div class="smelt-grid-container" id="smeltContainer" style="margin-top:10px;"></div>
         <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
             <button class="btn-main" style="margin:0; background:#8e44ad;" onclick="showRecipes()">合成功式</button>
-            <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
+            <button class="btn-main" style="margin:0;" onclick="executeSmelt()">開始合成</button>
         </div>
     `;
     const grid = document.getElementById("smeltContainer");
@@ -365,28 +385,48 @@ function renderShopSmelt() {
             slot.innerHTML = `<div class="smelt-plus">+</div>`;
         }
         slot.onclick = () => {
-            if(!smeltSlots[i]) {
-                alert("請從背包選擇物品添加 (預設添加鐵線)");
-                smeltSlots[i] = { name: "鐵線", img: "item_wire.PNG", count: 1 };
-                renderShop(); // Re-render to update slot
-            } else {
-                smeltSlots[i] = null;
-                renderShop();
-            }
+            currentSmeltSlotIndex = i;
+            document.getElementById("smeltSelectModal").style.display = "flex";
+            renderSmeltInventory();
         };
         grid.appendChild(slot);
     }
 }
 
+function renderSmeltInventory() {
+    const grid = document.getElementById("smeltInventoryGrid");
+    grid.innerHTML = "";
+    gameState.inventory.forEach((item, index) => {
+        if(!item) return;
+        const card = document.createElement("div");
+        card.className = "pokedex-card";
+        card.innerHTML = `
+            <img src="images/items/${item.img}" class="pokedex-img">
+            <div class="pokedex-title">${item.name}</div>
+            <div class="inv-count-badge">x${item.count}</div>
+        `;
+        card.onclick = () => selectSmeltItem(index);
+        grid.appendChild(card);
+    });
+}
+
+function selectSmeltItem(invIndex) {
+    const item = gameState.inventory[invIndex];
+    if(item) {
+        smeltSlots[currentSmeltSlotIndex] = { ...item, originalIndex: invIndex }; 
+        document.getElementById("smeltSelectModal").style.display = "none";
+        renderShop();
+    }
+}
+
 function renderShopGacha() {
     const container = document.getElementById("shopContentArea");
-    // 使用純 CSS 金蛋
     container.innerHTML = `
         <div class="gacha-container">
             <div id="gachaEgg" class="css-golden-egg"></div>
             <div id="gachaFlash" class="gacha-flash"></div>
             <div style="text-align:center; color:var(--primary-blue); font-weight:bold; margin-bottom:10px;">
-                龍蛋祈願 (花費: ${GACHA_CONFIG.COST} G)
+                龍蛋祈願 (花費: ${GACHA_CONFIG.COST} 金幣)
             </div>
             <button class="btn-main" style="background:#f1c40f; color:#d35400;" onclick="playGacha()">立即祈願</button>
         </div>
@@ -400,7 +440,7 @@ function playGacha() {
     
     gameState.user.coins -= GACHA_CONFIG.COST;
     saveGame();
-    renderShop(); // Update coin display
+    updateShopUI(); 
     
     const egg = document.getElementById("gachaEgg");
     const flash = document.getElementById("gachaFlash");
@@ -413,7 +453,6 @@ function playGacha() {
         flash.classList.add("active");
         playSFX('correct'); 
         
-        // Calculate Result
         const rand = Math.random();
         let rarity = 'R';
         if (rand < GACHA_CONFIG.RATES.SSR) rarity = 'SSR';
@@ -421,13 +460,12 @@ function playGacha() {
         
         const pool = DROP_ITEMS_POOL[rarity];
         const item = pool[Math.floor(Math.random() * pool.length)];
-        const rarityText = RARITY_MAP[rarity]; // 使用中文標籤
+        const rarityText = RARITY_MAP[rarity]; 
 
         let msg = "";
-        // Add to inventory
         if (item.type === 'coin') {
             gameState.user.coins += item.value;
-            msg = `${rarityText}\n恭喜獲得：${item.name} (+${item.value}G)`;
+            msg = `${rarityText}\n恭喜獲得：${item.name} (+${item.value}金幣)`;
         } else {
             const existing = gameState.inventory.find(i => i.id === item.id);
             if (existing) existing.count++;
@@ -436,12 +474,11 @@ function playGacha() {
         }
         
         saveGame();
-        renderShop();
-        showDropModal(item.img, msg.replace('\n', '<br>')); // 顯示彈窗而不是 alert
+        updateShopUI();
+        showGachaModal(item.img, msg.replace('\n', '<br>'));
     }, 1500);
 }
 
-// 兼容舊函數調用 (將其指向新的商店分頁)
 function renderSmelting() {
     currentShopTab = 'smelt';
     renderShop();
@@ -541,6 +578,10 @@ function renderDailyTasks() {
             const chapterKey = userState.targetKey;
             const chapterName = (chapterKey && db[chapterKey]) ? db[chapterKey].title : "隨機篇章";
             descText = descText.replace("指定篇章", chapterName);
+        } else if (quest.id === 2) {
+            const chapterKey = userState.targetKey;
+            const chapterName = (chapterKey && db[chapterKey]) ? db[chapterKey].title : "隨機篇章";
+            descText = `到惡龍圖鑑溫習《${chapterName}》10分鐘`;
         }
 
         const row = document.createElement("div");
@@ -627,7 +668,7 @@ function initSmelt() {
 function executeSmelt() {
     document.getElementById("smeltConfirmModal").style.display = "none";
     smeltSlots = [null, null, null, null];
-    renderShop(); // Refresh shop view
+    renderShop(); 
     alert("熔煉成功！(獲得: 未知物品)");
     updateCoreButtonVisibility();
 }
