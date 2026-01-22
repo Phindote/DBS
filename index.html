@@ -231,7 +231,10 @@
 </div>
 <button class="difficulty-btn btn-junior" onclick="initGame('junior')">初階 (多項選擇)</button>
 <button class="difficulty-btn btn-senior" onclick="initGame('senior')">高階 (填寫答案)</button>
-<button class="btn-secondary" style="margin-top:20px; background:#7f8c8d;" onclick="switchScreen('screen-menu')">返回主目錄</button>
+<div style="display:flex; gap:10px; width:100%; max-width:400px; justify-content:center; margin-top:30px;">
+    <button class="btn-secondary" style="background:#f1c40f; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="backToChapterSelection()">返回選單</button>
+    <button class="btn-secondary" style="background:#7f8c8d; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="resetMenu(); switchScreen('screen-menu')">返回主目錄</button>
+</div>
 </div>
 <div id="screen-game" class="screen">
 <canvas id="particleCanvas"></canvas>
@@ -252,6 +255,7 @@
 </div>
 <div class="boss-area">
 <img id="bossImage" src="" alt="Boss Dragon" class="boss-img">
+<div id="vfxLayer" class="vfx-layer"></div>
 <div id="battleChapterText" class="battle-chapter-name"></div>
 <div id="gameProgress" class="progress-display">進度：0 / 0</div>
 </div>
@@ -283,7 +287,10 @@
 <tbody id="resultBody"></tbody>
 </table>
 </div>
-<button class="btn-main" onclick="backToMenuFromEnd()">返回主目錄</button>
+<div style="display:flex; gap:15px; width:100%; max-width:500px; justify-content:center; margin-top:20px;">
+    <button class="btn-main" style="background:var(--primary-red); flex:1; margin:0;" onclick="backToChapterSelection()">繼續挑戰！</button>
+    <button class="btn-main" style="background:#7f8c8d; flex:1; margin:0;" onclick="backToMenuFromEnd()">返回主目錄</button>
+</div>
 </div>
 <div id="contentModal">
 <div class="modal-content">
@@ -459,8 +466,14 @@
 <script src="js/1_config.js"></script>
 <script src="js/2_state.js"></script>
 <script src="js/3_audio.js"></script>
-<script src="js/4_ui.js"></script>
-<script src="js/5_game.js"></script>
+<script src="js/4a_ui_core.js"></script>
+<script src="js/4b_ui_menus.js"></script>
+<script src="js/4c_ui_systems.js"></script>
+<script src="js/4d_ui_charts.js"></script>
+<script src="js/4e_ui_fx.js"></script>
+<script src="js/5a_game_lobby.js"></script>
+<script src="js/5b_game_battle.js"></script>
+<script src="js/5c_game_end.js"></script>
 <script src="js/6_main.js"></script>
 </body>
 </html>
