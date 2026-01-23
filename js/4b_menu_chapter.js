@@ -1,0 +1,156 @@
+function showSubMenu(type) {
+    document.querySelector(".menu-layout").style.display = "none";
+    const profileCard = document.querySelector(".profile-card");
+    if(profileCard) profileCard.style.display = "none";
+    
+    if(type === 'single') {
+        document.getElementById("subMenuSingle").style.display = "flex";
+        renderSingleList();
+    } else {
+        document.getElementById("subMenuMix").style.display = "flex";
+        renderMixList();
+    }
+    updateCoreButtonVisibility();
+}
+
+function backToChapterSelection() {
+    switchScreen('screen-menu');
+    
+    if(gameState.mode === 'single') {
+        showSubMenu('single');
+        if(pendingSingleChapterKey) {
+             const btns = document.querySelectorAll("#singleChapterList .chapter-btn");
+             btns.forEach(b => {
+                 if(b.onclick.toString().includes(pendingSingleChapterKey)) {
+                     b.classList.add("active");
+                 }
+             });
+             document.getElementById("singleConfirmArea").style.display = "block";
+        }
+    } else {
+        showSubMenu('mix');
+        if(gameState.mixSelectedKeys && gameState.mixSelectedKeys.length > 0) {
+             const inputs = document.querySelectorAll("#mixChapterList input");
+             inputs.forEach(inp => {
+                 if(gameState.mixSelectedKeys.includes(inp.value)) inp.checked = true;
+             });
+             checkMixCount();
+        }
+    }
+}
+
+function resetMenu() {
+    document.getElementById("subMenuSingle").style.display = "none";
+    document.getElementById("subMenuMix").style.display = "none";
+    document.querySelector(".menu-layout").style.display = "grid";
+    const profileCard = document.querySelector(".profile-card");
+    if(profileCard) profileCard.style.display = "flex";
+    
+    setTimeout(updateCoreButtonVisibility, 50);
+
+    document.getElementById("singleConfirmArea").style.display = "none";
+    document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
+    pendingSingleChapterKey = "";
+    gameState.mixSelectedKeys = [];
+    const chks = document.querySelectorAll("#mixChapterList input");
+    chks.forEach(c => c.checked = false);
+    document.getElementById("mixCount").innerText = "已選：0";
+}
+
+function renderSingleList() {
+    const db = window.questionsDB || {};
+    const div = document.getElementById("singleChapterList");
+    div.innerHTML = "";
+    document.getElementById("singleConfirmArea").style.display = "none";
+    Object.keys(db).forEach(k => {
+        const btn = document.createElement("button");
+        btn.className = "chapter-btn";
+        btn.innerText = db[k].title;
+        btn.onclick = () => selectSingleChapter(k, db[k].title, btn);
+        div.appendChild(btn);
+    });
+}
+
+function selectSingleChapter(key, title, btnElement) {
+    document.querySelectorAll("#singleChapterList .chapter-btn").forEach(b => b.classList.remove("active"));
+    btnElement.classList.add("active");
+    pendingSingleChapterKey = key;
+    document.getElementById("singleSelectedTitle").innerText = title;
+    document.getElementById("singleConfirmArea").style.display = "block";
+}
+
+function renderMixList() {
+    const db = window.questionsDB || {};
+    const div = document.getElementById("mixChapterList");
+    div.innerHTML = "";
+    Object.keys(db).forEach(k => {
+        const label = document.createElement("label");
+        label.className = "mix-item";
+        label.innerHTML = `<input type="checkbox" value="${k}" onchange="checkMixCount()"> ${db[k].title}`;
+        div.appendChild(label);
+    });
+    checkMixCount();
+}
+
+function checkMixCount() {
+    const c = document.querySelectorAll("#mixChapterList input:checked").length;
+    document.getElementById("mixCount").innerText = `已選：${c}`;
+    updateMixStyles();
+}
+
+function updateMixStyles() {
+    document.querySelectorAll(".mix-item").forEach(label => {
+        const chk = label.querySelector("input");
+        if(chk.checked) label.classList.add("active");
+        else label.classList.remove("active");
+    });
+}
+
+function selectAllMix() {
+    document.querySelectorAll("#mixChapterList input[type='checkbox']").forEach(c => c.checked = true);
+    checkMixCount();
+}
+
+function deselectAllMix() {
+    document.querySelectorAll("#mixChapterList input[type='checkbox']").forEach(c => c.checked = false);
+    checkMixCount();
+}
+
+function randomSelectMix() {
+    const count = parseInt(document.getElementById("mixRandomCount").value);
+    const db = window.questionsDB || {};
+    const keys = Object.keys(db);
+    
+    if (count > keys.length) return alert("選擇數量超過現有篇章總數！");
+    
+    gameState.mixSelectedKeys = [];
+    const shuffled = keys.sort(() => 0.5 - Math.random());
+    gameState.mixSelectedKeys = shuffled.slice(0, count);
+    
+    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE * count;
+    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE * count;
+    
+    const infoDiv = document.getElementById("energyCostInfo");
+    infoDiv.innerHTML = `
+            <div style="display:inline-flex; align-items:center; justify-content:center; gap:15px; background:white; padding:10px 25px; border-radius:50px; border:2px solid #1abc9c; box-shadow:0 5px 15px rgba(26, 188, 156, 0.2);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:12px; height:12px; background:#1abc9c; border-radius:50%; box-shadow:0 0 8px #1abc9c;"></div>
+                    <span style="font-weight:bold; color:#16a085; font-size:1.1rem;">浩然之氣</span>
+                </div>
+                <div style="height:20px; width:2px; background:#eee;"></div>
+                <div style="display:flex; gap:15px;">
+                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#2980b9;">
+                        <span style="font-size:1rem;">初階</span>
+                        <span style="font-size:1.4rem; line-height:1;">-${jrCost}</span>
+                    </div>
+                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#c0392b;">
+                        <span style="font-size:1rem;">高階</span>
+                        <span style="font-size:1.4rem; line-height:1;">-${srCost}</span>
+                    </div>
+                </div>
+            </div>
+    `;
+    
+    gameState.mode = 'mix';
+    switchScreen('screen-difficulty');
+}
