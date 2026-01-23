@@ -99,7 +99,7 @@ function switchShopTab(tab) {
 
 function renderShopBuy() {
     const container = document.getElementById("shopContentArea");
-    container.innerHTML = `<div class="pokedex-grid" id="shopGrid"></div>`;
+    container.innerHTML = `<div class="pokedex-grid" id="shopGrid" style="width:100%; margin:0; padding:0;"></div>`;
     const grid = document.getElementById("shopGrid");
     
     const allItems = [...SHOP_ITEMS];
@@ -223,10 +223,11 @@ function playGacha() {
         
         saveGame();
         updateShopUI();
+        
         setTimeout(() => {
             showGachaModal(item.img, msg.replace('\n', '<br>'));
             egg.classList.remove("cracked");
             flash.classList.remove("active");
-        }, 2000);
-    }, 1500);
+        }, 100);
+    }, 800);
 }

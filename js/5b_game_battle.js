@@ -112,6 +112,10 @@ function initGame(modeOrDifficulty) {
 }
 
 function renderQuestion() {
+    if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+    }
+    
     if (gameState.currentIndex >= gameState.pool.length) {
         endGame();
         return;
@@ -150,6 +154,8 @@ function renderQuestion() {
         opts.forEach(opt => {
             const btn = document.createElement("button");
             btn.className = "mc-btn";
+            btn.style.background = ""; 
+            btn.style.color = "";
             btn.innerText = opt;
             btn.disabled = false;
             btn.onclick = () => checkAnswer(opt, btn);
@@ -191,6 +197,8 @@ function submitSeniorAnswer() {
 function checkAnswer(userAns, btnElement) {
     if(inputLock) return;
     inputLock = true;
+    
+    if(btnElement) btnElement.blur();
 
     const btns = document.querySelectorAll(".mc-btn");
     btns.forEach(b => b.disabled = true);
@@ -277,9 +285,9 @@ function checkAnswer(userAns, btnElement) {
         }, 2000);
         
     } else {
-        playSFX('wrong');
-        
         gameState.history.push({ q: q, userAns: userAns, isCorrect: false });
+        
+        playSFX('wrong');
         
         if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_WRONG');
 
