@@ -28,7 +28,8 @@ function triggerDrop(scenario) {
     } else {
         const existing = gameState.inventory.find(i => i.id === itemTemplate.id);
         if (existing) {
-            existing.count++;
+            if (existing.count >= 99) return;
+            existing.count = Math.min(existing.count + 1, 99);
         } else {
             gameState.inventory.push({ ...itemTemplate, count: 1 });
         }
@@ -356,17 +357,64 @@ function renderShopBuy() {
     container.innerHTML = `<div class="pokedex-grid" id="shopGrid"></div>`;
     const grid = document.getElementById("shopGrid");
     
-    SHOP_ITEMS.forEach(item => {
+    const allItems = [...SHOP_ITEMS];
+    if (typeof DROP_ITEMS_POOL !== 'undefined') {
+        ['SSR', 'SR', 'R'].forEach(rarity => {
+            if(DROP_ITEMS_POOL[rarity]) {
+                DROP_ITEMS_POOL[rarity].forEach(dropItem => {
+                    if (dropItem.type !== 'coin' && !allItems.find(i => i.id === dropItem.id)) {
+                        let basePrice = 500;
+                        if(rarity === 'SSR') basePrice = 5000;
+                        else if(rarity === 'SR') basePrice = 1500;
+                        allItems.push({ ...dropItem, price: basePrice });
+                    }
+                });
+            }
+        });
+    }
+
+    allItems.forEach(item => {
+        if (!item.price) return;
         const card = document.createElement("div");
         card.className = "shop-card";
         card.innerHTML = `
             <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="shop-title">${item.name}</div>
             <div class="shop-price">$${item.price}</div>
-            <button class="btn-secondary" style="width:100%; margin:5px 0 0 0;" onclick="alert('功能開發中...')">購買</button>
+            <button class="btn-secondary" style="width:100%; margin:5px 0 0 0;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
         `;
         grid.appendChild(card);
     });
+}
+
+function buyItem(itemId, price) {
+    if (gameState.user.coins < price) {
+        return alert("金幣不足！");
+    }
+    
+    let allItems = [...SHOP_ITEMS];
+    ['SSR', 'SR', 'R'].forEach(r => {
+        if(DROP_ITEMS_POOL[r]) allItems = allItems.concat(DROP_ITEMS_POOL[r]);
+    });
+    const targetItem = allItems.find(i => i.id === itemId);
+    if(!targetItem) return;
+
+    const existing = gameState.inventory.find(i => i.id === itemId);
+    if (existing && existing.count >= 99) {
+        return alert("該物品已達上限 (99個)！");
+    }
+
+    gameState.user.coins -= price;
+    if (existing) {
+        existing.count++;
+    } else {
+        gameState.inventory.push({ ...targetItem, count: 1 });
+    }
+    
+    saveGame();
+    updateShopUI();
+    playSFX('success');
+    alert(`成功購買 ${targetItem.name}！`);
 }
 
 function renderShopSmelt() {
@@ -405,12 +453,18 @@ function renderSmeltInventory() {
     grid.innerHTML = "";
     gameState.inventory.forEach((item, index) => {
         if(!item) return;
+        
+        const usedCount = smeltSlots.filter(s => s && s.id === item.id).length;
+        const availableCount = item.count - usedCount;
+        
+        if (availableCount <= 0) return;
+
         const card = document.createElement("div");
         card.className = "pokedex-card";
         card.innerHTML = `
             <img src="images/items/${item.img}" class="pokedex-img">
             <div class="pokedex-title">${item.name}</div>
-            <div class="inv-count-badge">x${item.count}</div>
+            <div class="inv-count-badge">x${availableCount}</div>
         `;
         card.onclick = () => selectSmeltItem(index);
         grid.appendChild(card);
@@ -452,11 +506,13 @@ function playGacha() {
     const egg = document.getElementById("gachaEgg");
     const flash = document.getElementById("gachaFlash");
     
+    egg.classList.remove("cracked");
     egg.classList.add("gacha-shake");
     playSFX('click'); 
     
     setTimeout(() => {
         egg.classList.remove("gacha-shake");
+        egg.classList.add("cracked"); 
         flash.classList.add("active");
         playSFX('correct'); 
         
@@ -471,18 +527,25 @@ function playGacha() {
 
         let msg = "";
         if (item.type === 'coin') {
-            gameState.user.coins += item.value;
+            gameState.user.coins = Math.min(gameState.user.coins + item.value, GAME_CONFIG.MAX_COINS);
             msg = `${rarityText}\n恭喜獲得：${item.name} (+${item.value}金幣)`;
         } else {
             const existing = gameState.inventory.find(i => i.id === item.id);
-            if (existing) existing.count++;
-            else gameState.inventory.push({ ...item, count: 1 });
+            if (existing) {
+                if (existing.count < 99) existing.count++;
+            } else {
+                gameState.inventory.push({ ...item, count: 1 });
+            }
             msg = `${rarityText}\n恭喜獲得：${item.name}`;
         }
         
         saveGame();
         updateShopUI();
-        showGachaModal(item.img, msg.replace('\n', '<br>'));
+        setTimeout(() => {
+            showGachaModal(item.img, msg.replace('\n', '<br>'));
+            egg.classList.remove("cracked");
+            flash.classList.remove("active");
+        }, 500);
     }, 1500);
 }
 
@@ -502,6 +565,7 @@ function renderInventory() {
     switchScreen("screen-inventory");
     const container = document.getElementById("inventoryContainer");
     container.innerHTML = "";
+    container.className = "inventory-grid-compact";
     
     let filteredItems = gameState.inventory.map((item, index) => ({...item, originalIndex: index}));
     
@@ -509,7 +573,7 @@ function renderInventory() {
         filteredItems = filteredItems.filter(item => item && item.type === currentInvTab);
     }
     
-    const slots = 48;
+    const slots = 100;
     
     for(let i=0; i<slots; i++) {
         const card = document.createElement("div");
@@ -528,14 +592,13 @@ function renderInventory() {
         } else {
              card.style.opacity = "0.5";
              card.innerHTML = `
-                <div style="width:100%; height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">${i+1}</div>
-                <div style="font-size:0.8rem; color:#ccc;">空</div>
+                <div style="font-size:0.8rem; color:#ccc; margin-top:20px;">${i+1}</div>
              `;
         }
         container.appendChild(card);
     }
     
-    if (gameState.inventory.length > 48) {
+    if (gameState.inventory.length > 100) {
         alert("警告：背包已滿，請清理物品！");
     }
 }

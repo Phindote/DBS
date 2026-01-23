@@ -7,10 +7,15 @@ document.addEventListener("DOMContentLoaded", () => {
         backdrop.onclick = () => {
             const sub = document.getElementById("floatingSubMenu");
             const bd = document.getElementById("floatingBackdrop");
+            const radial = document.getElementById("radialMenuContainer");
+
             if(sub) {
                 sub.classList.remove("visible");
                 sub.classList.add("hidden");
                 setTimeout(() => { if(!sub.classList.contains("visible")) sub.style.display = "none"; }, 300);
+            }
+            if(radial) {
+                radial.classList.remove("open");
             }
             if(bd) bd.classList.remove("active");
         };

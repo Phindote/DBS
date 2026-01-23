@@ -10,22 +10,17 @@ function showSubMenu(type) {
         document.getElementById("subMenuMix").style.display = "flex";
         renderMixList();
     }
-    // 呼叫更新可見性，這裡會隱藏 Core Button
     updateCoreButtonVisibility();
 }
 
 function backToChapterSelection() {
-    // 先切換回主畫面，這會重置音樂和狀態
     switchScreen('screen-menu');
     
-    // 然後根據之前的模式重新打開子選單
     if(gameState.mode === 'single') {
         showSubMenu('single');
-        // 嘗試恢復之前的選中狀態高亮
         if(pendingSingleChapterKey) {
              const btns = document.querySelectorAll("#singleChapterList .chapter-btn");
              btns.forEach(b => {
-                 // 簡單的比對邏輯
                  if(b.onclick.toString().includes(pendingSingleChapterKey)) {
                      b.classList.add("active");
                  }
@@ -34,7 +29,6 @@ function backToChapterSelection() {
         }
     } else {
         showSubMenu('mix');
-        // 恢復之前的勾選狀態
         if(gameState.mixSelectedKeys && gameState.mixSelectedKeys.length > 0) {
              const inputs = document.querySelectorAll("#mixChapterList input");
              inputs.forEach(inp => {
@@ -135,7 +129,15 @@ function randomSelectMix() {
     
     const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
     const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
-    document.getElementById("energyCostInfo").innerText = `消耗：初階 ${jrCost} / 高階 ${srCost}`;
+    
+    const infoDiv = document.getElementById("energyCostInfo");
+    infoDiv.innerHTML = "";
+    
+    const capsule = document.createElement("div");
+    capsule.className = "mix-blue-wrapper";
+    capsule.style.display = "inline-flex";
+    capsule.innerHTML = `<span>消耗：初階 ${jrCost} / 高階 ${srCost}</span>`;
+    infoDiv.appendChild(capsule);
     
     gameState.mode = 'mix';
     switchScreen('screen-difficulty');
@@ -194,16 +196,21 @@ function closeHelp() {
 
 function toggleRadialMenu() {
     const container = document.getElementById("radialMenuContainer");
+    const bd = document.getElementById("floatingBackdrop");
+
     if (container.classList.contains("open")) {
         closeRadialMenu();
     } else {
         container.classList.add("open");
+        if(bd) bd.classList.add("active");
     }
 }
 
 function closeRadialMenu() {
     const container = document.getElementById("radialMenuContainer");
+    const bd = document.getElementById("floatingBackdrop");
     if (container) container.classList.remove("open");
+    if (bd) bd.classList.remove("active");
 }
 
 document.addEventListener('click', function(e) {
