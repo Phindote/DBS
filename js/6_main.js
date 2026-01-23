@@ -1,6 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
     loadGame();
     preloadAssets(() => {
+        const backdrop = document.createElement("div");
+        backdrop.id = "floatingBackdrop";
+        backdrop.className = "floating-backdrop";
+        backdrop.onclick = () => {
+            const sub = document.getElementById("floatingSubMenu");
+            const bd = document.getElementById("floatingBackdrop");
+            if(sub) {
+                sub.classList.remove("visible");
+                sub.classList.add("hidden");
+                setTimeout(() => { if(!sub.classList.contains("visible")) sub.style.display = "none"; }, 300);
+            }
+            if(bd) bd.classList.remove("active");
+        };
+        document.body.appendChild(backdrop);
+
         initDraggableMenu();
         if (gameState.user.name === "DBS_Chinese" && !window.godModeActive) {
             initGodMode();
@@ -29,54 +44,44 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    // [DROP SYSTEM] 情況 7, 8 & 6: 時間相關掉落檢查器 (每分鐘)
     setInterval(() => {
         if(typeof triggerDrop === 'function') {
-            // 7. 遊玩時間
             triggerDrop('ON_PLAY_TIME_10MIN'); 
             
-            // 8. 特定時間 (例如 12:00 - 13:00)
             const h = new Date().getHours();
             if(h === 12) triggerDrop('SPECIFIC_TIME_BONUS');
             
-            // 6. 溫習時間補丁 (如果在溫習介面)
             const modal = document.getElementById('contentModal');
             if(modal && modal.style.display === 'flex') {
                 triggerDrop('ON_STUDY_MINUTE');
             }
         }
-    }, 60000); // 60秒檢查一次
+    }, 60000); 
 });
 
-// GLOBAL CLICK LISTENER: SFX & MENU CLOSING
 document.addEventListener('click', (e) => {
-    // [DROP SYSTEM] 情況 1: 點擊任何按鈕掉落
     if(typeof triggerDrop === 'function') {
-        // 為了避免太頻繁，可以加一點隨機性或冷卻，但這裡直接交給 triggerDrop 內的機率控制
         triggerDrop('ON_CLICK_ANY');
     }
 
-    // 1. Handle Global Click SFX
-    // Target any clickable element (buttons, cards, nodes)
     const target = e.target.closest('button, .menu-btn, .shop-card, .pokedex-card, .title-node, .smelt-slot, .radial-sub-btn, #floatingMainBtn, .btn-main, .btn-secondary, .btn-edit, .btn-claim, .btn-inv-delete, .tab-btn, .difficulty-btn, .gacha-egg');
     
     if (target) {
-        // Exclude Answer Buttons (Junior MC & Senior Attack) as they have specific logic sounds
         if (!target.classList.contains('mc-btn') && !target.classList.contains('btn-attack')) {
             playSFX('click');
         }
     }
 
-    // 2. Handle Floating Menu Auto-Close
     const floatContainer = document.getElementById("floatingMenuContainer");
     const subMenu = document.getElementById("floatingSubMenu");
     const mainBtn = document.getElementById("floatingMainBtn");
+    const backdrop = document.getElementById("floatingBackdrop");
     
     if (subMenu && subMenu.classList.contains("visible")) {
-        // If clicking outside the floating container (and not on the main button itself which toggles it)
         if (!floatContainer.contains(e.target) && !mainBtn.contains(e.target)) {
             subMenu.classList.remove("visible");
             subMenu.classList.add("hidden");
+            if(backdrop) backdrop.classList.remove("active");
             setTimeout(() => {
                 if(subMenu.classList.contains("hidden")) subMenu.style.display = "none";
             }, 300);
@@ -205,17 +210,20 @@ function initDraggableMenu() {
     
     let subMenuVisible = false;
     dragItem.addEventListener('click', (e) => {
-        // Only toggle if not dragging
         if(Math.abs(xOffset) < 5 && Math.abs(yOffset) < 5) {
             subMenuVisible = !document.getElementById("floatingSubMenu").classList.contains("visible");
             const sub = document.getElementById("floatingSubMenu");
+            const backdrop = document.getElementById("floatingBackdrop");
+            
             if(subMenuVisible) {
                 sub.style.display = "flex";
                 sub.classList.remove("hidden");
                 sub.classList.add("visible");
+                if(backdrop) backdrop.classList.add("active");
             } else {
                 sub.classList.remove("visible");
                 sub.classList.add("hidden");
+                if(backdrop) backdrop.classList.remove("active");
                 setTimeout(() => {
                     if(!sub.classList.contains("visible")) sub.style.display = "none";
                 }, 300);
@@ -225,6 +233,8 @@ function initDraggableMenu() {
 }
 
 function handleFooterClick() {
+    if (!document.getElementById('screen-login').classList.contains('active')) return;
+
     if (!window.footerClickCount) window.footerClickCount = 0;
     window.footerClickCount++;
     if (window.footerClickCount === 5) {

@@ -7,6 +7,8 @@ function updateShopUI() {
 }
 
 function triggerDrop(scenario) {
+    if (!gameState.user.name) return;
+
     const rate = DROP_SYSTEM_CONFIG[scenario] || 0;
     if (Math.random() > rate) return; 
 
@@ -552,6 +554,12 @@ function confirmDelete() {
     if (itemToDeleteIndex === -1) return;
     const count = parseInt(document.getElementById("deleteCount").value);
     const item = gameState.inventory[itemToDeleteIndex];
+
+    if(count < 1 || count > item.count) {
+        alert("無效的數量！");
+        return;
+    }
+
     if (count >= item.count) {
         gameState.inventory.splice(itemToDeleteIndex, 1);
     } else {
@@ -586,7 +594,7 @@ function renderDailyTasks() {
         } else if (quest.id === 2) {
             const chapterKey = userState.targetKey;
             const chapterName = (chapterKey && db[chapterKey]) ? db[chapterKey].title : "隨機篇章";
-            descText = `到惡龍圖鑑溫習《${chapterName}》10分鐘`;
+            descText = `到惡龍圖鑑溫習 ${chapterName} 10分鐘`;
         }
 
         const row = document.createElement("div");
@@ -673,6 +681,18 @@ function initSmelt() {
 
 function executeSmelt() {
     document.getElementById("smeltConfirmModal").style.display = "none";
+    
+    smeltSlots.forEach(slotItem => {
+        if(slotItem) {
+            const targetItem = gameState.inventory.find(i => i.name === slotItem.name && i.count > 0);
+            if(targetItem) {
+                targetItem.count--;
+            }
+        }
+    });
+    gameState.inventory = gameState.inventory.filter(i => i.count > 0);
+    saveGame();
+
     smeltSlots = [null, null, null, null];
     renderShop(); 
     alert("熔煉成功！(獲得: 未知物品)");

@@ -126,14 +126,8 @@ function playSFX(name) {
     
     const sfx = audioFiles[name];
     if (sfx) {
-        if (name === 'click') {
-            const clone = sfx.cloneNode();
-            clone.volume = 0.8;
-            clone.play().catch(e => {});
-        } else {
-            sfx.currentTime = 0;
-            sfx.volume = 0.8;
-            sfx.play().catch(e => {});
-        }
+        const clone = sfx.cloneNode();
+        clone.volume = 0.8;
+        clone.play().catch(e => {});
     }
 }
