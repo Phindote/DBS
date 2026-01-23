@@ -6,8 +6,11 @@ function updateShopUI() {
 }
 
 function triggerDrop(scenario) {
+    // FIX: 嚴格檢查登入介面，防止意外掉落
     const loginScreen = document.getElementById("screen-login");
-    if (loginScreen && loginScreen.classList.contains("active")) return;
+    if (loginScreen && (loginScreen.style.display === "flex" || loginScreen.classList.contains("active"))) {
+        return;
+    }
 
     if (!gameState.user.name) return;
 
