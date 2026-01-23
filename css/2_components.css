@@ -147,6 +147,50 @@ select.form-input {
     overflow-y: auto;
     padding: 5px;
 }
+.inventory-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+    width: 100%;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 5px;
+}
+.inventory-grid-compact .pokedex-card {
+    padding: 2px;
+    min-height: 60px;
+    border-radius: 4px;
+}
+.inventory-grid-compact .pokedex-img {
+    height: 30px;
+    width: 30px;
+    margin-bottom: 2px;
+}
+.inventory-grid-compact .pokedex-title {
+    font-size: 0.6rem;
+    min-height: auto;
+    line-height: 1;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+.inventory-grid-compact .inv-count-badge {
+    position: static;
+    font-size: 0.6rem;
+    padding: 0 2px;
+    background: transparent;
+    color: #333;
+}
+.inventory-grid-compact .btn-inv-delete {
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
+    top: 1px;
+    right: 1px;
+}
+
 .pokedex-card, .shop-card {
     background: #fff;
     border: none;
@@ -687,6 +731,7 @@ select.form-input {
     cursor: pointer;
     box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset -10px -10px 20px rgba(0,0,0,0.2);
     position: relative;
+    overflow: hidden;
 }
 .css-golden-egg::after {
     content: '';
@@ -698,6 +743,22 @@ select.form-input {
     background: rgba(255, 255, 255, 0.4);
     border-radius: 50%;
     transform: rotate(-20deg);
+}
+
+.css-golden-egg.cracked {
+    background: radial-gradient(circle at 30% 30%, #ffd700, #e67e22, #a04000);
+}
+.css-golden-egg.cracked::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(45deg, transparent 48%, #333 49%, #333 51%, transparent 52%) center/100% 100%,
+        linear-gradient(-45deg, transparent 48%, #333 49%, #333 51%, transparent 52%) center/100% 100%;
+    opacity: 0.8;
 }
 
 .gacha-shake {
@@ -742,4 +803,23 @@ select.form-input {
     font-weight: bold;
     padding: 15px;
     font-size: 1.2rem;
+}
+
+.result-tip-bubble {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: relative;
+    animation: fadeIn 0.5s ease;
+}
+.result-tip-bubble::before {
+    content: '💡';
+    margin-right: 5px;
 }
