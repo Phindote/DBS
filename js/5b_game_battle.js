@@ -217,7 +217,6 @@ function checkAnswer(userAns, btnElement) {
             btnElement.style.color = "white";
         }
         
-        // [DROP SYSTEM] 情況3: 答對掉落
         if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_CORRECT');
         
         let gain = 0;
@@ -280,7 +279,8 @@ function checkAnswer(userAns, btnElement) {
     } else {
         playSFX('wrong');
         
-        // [DROP SYSTEM] 情況2: 答錯掉落
+        gameState.history.push({ q: q, userAns: userAns, isCorrect: false });
+        
         if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_WRONG');
 
         gameState.user.hp = Math.max(0, gameState.user.hp - GAME_CONFIG.HP_PENALTY);
@@ -315,7 +315,6 @@ function checkAnswer(userAns, btnElement) {
         if (gameState.currentAttempts >= 3) {
             document.getElementById("msgBox").innerText = "多次嘗試失敗... 跳過此題";
             document.getElementById("msgBox").style.color = "var(--primary-red)";
-            gameState.history.push({ q: q, userAns: userAns, isCorrect: false });
             
             if (gameState.difficulty === 'junior' && btnElement) {
                 btnElement.style.background = "#e74c3c";

@@ -127,17 +127,29 @@ function randomSelectMix() {
     const shuffled = keys.sort(() => 0.5 - Math.random());
     gameState.mixSelectedKeys = shuffled.slice(0, count);
     
-    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE;
-    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE;
+    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE * count;
+    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE * count;
     
     const infoDiv = document.getElementById("energyCostInfo");
-    infoDiv.innerHTML = "";
-    
-    const capsule = document.createElement("div");
-    capsule.className = "mix-blue-wrapper";
-    capsule.style.display = "inline-flex";
-    capsule.innerHTML = `<span>消耗：初階 ${jrCost} / 高階 ${srCost}</span>`;
-    infoDiv.appendChild(capsule);
+    infoDiv.innerHTML = `
+            <div style="display:inline-flex; align-items:center; justify-content:center; gap:15px; background:white; padding:10px 25px; border-radius:50px; border:2px solid #1abc9c; box-shadow:0 5px 15px rgba(26, 188, 156, 0.2);">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div style="width:12px; height:12px; background:#1abc9c; border-radius:50%; box-shadow:0 0 8px #1abc9c;"></div>
+                    <span style="font-weight:bold; color:#16a085; font-size:1.1rem;">浩然之氣</span>
+                </div>
+                <div style="height:20px; width:2px; background:#eee;"></div>
+                <div style="display:flex; gap:15px;">
+                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#2980b9;">
+                        <span style="font-size:1rem;">初階</span>
+                        <span style="font-size:1.4rem; line-height:1;">-${jrCost}</span>
+                    </div>
+                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#c0392b;">
+                        <span style="font-size:1rem;">高階</span>
+                        <span style="font-size:1.4rem; line-height:1;">-${srCost}</span>
+                    </div>
+                </div>
+            </div>
+    `;
     
     gameState.mode = 'mix';
     switchScreen('screen-difficulty');

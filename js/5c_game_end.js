@@ -102,21 +102,17 @@ function endGame() {
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
     gameState.pool.forEach(q => {
-        let record = gameState.history.findLast(h => h.q.id === q.id);
+        const attempts = gameState.history.filter(h => h.q.id === q.id);
         const tr = document.createElement("tr");
         let userAnsCell = `<td style="color:gray;">未作答</td>`;
         
-        if (record) {
-            let answerHistory = "";
-            const attempts = gameState.history.filter(h => h.q.id === q.id);
-            if (attempts.length > 0) {
-                const chain = attempts.map(a => a.userAns).join(" > ");
-                answerHistory = `<br><span style="font-size:0.8rem; color:#888;">${chain}</span>`;
-            }
-
-            const cls = record.isCorrect ? 'res-correct' : 'res-wrong';
-            userAnsCell = `<td class="${cls}">${record.userAns}${answerHistory}</td>`;
+        if (attempts.length > 0) {
+            const chain = attempts.map(a => a.userAns).join(" > ");
+            const lastAttempt = attempts[attempts.length - 1];
+            let cls = lastAttempt.isCorrect ? 'res-correct' : 'res-wrong';
+            userAnsCell = `<td class="${cls}">${chain}</td>`;
         }
+        
         tr.innerHTML = `<td>${q.line} <br><small>(${q.word})</small></td>${userAnsCell}<td>${q.answer}</td>`;
         tbody.appendChild(tr);
     });

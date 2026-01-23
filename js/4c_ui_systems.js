@@ -381,7 +381,7 @@ function renderShopBuy() {
             <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="shop-title">${item.name}</div>
             <div class="shop-price">$${item.price}</div>
-            <button class="btn-secondary" style="width:100%; margin:5px 0 0 0;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
+            <button class="btn-main" style="width:100%; margin:5px 0 0 0; background-color: #e74c3c;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
         `;
         grid.appendChild(card);
     });
@@ -545,7 +545,7 @@ function playGacha() {
             showGachaModal(item.img, msg.replace('\n', '<br>'));
             egg.classList.remove("cracked");
             flash.classList.remove("active");
-        }, 500);
+        }, 2000);
     }, 1500);
 }
 
