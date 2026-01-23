@@ -16,13 +16,16 @@ const GAME_CONFIG = {
 
 const GACHA_CONFIG = {
     COST: 100,
-    RATES: { SSR: 0.05, SR: 0.20, R: 0.75 }
+    RATES: { T0: 0.001, T1: 0.01, T2: 0.05, T3: 0.20, T4: 0.739 }
 };
 
 const RARITY_MAP = {
-    SSR: "【傳說之光】",
-    SR: "【稀有之光】",
-    R: "【普通之光】"
+    T0: "【傳說】",
+    T1: "【史詩】",
+    T2: "【稀有】",
+    T3: "【精良】",
+    T4: "【普通】",
+    SP: "【特殊】"
 };
 
 const DROP_SYSTEM_CONFIG = {
@@ -39,27 +42,21 @@ const DROP_SYSTEM_CONFIG = {
     LOGIN_MOMENT_BONUS: 0.80   
 };
 
-// === 自動化數據處理工廠 ===
-// 這裡會自動從 0_items.js 的 MASTER_ITEMS 生成商店和掉落列表
 const SHOP_ITEMS = [];
-const DROP_ITEMS_POOL = { SSR: [], SR: [], R: [] };
+const DROP_ITEMS_POOL = { T0: [], T1: [], T2: [], T3: [], T4: [] };
 
 if (typeof MASTER_ITEMS !== 'undefined') {
     MASTER_ITEMS.forEach(item => {
-        // 1. 如果有 price，加入商店
-        if (item.price && item.price > 0) {
+        if (item.price && item.price > 0 && item.type !== 'pet' && item.rarity !== 'T0' && item.rarity !== 'T1' && item.id !== 'item_ash') {
             SHOP_ITEMS.push(item);
         }
-        
-        // 2. 如果有 drop 屬性，加入對應掉落池
-        if (item.drop && DROP_ITEMS_POOL[item.drop]) {
-            DROP_ITEMS_POOL[item.drop].push(item);
+        if (item.rarity && DROP_ITEMS_POOL[item.rarity] && item.type !== 'pet') {
+            DROP_ITEMS_POOL[item.rarity].push(item);
         }
     });
 } else {
-    console.error("錯誤：找不到 MASTER_ITEMS，請確保已載入 0_items.js");
+    console.error("Master Items not found");
 }
-// =========================
 
 const TITLES = [
     "初心新手", "鐵劍勇者", "龍影覓者", "鱗甲獵手", "龍息破者",
@@ -74,7 +71,7 @@ const ACHIEVEMENTS = [
     {id: "ach_3", title: "駐足常客", desc: "累積遊玩 15 分鐘"},
     {id: "ach_4", title: "流連忘返", desc: "累積遊玩 60 分鐘"},
     {id: "ach_5", title: "歲月如歌", desc: "累積遊玩 999 分鐘"},
-    {id: "ach_6", title: "屠龍首殺", desc: "完成任意一篇試煉"},
+    {id: "ach_6", title: "初探龍巢", desc: "完成任意一篇試煉"},
     {id: "ach_7", title: "毫髮無傷", desc: "3篇不同篇章滿血通關"},
     {id: "ach_8", title: "險勝一籌", desc: "剩餘 HP < 10 通關"},
     {id: "ach_9", title: "絕地反擊", desc: "剩餘 HP < 5 通關"},
@@ -121,7 +118,6 @@ const DAILY_QUESTS = [
     { id: 7, desc: "指定篇章高階完美通關 1 次", target: 1, reward: 80, type: "target_sr" }
 ];
 
-// 資產加載列表 (加入新物品圖)
 const ASSETS_TO_LOAD = [
     'images/ui/banner.jpg',
     'images/bg/login_bg.jpg',
@@ -141,6 +137,8 @@ const ASSETS_TO_LOAD = [
     'images/ui/btn_inventory.PNG',
     'images/ui/btn_smelt.PNG',
     'images/ui/btn_pet.PNG',
+    'images/ui/icon_coin.PNG',
+    'images/items/pet_unknown.PNG',
     'images/dragons/dragon_unknown.jpg',
     'images/dragons/dragon_mix.jpg',
     'images/results/img_perfect.PNG',
@@ -148,7 +146,7 @@ const ASSETS_TO_LOAD = [
     'images/results/img_defeat.PNG',
     'images/achievements/ach_locked.PNG'
 ];
-// 自動加入物品圖片到預加載列表
+
 if (typeof MASTER_ITEMS !== 'undefined') {
     MASTER_ITEMS.forEach(item => {
         if(item.img) ASSETS_TO_LOAD.push('images/items/' + item.img);

@@ -20,6 +20,24 @@ document.addEventListener("DOMContentLoaded", () => {
             if(bd) bd.classList.remove("active");
         };
         document.body.appendChild(backdrop);
+        
+        const spamModal = document.createElement("div");
+        spamModal.id = "spamModal";
+        spamModal.className = "modal-backdrop";
+        spamModal.style.display = "none";
+        spamModal.style.zIndex = "99999";
+        spamModal.innerHTML = `
+            <div class="modal-content" style="max-width:300px; text-align:center;">
+                <div class="modal-header" style="background:#e74c3c; color:white; justify-content:center;">⚠️ 警告</div>
+                <div class="modal-body" style="padding:20px; font-weight:bold; font-size:1.1rem; color:#2c3e50;">
+                    手速太快了！放慢一點！
+                </div>
+                <div class="modal-footer" style="justify-content:center;">
+                    <button class="btn-main" onclick="document.getElementById('spamModal').style.display='none'">我知道了</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(spamModal);
 
         initDraggableMenu();
         if (gameState.user.name === "DBS_Chinese" && !window.godModeActive) {
@@ -64,7 +82,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 60000); 
 });
 
+let clickSpamCount = 0;
+let clickSpamTimer = null;
+
 document.addEventListener('click', (e) => {
+    const spamModal = document.getElementById("spamModal");
+    if(spamModal && spamModal.style.display === "flex") return;
+
+    clickSpamCount++;
+    clearTimeout(clickSpamTimer);
+    
+    if (clickSpamCount >= 3) {
+        if(spamModal) spamModal.style.display = "flex";
+        clickSpamCount = 0;
+    } else {
+        clickSpamTimer = setTimeout(() => {
+            clickSpamCount = 0;
+        }, 300);
+    }
+
     if(typeof triggerDrop === 'function') {
         triggerDrop('ON_CLICK_ANY');
     }
@@ -309,9 +345,21 @@ function initGodMode() {
         task.claimed = false; 
     });
 
+    gameState.inventory = [];
+    gameState.pets = [];
+    if (typeof MASTER_ITEMS !== 'undefined') {
+        MASTER_ITEMS.forEach(item => {
+            if (item.type === 'fragment' || item.type === 'product' || item.type === 'material') {
+                gameState.inventory.push({ ...item, count: 99 });
+            } else if (item.type === 'pet') {
+                gameState.pets.push(item.id);
+            }
+        });
+    }
+
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
-    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，每日任務已可領取！(點擊底部 3 次可還原)");
+    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，每日任務已可領取，全物品及寵物已解鎖！(點擊底部 3 次可還原)");
 }
 
 function revertGodMode() {

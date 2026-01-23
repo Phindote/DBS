@@ -1,4 +1,6 @@
 let currentShopTab = 'buy'; 
+let currentShopBuyFilter = 'all';
+let isGachaAnimating = false;
 
 function updateShopUI() {
     const coinEl = document.getElementById("coinDisplay");
@@ -6,7 +8,6 @@ function updateShopUI() {
 }
 
 function triggerDrop(scenario) {
-    // FIX: 嚴格檢查登入介面，防止意外掉落
     const loginScreen = document.getElementById("screen-login");
     if (loginScreen && (loginScreen.style.display === "flex" || loginScreen.classList.contains("active"))) {
         return;
@@ -18,9 +19,11 @@ function triggerDrop(scenario) {
     if (Math.random() > rate) return; 
 
     const rand = Math.random();
-    let rarity = 'R';
-    if (rand < 0.05) rarity = 'SSR';
-    else if (rand < 0.30) rarity = 'SR';
+    let rarity = 'T4';
+    if (rand < 0.001) rarity = 'T0';
+    else if (rand < 0.01) rarity = 'T1';
+    else if (rand < 0.05) rarity = 'T2';
+    else if (rand < 0.20) rarity = 'T3';
 
     const pool = DROP_ITEMS_POOL[rarity];
     if (!pool || pool.length === 0) return;
@@ -52,13 +55,15 @@ function showDropModal(img, text) {
     const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
     `;
     const btn = modal.querySelector(".btn-main");
     if(btn) {
         btn.style.background = "#e74c3c";
         btn.innerText = "馬上收下！";
+        btn.style.display = "block";
+        btn.style.margin = "20px auto 0 auto"; 
     }
     modal.style.display = 'flex';
     updateCoreButtonVisibility();
@@ -71,7 +76,7 @@ function showGachaModal(img, text) {
     const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
     `;
     modal.style.display = 'flex';
@@ -103,29 +108,28 @@ function switchShopTab(tab) {
     playSFX('click');
 }
 
+function switchBuyFilter(filter) {
+    currentShopBuyFilter = filter;
+    renderShopBuy();
+}
+
 function renderShopBuy() {
     const container = document.getElementById("shopContentArea");
-    container.innerHTML = `<div class="pokedex-grid" id="shopGrid" style="width:100%; margin:0; padding:0;"></div>`;
+    container.innerHTML = `
+        <div class="inventory-tabs" style="margin-bottom:10px;">
+            <button class="tab-btn ${currentShopBuyFilter === 'all' ? 'active' : ''}" onclick="switchBuyFilter('all')">全部</button>
+            <button class="tab-btn ${currentShopBuyFilter === 'fragment' ? 'active' : ''}" onclick="switchBuyFilter('fragment')">素材</button>
+            <button class="tab-btn ${currentShopBuyFilter === 'product' ? 'active' : ''}" onclick="switchBuyFilter('product')">成品</button>
+        </div>
+        <div class="pokedex-grid" id="shopGrid" style="width:100%; margin:0; padding:0;"></div>
+    `;
+    
     const grid = document.getElementById("shopGrid");
     
-    const allItems = [...SHOP_ITEMS];
-    if (typeof DROP_ITEMS_POOL !== 'undefined') {
-        ['SSR', 'SR', 'R'].forEach(rarity => {
-            if(DROP_ITEMS_POOL[rarity]) {
-                DROP_ITEMS_POOL[rarity].forEach(dropItem => {
-                    if (dropItem.type !== 'coin' && !allItems.find(i => i.id === dropItem.id)) {
-                        let basePrice = 500;
-                        if(rarity === 'SSR') basePrice = 5000;
-                        else if(rarity === 'SR') basePrice = 1500;
-                        allItems.push({ ...dropItem, price: basePrice });
-                    }
-                });
-            }
-        });
-    }
+    SHOP_ITEMS.forEach(item => {
+        if (currentShopBuyFilter === 'fragment' && item.type !== 'fragment') return;
+        if (currentShopBuyFilter === 'product' && item.type !== 'product') return;
 
-    allItems.forEach(item => {
-        if (!item.price) return;
         const card = document.createElement("div");
         card.className = "shop-card";
         card.innerHTML = `
@@ -143,11 +147,7 @@ function buyItem(itemId, price) {
         return alert("金幣不足！");
     }
     
-    let allItems = [...SHOP_ITEMS];
-    ['SSR', 'SR', 'R'].forEach(r => {
-        if(DROP_ITEMS_POOL[r]) allItems = allItems.concat(DROP_ITEMS_POOL[r]);
-    });
-    const targetItem = allItems.find(i => i.id === itemId);
+    const targetItem = MASTER_ITEMS.find(i => i.id === itemId);
     if(!targetItem) return;
 
     const existing = gameState.inventory.find(i => i.id === itemId);
@@ -183,10 +183,12 @@ function renderShopGacha() {
 }
 
 function playGacha() {
+    if (isGachaAnimating) return;
     if (gameState.user.coins < GACHA_CONFIG.COST) {
         return alert("金幣不足！");
     }
     
+    isGachaAnimating = true;
     gameState.user.coins -= GACHA_CONFIG.COST;
     saveGame();
     updateShopUI(); 
@@ -205,27 +207,24 @@ function playGacha() {
         playSFX('correct'); 
         
         const rand = Math.random();
-        let rarity = 'R';
-        if (rand < GACHA_CONFIG.RATES.SSR) rarity = 'SSR';
-        else if (rand < (GACHA_CONFIG.RATES.SSR + GACHA_CONFIG.RATES.SR)) rarity = 'SR';
+        let rarity = 'T4';
+        if (rand < GACHA_CONFIG.RATES.T0) rarity = 'T0';
+        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1)) rarity = 'T1';
+        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2)) rarity = 'T2';
+        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2 + GACHA_CONFIG.RATES.T3)) rarity = 'T3';
         
         const pool = DROP_ITEMS_POOL[rarity];
         const item = pool[Math.floor(Math.random() * pool.length)];
         const rarityText = RARITY_MAP[rarity]; 
 
         let msg = "";
-        if (item.type === 'coin') {
-            gameState.user.coins = Math.min(gameState.user.coins + item.value, GAME_CONFIG.MAX_COINS);
-            msg = `${rarityText}\n恭喜獲得：${item.name} (+${item.value}金幣)`;
+        const existing = gameState.inventory.find(i => i.id === item.id);
+        if (existing) {
+            if (existing.count < 99) existing.count++;
         } else {
-            const existing = gameState.inventory.find(i => i.id === item.id);
-            if (existing) {
-                if (existing.count < 99) existing.count++;
-            } else {
-                gameState.inventory.push({ ...item, count: 1 });
-            }
-            msg = `${rarityText}\n恭喜獲得：${item.name}`;
+            gameState.inventory.push({ ...item, count: 1 });
         }
+        msg = `${rarityText}\n恭喜獲得：${item.name}`;
         
         saveGame();
         updateShopUI();
@@ -234,6 +233,7 @@ function playGacha() {
             showGachaModal(item.img, msg.replace('\n', '<br>'));
             egg.classList.remove("cracked");
             flash.classList.remove("active");
+            isGachaAnimating = false;
         }, 100);
     }, 800);
 }

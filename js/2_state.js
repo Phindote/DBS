@@ -26,7 +26,7 @@ let gameState = {
     unlockedAchievements: []
 };
 let pendingSingleChapterKey = ""; 
-let inputLock = false; // 戰鬥鎖，防止連點
+let inputLock = false; 
 let pokedexTimer = null;
 let pokedexSeconds = 0;
 
@@ -67,7 +67,6 @@ function applyGameData(parsed) {
     if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 50;
     
     gameState.stats = parsed.stats || {};
-    // 確保所有統計變數存在
     ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5', 
      'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins', 
      'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
@@ -83,12 +82,10 @@ function applyGameData(parsed) {
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
     
-    // 如果有 UI 更新函數，就執行
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
 }
 
 function checkAchievements() {
-    // 確保只在 UI 載入後執行
     if (typeof window.questionsDB === 'undefined') return;
     
     const db = window.questionsDB || {};

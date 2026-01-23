@@ -3,22 +3,62 @@ function renderPets() {
     const container = document.getElementById("petContainer");
     container.innerHTML = "";
     
+    const allPets = MASTER_ITEMS.filter(i => i.type === 'pet');
+    
     for(let i=0; i<20; i++) {
         const card = document.createElement("div");
-        card.className = "pokedex-card";
+        const petData = allPets[i];
         
-        if(gameState.pets[i]) {
-            card.innerHTML = `
-                <img src="images/pets/${gameState.pets[i].img}" class="pokedex-img">
-                <div class="pokedex-title">${gameState.pets[i].name}</div>
-            `;
+        if(petData) {
+            const isUnlocked = gameState.pets.includes(petData.id);
+            if (isUnlocked) {
+                card.className = "pokedex-card";
+                card.innerHTML = `
+                    <img src="images/items/${petData.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
+                    <div class="pokedex-title">${petData.name}</div>
+                    <div style="font-size:0.7rem; color:#d35400;">${RARITY_MAP[petData.rarity]}</div>
+                `;
+                card.onclick = () => showPetDetail(petData);
+            } else {
+                card.className = "pokedex-card";
+                card.style.opacity = "0.5";
+                card.innerHTML = `
+                    <img src="images/items/pet_unknown.PNG" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
+                    <div class="pokedex-title">未獲得</div>
+                    <div style="font-size:0.7rem; color:#d35400;">${RARITY_MAP[petData.rarity]}</div>
+                `;
+                card.onclick = () => showPetDetail(petData, false);
+            }
         } else {
-            card.style.opacity = "0.5";
-            card.innerHTML = `
-                <div style="width:100%; height:100px; display:flex; align-items:center; justify-content:center; color:#ccc; font-size:2rem; font-weight:bold;">?</div>
-                <div class="shop-title">寵物位 ${i+1}</div>
-            `;
+             card.className = "pokedex-card";
+             card.style.opacity = "0.2";
+             card.innerHTML = `<div class="shop-title">未開放</div>`;
         }
         container.appendChild(card);
     }
+}
+
+function showPetDetail(pet, unlocked = true) {
+    const modal = document.getElementById("contentModal");
+    const header = modal.querySelector(".modal-header");
+    const body = document.getElementById("contentModalBody");
+    const btn = modal.querySelector(".btn-main");
+
+    header.innerText = "靈獸";
+    
+    const imgSrc = unlocked ? `images/items/${pet.img}` : `images/items/pet_unknown.PNG`;
+    const nameStr = unlocked ? pet.name : "未獲得";
+    const descStr = unlocked ? pet.desc : "???";
+
+    body.innerHTML = `
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
+        <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${nameStr}</div>
+        <div style="font-size:0.9rem; color:#d35400; margin-bottom:10px;">${RARITY_MAP[pet.rarity]}</div>
+        <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${descStr}</div>
+    `;
+    
+    if(btn) btn.style.display = "none";
+    
+    modal.style.display = "flex";
+    updateCoreButtonVisibility();
 }
