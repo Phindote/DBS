@@ -6,6 +6,9 @@ function updateShopUI() {
 }
 
 function triggerDrop(scenario) {
+    const loginScreen = document.getElementById("screen-login");
+    if (loginScreen && loginScreen.classList.contains("active")) return;
+
     if (!gameState.user.name) return;
 
     const rate = DROP_SYSTEM_CONFIG[scenario] || 0;
