@@ -43,6 +43,7 @@ function endGame() {
             
             if(!gameState.chapterFirstPerfect) gameState.chapterFirstPerfect = {};
             const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
+            // 如果還沒有紀錄，才寫入 (First Time Only)
             if(!gameState.chapterFirstPerfect[chKey]) {
                 gameState.chapterFirstPerfect[chKey] = new Date().getTime();
             }
@@ -125,7 +126,7 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
-    // 獨立判斷：只要有歷史紀錄，無論本次成敗都顯示日期
+    // Logic: 只要該篇章有首次完美紀錄，無論本次結局如何，都顯示該日期
     let firstPerfectHTML = "";
     const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
     if (gameState.chapterFirstPerfect && gameState.chapterFirstPerfect[chKey]) {
@@ -133,7 +134,7 @@ function endGame() {
         firstPerfectHTML = `<div class="stat-perfect-date">首次完美通關：${getFormattedDate(date)}</div>`;
     }
 
-    // 提示文字邏輯
+    // 提示文字邏輯 (更新戰敗文字)
     let tipText = "超過一半題目曾經錯誤或同一道題目答錯超過兩次，也算為戰敗喔！";
     if (isPerfect) {
         tipText = "努力保持這種水準，答案一擊即中就是完美！";
@@ -151,6 +152,7 @@ function endGame() {
     tipDiv.className = "result-tip-bubble";
     tipDiv.innerText = tipText;
 
+    // 將日期插入表格下方、Tip上方
     if (firstPerfectHTML) {
         const dateDiv = document.createElement("div");
         dateDiv.innerHTML = firstPerfectHTML;
