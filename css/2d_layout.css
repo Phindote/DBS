@@ -58,10 +58,11 @@ select.form-input {
     justify-content: center;
 }
 
+/* 強制固定 4 格，針對 iPhone 14 Pro Max 優化 */
 .pokedex-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: 6px; /* 稍微縮小間距以適應手機 */
     width: 100%;
     max-height: 60vh;
     overflow-y: auto;
@@ -372,35 +373,36 @@ select.form-input {
     color: #d35400;
     border: 1px solid #edbb99;
 }
+/* 綠色樣式：首次完美通關 (調小字體) */
 .stat-perfect-date {
     background: #e8f8f5;
     color: #16a085;
     border: 1px solid #a3e4d7;
-    font-size: 0.8rem;
-    padding: 4px 8px;
+    font-size: 0.75rem; /* 微調 */
+    padding: 3px 6px;
     border-radius: 6px;
     margin-top: 8px;
     display: inline-block;
     font-weight: bold;
 }
 
-/* 提示氣泡樣式 */
+/* 提示氣泡樣式：字體極小化 */
 .result-tip-bubble {
     background: #fff3cd;
     border: 1px solid #ffeeba;
     color: #856404;
-    padding: 5px 8px; /* 緊湊內距 */
+    padding: 4px 6px; /* 更緊湊 */
     border-radius: 10px;
-    margin-top: 10px;
+    margin-top: 8px;
     text-align: center;
-    font-size: 0.65rem !important; /* 強制小字體 */
+    font-size: 0.6rem !important; /* 10px左右，確保極小 */
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     position: relative;
     animation: fadeIn 0.5s ease;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 .result-tip-bubble::before {
     content: '💡';
-    margin-right: 5px;
+    margin-right: 4px;
 }
