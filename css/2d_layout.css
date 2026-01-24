@@ -61,17 +61,12 @@ select.form-input {
 .pokedex-grid-4 {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     max-height: 60vh;
     overflow-y: auto;
     padding: 5px;
     box-sizing: border-box;
-}
-@media screen and (max-width: 600px) {
-    .pokedex-grid-4 {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 .inventory-grid-compact {
@@ -342,7 +337,7 @@ select.form-input {
     display: block;
     padding: 2px 4px;
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     margin-top: 3px;
     font-weight: bold;
     text-align: center;
@@ -376,4 +371,36 @@ select.form-input {
     background: #fdf2e9;
     color: #d35400;
     border: 1px solid #edbb99;
+}
+.stat-perfect-date {
+    background: #e8f8f5;
+    color: #16a085;
+    border: 1px solid #a3e4d7;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+/* 提示氣泡樣式 */
+.result-tip-bubble {
+    background: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 5px 8px; /* 緊湊內距 */
+    border-radius: 10px;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 0.65rem !important; /* 強制小字體 */
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: relative;
+    animation: fadeIn 0.5s ease;
+    line-height: 1.4;
+}
+.result-tip-bubble::before {
+    content: '💡';
+    margin-right: 5px;
 }
