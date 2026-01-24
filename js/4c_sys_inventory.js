@@ -3,6 +3,15 @@ let currentSmeltFilter = 'all';
 let currentRecipePage = 0;
 const RECIPE_RARITY_ORDER = ["T4", "T3", "T2", "T1", "T0"];
 
+const RARITY_COLORS = {
+    'T4': '#333333', // Black
+    'T3': '#e74c3c', // Red
+    'T2': '#3498db', // Blue
+    'T1': '#8e44ad', // Purple
+    'T0': '#f1c40f', // Gold
+    'SP': '#f1c40f'
+};
+
 function renderShopSmelt() {
     const container = document.getElementById("shopContentArea");
     container.innerHTML = `
@@ -72,9 +81,10 @@ function renderSmeltInventory() {
 
         const card = document.createElement("div");
         card.className = "pokedex-card";
+        const color = RARITY_COLORS[item.rarity] || '#333';
         card.innerHTML = `
             <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
-            <div class="pokedex-title">${item.name}</div>
+            <div class="pokedex-title" style="color:${color}">${item.name}</div>
             <div class="inv-count-badge">x${availableCount}</div>
         `;
         card.onclick = () => selectSmeltItem(index);
@@ -126,10 +136,11 @@ function renderInventory() {
         if(i < filteredItems.length && filteredItems[i]) {
             const item = filteredItems[i];
             const realIndex = item.originalIndex;
+            const color = RARITY_COLORS[item.rarity] || '#333';
             
              card.innerHTML = `
                 <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
-                <div class="pokedex-title">${item.name}</div>
+                <div class="pokedex-title" style="color:${color}">${item.name}</div>
                 <div class="inv-count-badge">x${item.count}</div>
                 <button class="btn-inv-delete" onclick="promptSellItem(event, ${realIndex})" style="background:none; border:none; padding:0; width:25px; height:25px; display:flex; align-items:center; justify-content:center; z-index:10;">
                     <img src="images/ui/icon_coin.PNG" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='images/ui/icon_core.PNG'">
@@ -168,10 +179,12 @@ function showItemDetail(index) {
     }
     header.style.color = "white";
 
+    const rarityColor = RARITY_COLORS[item.rarity] || '#d35400';
+
     body.innerHTML = `
         <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${item.name}</div>
-        <div style="font-size:0.9rem; color:#d35400; margin-bottom:10px;">${RARITY_MAP[item.rarity]}</div>
+        <div style="font-size:0.9rem; color:${rarityColor}; margin-bottom:10px; font-weight:bold;">${RARITY_MAP[item.rarity]}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${item.desc}</div>
     `;
     
@@ -320,14 +333,18 @@ function showRecipes() {
 
 function renderRecipePage() {
     const body = document.getElementById("recipeListBody");
+    body.scrollTop = 0;
     body.innerHTML = "";
     
     const rarity = RECIPE_RARITY_ORDER[currentRecipePage];
     const items = MASTER_ITEMS.filter(i => i.rarity === rarity && i.recipe);
     
     const pageTitle = document.createElement("div");
-    pageTitle.style.cssText = "text-align:center; font-size:1.5rem; color:var(--primary-blue); margin:10px 0 20px 0; font-weight:bold;";
-    pageTitle.innerText = "【" + RARITY_MAP[rarity] + "】";
+    
+    const rarityColor = RARITY_COLORS[rarity] || '#333';
+    
+    pageTitle.style.cssText = `text-align:center; font-size:1.5rem; color:${rarityColor}; margin:10px 0 20px 0; font-weight:bold;`;
+    pageTitle.innerText = RARITY_MAP[rarity];
     body.appendChild(pageTitle);
 
     if (items.length === 0) {
@@ -339,18 +356,20 @@ function renderRecipePage() {
     } else {
         items.forEach(item => {
             const row = document.createElement("div");
-            row.style.cssText = "display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee; gap:15px; background:#fff; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;";
+            row.style.cssText = "display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee; gap:15px; background:#fff; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; box-sizing: border-box;";
             
             const recipeNames = item.recipe.map(rid => {
                 const material = MASTER_ITEMS.find(m => m.id === rid);
                 return material ? material.name : rid;
             }).join(" + ");
             
+            const nameColor = RARITY_COLORS[item.rarity] || '#333';
+
             row.innerHTML = `
-                <img src="images/items/${item.img}" style="width:50px; height:50px; object-fit:contain;">
-                <div style="flex:1;">
-                    <div style="font-weight:bold; color:var(--primary-blue); font-size:1.1rem;">${item.name}</div>
-                    <div style="font-size:0.9rem; color:#555; margin-top:5px;">公式: ${recipeNames}</div>
+                <img src="images/items/${item.img}" style="width:50px; height:50px; object-fit:contain; flex-shrink: 0;">
+                <div style="flex:1; min-width: 0;">
+                    <div style="font-weight:bold; color:${nameColor}; font-size:1.1rem;">${item.name}</div>
+                    <div style="font-size:0.9rem; color:#555; margin-top:5px; word-wrap: break-word;">公式: ${recipeNames}</div>
                 </div>
             `;
             body.appendChild(row);

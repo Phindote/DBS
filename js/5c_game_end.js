@@ -99,6 +99,13 @@ function endGame() {
     document.getElementById("endTitle").innerText = title;
     document.getElementById("endStatsRow").innerText = `獲得${gameState.currentSessionXP}點經驗，${earnedCoins}個金幣，回復${gainedEnergy}點浩然之氣！`;
 
+    const tableHeaders = document.querySelectorAll(".result-table th");
+    let headerColor = "#95a5a6"; 
+    if (isPerfect) headerColor = "#f1c40f"; 
+    else if (isFail) headerColor = "#c0392b"; 
+    
+    tableHeaders.forEach(th => th.style.backgroundColor = headerColor);
+
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
     gameState.pool.forEach(q => {
@@ -107,10 +114,12 @@ function endGame() {
         let userAnsCell = `<td style="color:gray;">未作答</td>`;
         
         if (attempts.length > 0) {
-            const chain = attempts.map(a => a.userAns).join(" > ");
-            const lastAttempt = attempts[attempts.length - 1];
-            let cls = lastAttempt.isCorrect ? 'res-correct' : 'res-wrong';
-            userAnsCell = `<td class="${cls}">${chain}</td>`;
+            let chainHtml = attempts.map((a, i) => {
+                let color = a.isCorrect ? 'var(--hp-green)' : 'var(--primary-red)';
+                let arrow = (i < attempts.length - 1) ? '<span style="color:black; margin:0 5px;">&gt;</span>' : '';
+                return `<span style="color:${color}; font-weight:bold;">${a.userAns}</span>${arrow}`;
+            }).join("");
+            userAnsCell = `<td>${chainHtml}</td>`;
         }
         
         tr.innerHTML = `<td>${q.line} <br><small>(${q.word})</small></td>${userAnsCell}<td>${q.answer}</td>`;
@@ -120,9 +129,16 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
+    let tipText = "同一條題目答錯超過三次也會算為戰敗喔！";
+    if (isPerfect) {
+        tipText = "努力保持這種水準，答案一擊即中就是完美！";
+    } else if (!isFail) {
+        tipText = "假如曾經答錯，也不算完美喔！繼續加油！";
+    }
+
     const tipBubble = document.createElement("div");
     tipBubble.className = "result-tip-bubble";
-    tipBubble.innerText = "同一條題目答錯超過三次也會算為戰敗喔！";
+    tipBubble.innerText = tipText;
     tbody.parentElement.parentElement.appendChild(tipBubble);
 }
 

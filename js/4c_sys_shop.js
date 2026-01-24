@@ -3,6 +3,16 @@ let currentShopBuyFilter = 'all';
 let isGachaAnimating = false;
 let currentBuyItem = null;
 
+// Re-defining here just in case, though shared context is better.
+const ITEM_RARITY_COLORS = {
+    'T4': '#333333',
+    'T3': '#e74c3c',
+    'T2': '#3498db',
+    'T1': '#8e44ad',
+    'T0': '#f1c40f',
+    'SP': '#f1c40f'
+};
+
 function updateShopUI() {
     const coinEl = document.getElementById("coinDisplay");
     if(coinEl) coinEl.innerText = gameState.user.coins;
@@ -30,10 +40,10 @@ function triggerDrop(scenario) {
     if (!pool || pool.length === 0) return;
     const itemTemplate = pool[Math.floor(Math.random() * pool.length)];
 
-    let msg = "";
+    let count = 1;
     if (itemTemplate.type === 'coin') {
-        gameState.user.coins = Math.min(gameState.user.coins + itemTemplate.value, GAME_CONFIG.MAX_COINS);
-        msg = `獲得：${itemTemplate.name} (+${itemTemplate.value}金幣)`;
+        count = itemTemplate.value;
+        gameState.user.coins = Math.min(gameState.user.coins + count, GAME_CONFIG.MAX_COINS);
     } else {
         const existing = gameState.inventory.find(i => i.id === itemTemplate.id);
         if (existing) {
@@ -42,22 +52,31 @@ function triggerDrop(scenario) {
         } else {
             gameState.inventory.push({ ...itemTemplate, count: 1 });
         }
-        msg = `獲得：${itemTemplate.name} x1`;
     }
     
     saveGame();
     updateShopUI();
-    showDropModal(itemTemplate.img, msg);
+    showDropModal(itemTemplate, count);
 }
 
-function showDropModal(img, text) {
+function showDropModal(item, count) {
     const modal = document.getElementById("dropModal");
     const body = document.getElementById("dropModalBody");
-    const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
+    const imgSrc = item.img ? `images/items/${item.img}` : `images/ui/icon_core.PNG`;
+    
+    const rarityText = RARITY_MAP[item.rarity] || "";
+    const rarityColor = ITEM_RARITY_COLORS[item.rarity] || '#333';
+    
+    let textHTML = "";
+    if (item.type === 'coin') {
+        textHTML = `<div style="font-size:1.4rem; font-weight:bold; color:#f1c40f; margin-bottom: 5px;">${item.name} +${count}</div>`;
+    } else {
+        textHTML = `<div style="font-size:1.2rem; font-weight:bold; color:black; margin-bottom: 5px;">${item.name} x${count} <span style="font-size:0.9rem; color:${rarityColor};">${rarityText}</span></div>`;
+    }
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(231, 76, 60, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
-        <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
+        ${textHTML}
     `;
     const btn = modal.querySelector(".btn-main");
     if(btn) {
@@ -72,14 +91,18 @@ function showDropModal(img, text) {
     playSFX('success');
 }
 
-function showGachaModal(img, text) {
+function showGachaModal(item) {
     const modal = document.getElementById("gachaModal");
     const body = document.getElementById("gachaModalBody");
-    const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
+    const imgSrc = item.img ? `images/items/${item.img}` : `images/ui/icon_core.PNG`;
+
+    const rarityText = RARITY_MAP[item.rarity] || "";
+    const rarityColor = ITEM_RARITY_COLORS[item.rarity] || '#333';
 
     body.innerHTML = `
         <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
-        <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
+        <div style="font-size:1.2rem; font-weight:bold; color:black; margin-bottom: 5px;">${item.name} x1 <span style="font-size:0.9rem; color:${rarityColor};">${rarityText}</span></div>
+        <div style="font-size:1.6rem; font-weight:bold; color:#f1c40f; margin-top: 15px;">恭喜獲得！</div>
     `;
     modal.style.display = 'flex';
     updateCoreButtonVisibility();
@@ -142,9 +165,11 @@ function renderShopBuy() {
 
         const card = document.createElement("div");
         card.className = "shop-card";
+        const color = ITEM_RARITY_COLORS[item.rarity] || '#333';
+        
         card.innerHTML = `
             <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
-            <div class="shop-title">${item.name}</div>
+            <div class="shop-title" style="color:${color}">${item.name}</div>
             <div class="shop-price">$${item.price}</div>
             <button class="btn-main" style="width:100%; margin:5px 0 0 0; background-color: #e74c3c; color: white;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
         `;
@@ -276,22 +301,19 @@ function playGacha() {
         
         const pool = DROP_ITEMS_POOL[rarity];
         const item = pool[Math.floor(Math.random() * pool.length)];
-        const rarityText = RARITY_MAP[rarity]; 
-
-        let msg = "";
+        
         const existing = gameState.inventory.find(i => i.id === item.id);
         if (existing) {
             if (existing.count < 99) existing.count++;
         } else {
             gameState.inventory.push({ ...item, count: 1 });
         }
-        msg = `${rarityText}\n恭喜獲得：${item.name}`;
         
         saveGame();
         updateShopUI();
         
         setTimeout(() => {
-            showGachaModal(item.img, msg.replace('\n', '<br>'));
+            showGachaModal(item);
             egg.classList.remove("cracked");
             flash.classList.remove("active");
             isGachaAnimating = false;
