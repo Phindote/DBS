@@ -1,5 +1,7 @@
 let currentSmeltSlotIndex = -1;
 let currentSmeltFilter = 'all';
+let currentRecipePage = 0;
+const RECIPE_RARITY_ORDER = ["T4", "T3", "T2", "T1", "T0"];
 
 function renderShopSmelt() {
     const container = document.getElementById("shopContentArea");
@@ -183,31 +185,38 @@ function promptSellItem(event, index) {
     const item = gameState.inventory[index];
     
     const modal = document.getElementById("deleteModal");
+    document.getElementById("deleteItemName").innerText = item.name;
+    document.getElementById("deleteItemImg").src = "images/items/" + item.img;
     
-    const header = modal.querySelector(".modal-header");
-    header.innerText = "出售物品";
-    header.style.background = "#f1c40f";
-    header.style.color = "#d35400";
+    const slider = document.getElementById("deleteSlider");
+    slider.min = 1;
+    slider.max = item.count;
+    slider.value = 1;
+    
+    updateSellPrice(1, 10);
+    
+    slider.oninput = function() {
+        updateSellPrice(parseInt(this.value), 10);
+    };
 
-    document.getElementById("deleteItemName").innerText = "出售: " + item.name + " (擁有: " + item.count + ")";
-    document.getElementById("deleteCount").value = 1;
-    document.getElementById("deleteCount").max = item.count;
-    
     const confirmBtn = document.getElementById("btnConfirmSell");
     if(confirmBtn) {
-        confirmBtn.innerText = "確認出售";
         confirmBtn.onclick = confirmSell;
-        confirmBtn.style.background = "#f1c40f";
-        confirmBtn.style.color = "#d35400";
     }
     
     modal.style.display = "flex";
     updateCoreButtonVisibility();
 }
 
+function updateSellPrice(count, pricePerUnit) {
+    document.getElementById("delCountVal").innerText = count;
+    document.getElementById("delTotalVal").innerText = count * pricePerUnit;
+}
+
 function confirmSell() {
     if (itemToDeleteIndex === -1) return;
-    const count = parseInt(document.getElementById("deleteCount").value);
+    const slider = document.getElementById("deleteSlider");
+    const count = parseInt(slider.value);
     const item = gameState.inventory[itemToDeleteIndex];
 
     if(count < 1 || count > item.count) {
@@ -304,23 +313,33 @@ function executeSmelt() {
 
 function showRecipes() {
     document.getElementById("recipeModal").style.display = "flex";
+    currentRecipePage = 0;
+    renderRecipePage();
+    updateCoreButtonVisibility();
+}
+
+function renderRecipePage() {
     const body = document.getElementById("recipeListBody");
     body.innerHTML = "";
     
-    const rarities = ["T0", "T1", "T2", "T3", "T4"];
+    const rarity = RECIPE_RARITY_ORDER[currentRecipePage];
+    const items = MASTER_ITEMS.filter(i => i.rarity === rarity && i.recipe);
     
-    rarities.forEach(rarity => {
-        const items = MASTER_ITEMS.filter(i => i.rarity === rarity && i.recipe);
-        if (items.length === 0) return;
-        
-        const groupTitle = document.createElement("div");
-        groupTitle.style.cssText = "background:#eee; padding:5px 10px; font-weight:bold; margin-top:10px; border-left:4px solid var(--primary-blue);";
-        groupTitle.innerText = RARITY_MAP[rarity];
-        body.appendChild(groupTitle);
-        
+    const pageTitle = document.createElement("div");
+    pageTitle.style.cssText = "text-align:center; font-size:1.5rem; color:var(--primary-blue); margin:10px 0 20px 0; font-weight:bold;";
+    pageTitle.innerText = RARITY_MAP[rarity] + "配方";
+    body.appendChild(pageTitle);
+
+    if (items.length === 0) {
+        const noData = document.createElement("div");
+        noData.style.textAlign = "center";
+        noData.style.color = "#999";
+        noData.innerText = "暫無配方記錄";
+        body.appendChild(noData);
+    } else {
         items.forEach(item => {
             const row = document.createElement("div");
-            row.style.cssText = "display:flex; align-items:center; padding:10px; border-bottom:1px solid #f0f0f0; gap:10px;";
+            row.style.cssText = "display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee; gap:15px; background:#fff; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);";
             
             const recipeNames = item.recipe.map(rid => {
                 const material = MASTER_ITEMS.find(m => m.id === rid);
@@ -328,15 +347,27 @@ function showRecipes() {
             }).join(" + ");
             
             row.innerHTML = `
-                <img src="images/items/${item.img}" style="width:40px; height:40px; object-fit:contain;">
+                <img src="images/items/${item.img}" style="width:50px; height:50px; object-fit:contain;">
                 <div style="flex:1;">
-                    <div style="font-weight:bold; color:var(--primary-blue);">${item.name}</div>
-                    <div style="font-size:0.85rem; color:#555;">公式: ${recipeNames}</div>
+                    <div style="font-weight:bold; color:var(--primary-blue); font-size:1.1rem;">${item.name}</div>
+                    <div style="font-size:0.9rem; color:#555; margin-top:5px;">公式: ${recipeNames}</div>
                 </div>
             `;
             body.appendChild(row);
         });
-    });
-    
-    updateCoreButtonVisibility();
+    }
+}
+
+function nextRecipePage() {
+    if (currentRecipePage < RECIPE_RARITY_ORDER.length - 1) {
+        currentRecipePage++;
+        renderRecipePage();
+    }
+}
+
+function prevRecipePage() {
+    if (currentRecipePage > 0) {
+        currentRecipePage--;
+        renderRecipePage();
+    }
 }

@@ -1,6 +1,7 @@
 let currentShopTab = 'buy'; 
 let currentShopBuyFilter = 'all';
 let isGachaAnimating = false;
+let currentBuyItem = null;
 
 function updateShopUI() {
     const coinEl = document.getElementById("coinDisplay");
@@ -88,13 +89,19 @@ function renderShop() {
     switchScreen("screen-shop");
     updateShopUI();
     
-    ['tabBuy', 'tabSmelt', 'tabGacha'].forEach(id => document.getElementById(id).classList.remove('active'));
+    ['tabBuy', 'tabSmelt', 'tabGacha'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('active');
+        el.style.backgroundColor = '';
+    });
     
     if (currentShopTab === 'buy') {
         document.getElementById('tabBuy').classList.add('active');
         renderShopBuy();
     } else if (currentShopTab === 'smelt') {
-        document.getElementById('tabSmelt').classList.add('active');
+        const el = document.getElementById('tabSmelt');
+        el.classList.add('active');
+        el.style.backgroundColor = '#8e44ad';
         renderShopSmelt();
     } else if (currentShopTab === 'gacha') {
         document.getElementById('tabGacha').classList.add('active');
@@ -150,22 +157,72 @@ function buyItem(itemId, price) {
     const targetItem = MASTER_ITEMS.find(i => i.id === itemId);
     if(!targetItem) return;
 
+    currentBuyItem = { ...targetItem, price: price };
+    
+    const maxAfford = Math.floor(gameState.user.coins / price);
     const existing = gameState.inventory.find(i => i.id === itemId);
-    if (existing && existing.count >= 99) {
-        return alert("該物品已達上限 (99個)！");
+    const currentCount = existing ? existing.count : 0;
+    const maxSpace = 99 - currentCount;
+    const maxBuy = Math.min(maxAfford, maxSpace);
+
+    if (maxBuy < 1) {
+        if (maxSpace <= 0) return alert("該物品已達上限 (99個)！");
+        return alert("金幣不足！");
     }
 
-    gameState.user.coins -= price;
+    const modal = document.getElementById("buyModal");
+    document.getElementById("buyItemName").innerText = targetItem.name;
+    document.getElementById("buyItemImg").src = "images/items/" + targetItem.img;
+    
+    const slider = document.getElementById("buySlider");
+    slider.min = 1;
+    slider.max = maxBuy;
+    slider.value = 1;
+    
+    updateBuyPrice(1, price);
+    
+    slider.oninput = function() {
+        updateBuyPrice(parseInt(this.value), price);
+    };
+
+    const confirmBtn = document.getElementById("btnConfirmBuy");
+    confirmBtn.onclick = confirmBuy;
+    
+    modal.style.display = "flex";
+    updateCoreButtonVisibility();
+}
+
+function updateBuyPrice(count, price) {
+    document.getElementById("buyCountVal").innerText = count;
+    document.getElementById("buyTotalVal").innerText = count * price;
+}
+
+function confirmBuy() {
+    if (!currentBuyItem) return;
+    
+    const slider = document.getElementById("buySlider");
+    const count = parseInt(slider.value);
+    const totalPrice = count * currentBuyItem.price;
+
+    if (gameState.user.coins < totalPrice) {
+        return alert("金幣不足！");
+    }
+
+    gameState.user.coins -= totalPrice;
+    const existing = gameState.inventory.find(i => i.id === currentBuyItem.id);
+    
     if (existing) {
-        existing.count++;
+        existing.count += count;
     } else {
-        gameState.inventory.push({ ...targetItem, count: 1 });
+        gameState.inventory.push({ ...currentBuyItem, count: count });
     }
     
     saveGame();
     updateShopUI();
     playSFX('success');
-    alert(`成功購買 ${targetItem.name}！`);
+    document.getElementById("buyModal").style.display = "none";
+    updateCoreButtonVisibility();
+    alert(`成功購買 ${count} 個 ${currentBuyItem.name}！`);
 }
 
 function renderShopGacha() {
