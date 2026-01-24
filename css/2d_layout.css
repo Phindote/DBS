@@ -325,6 +325,7 @@ select.form-input {
     display: block;
     line-height: 1.6;
     color: #333;
+    box-sizing: border-box;
 }
 #helpBody h3 {
     margin-top: 0;
