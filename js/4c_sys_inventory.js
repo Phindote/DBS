@@ -177,14 +177,13 @@ function showItemDetail(index) {
     
     if(item.type === 'fragment') {
         title.innerText = "碎片";
-        header.style.background = "#3498db";
     } else {
         title.innerText = "成品";
-        header.style.background = "#2c3e50";
     }
     header.style.color = "white";
 
-    const rarityColor = RARITY_COLORS[item.rarity] || '#d35400';
+    const rarityColor = RARITY_COLORS[item.rarity] || '#2c3e50';
+    header.style.background = rarityColor;
 
     body.innerHTML = `
         <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">

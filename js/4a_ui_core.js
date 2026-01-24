@@ -7,8 +7,9 @@ let currentHelpPage = 0;
 const HELP_PAGES = [
     `
     <div style="text-align:center; font-weight:bold; font-size:1.1rem; margin-bottom:10px;">歡迎來到拔萃之魂的試煉世界。</div>
-    <p>既然重生於此，你手中的十二篇古籍便是你斬殺惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
-    <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+    <p>既然重生於此，你手中的十二篇古籍便是你馴化惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
+    `,
+    `
     <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">生存與代價⏳</h3>
     <p>你的生命值是你立足於此的根本，每一次對經文的誤解，都會引來惡龍的攻擊而受傷，歸零則意味著戰敗。而每一次發起挑戰，都需要消耗體內的浩然之氣。初階試煉消耗較少，高階試煉則倍之。若氣息耗盡，你將無法再戰。唯有通過勝利，或是在圖鑑中潛心溫習，方能重新凝聚這股天地正氣。</p>
     `,
@@ -24,6 +25,8 @@ const HELP_PAGES = [
     `
     <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">成長之路🚩</h3>
     <p>在這條漫長的歷煉之路上，時刻審視自我至關重要。輕觸你的稱號，便可窺見這條晉升之路的全貌，知曉自己身處何方。若想知曉自己在理解古文的造詣深淺，只需點擊校徽，六角星芒陣自會顯現你真實的屬性，六邊形戰士由此誕生⋯⋯</p>
+    `,
+    `
     <div style="text-align:center; color:var(--primary-red); font-weight:bold; margin-top:20px; line-height:1.6;">
     勇者啊，握緊手中的知識之劍，<br>
     去征服那些盤踞在古籍中的惡龍吧！
@@ -148,7 +151,15 @@ function updateBars() {
 }
 
 function showHelp() {
-    document.getElementById("helpModal").style.display = "flex";
+    const modal = document.getElementById("helpModal");
+    modal.style.display = "flex";
+
+    const header = modal.querySelector(".modal-header");
+    if(header) header.style.background = "#2c3e50";
+
+    const body = document.getElementById("helpBody");
+    if(body) body.style.justifyContent = "center";
+
     currentHelpPage = 0;
     renderHelpPage();
     updateCoreButtonVisibility();
