@@ -311,6 +311,8 @@ function initGodMode() {
     }
     
     const db = window.questionsDB || {};
+    // 獲取當前時間戳
+    const now = new Date().getTime();
 
     window.godModeActive = true;
     gameState.user.level = 99;
@@ -323,15 +325,31 @@ function initGodMode() {
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
     
+    // 初始化記錄物件
+    if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
+    if(!gameState.collectionDates) gameState.collectionDates = {};
+    
+    // 設定混合模式時間
+    gameState.chapterLastPlayed['mix'] = now;
+    
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
         gameState.masteredChapters.push('mix');
+        
+        // 設定該篇章的上回挑戰時間為現在
+        gameState.chapterLastPlayed[k] = now;
+        
         if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
         if(db[k].senior) db[k].senior.forEach(q => gameState.solvedQuestionIds.push(q.id));
     });
     
     gameState.unlockedAchievements = ACHIEVEMENTS.map(a => a.id);
+    // 設定所有成就獲得時間為現在
+    gameState.unlockedAchievements.forEach(id => {
+        gameState.collectionDates[id] = now;
+    });
+
     gameState.stats.totalPlayTime = 99999;
     gameState.stats.mixWinCount = 999;
     
@@ -354,6 +372,8 @@ function initGodMode() {
                 gameState.inventory.push({ ...item, count: 99 });
             } else {
                 gameState.pets.push(item.id);
+                // 設定所有寵物獲得時間為現在
+                gameState.collectionDates[item.id] = now;
             }
         });
     }
