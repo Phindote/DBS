@@ -40,16 +40,6 @@ function editProfile() {
     switchScreen("screen-login");
 }
 
-function showHelp() {
-    document.getElementById("helpModal").style.display = "flex";
-    updateCoreButtonVisibility();
-}
-
-function closeHelp() {
-    document.getElementById("helpModal").style.display = "none";
-    updateCoreButtonVisibility();
-}
-
 function toggleRadialMenu() {
     const container = document.getElementById("radialMenuContainer");
     const bd = document.getElementById("floatingBackdrop");
