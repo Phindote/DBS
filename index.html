@@ -61,7 +61,6 @@
 <img src="images/ui/icon_coin.PNG">
 </div>
 <div id="damageOverlay"></div>
-
 <div id="screen-loading" class="screen active">
 <img src="images/ui/school_logo.jpg" alt="Logo" class="loading-logo" onerror="this.style.display='none'">
 <h2 style="color: var(--primary-blue); margin-top: 10px;">資源載入中...</h2>
@@ -72,12 +71,10 @@
 </div>
 <div id="loadingText" style="margin-top: 20px; color: #666; font-weight: bold;">0%</div>
 </div>
-
 <div class="container">
 <div class="header-bar">
 <img src="images/ui/banner.jpg" class="header-banner" alt="Banner" loading="eager">
 </div>
-
 <div id="screen-login" class="screen">
 <img src="images/ui/school_logo.jpg" alt="校徽" class="profile-logo" style="width:100px; height:100px;" onerror="this.src='https://via.placeholder.com/100?text=Logo'">
 <h2 style="color: var(--primary-blue);">拔萃之魂</h2>
@@ -112,7 +109,6 @@
 </div>
 <button class="btn-main" onclick="handleLogin()">進入試煉</button>
 </div>
-
 <div id="screen-menu" class="screen">
 <div class="profile-card">
 <img src="images/ui/school_logo.jpg" alt="校徽" class="profile-logo" onclick="showStatsModal(); event.stopPropagation();" style="cursor: pointer;" onerror="this.src='https://via.placeholder.com/80?text=Logo'">
@@ -186,36 +182,32 @@
 </div>
 </div>
 </div>
-
 <div id="screen-pokedex" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">惡龍圖鑑</h2>
 <div class="pokedex-grid" id="pokedexContainer"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-achievements" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">龍印寶典</h2>
 <div class="pokedex-grid" id="sealContainer"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-shop" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">資源商店</h2>
 <div class="shop-header-row">
-    <div class="shop-tabs">
-        <button class="tab-btn-pill active" id="tabBuy" onclick="switchShopTab('buy')">採購</button>
-        <button class="tab-btn-pill" id="tabSmelt" onclick="switchShopTab('smelt')">熔煉</button>
-        <button class="tab-btn-pill" id="tabGacha" onclick="switchShopTab('gacha')">祈願</button>
-    </div>
-    <div class="coin-capsule">
-        <img src="images/ui/icon_coin.PNG" class="coin-icon-img" alt="G" onerror="this.style.display='none'">
-        <span id="coinDisplay">0</span>
-    </div>
+<div class="shop-tabs">
+<button class="tab-btn-pill active" id="tabBuy" onclick="switchShopTab('buy')">採購</button>
+<button class="tab-btn-pill" id="tabSmelt" onclick="switchShopTab('smelt')">熔煉</button>
+<button class="tab-btn-pill" id="tabGacha" onclick="switchShopTab('gacha')">祈願</button>
+</div>
+<div class="coin-capsule">
+<img src="images/ui/icon_coin.PNG" class="coin-icon-img" alt="G" onerror="this.style.display='none'">
+<span id="coinDisplay">0</span>
+</div>
 </div>
 <div id="shopContentArea" style="width:100%; flex:1; overflow-y:auto; padding:5px;"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-inventory" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">勇者背包</h2>
 <div class="inventory-tabs">
@@ -226,19 +218,16 @@
 <div class="pokedex-grid" id="inventoryContainer" style="margin-top:5px;"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-daily" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">每日任務</h2>
 <div class="pokedex-grid" id="dailyContainer" style="margin-top:5px; display:block;"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-pet" class="screen">
 <h2 style="color:var(--primary-blue); margin-bottom:5px;">龍魄靈獸</h2>
 <div class="pokedex-grid" id="petContainer" style="margin-top:5px;"></div>
 <button class="btn-bottom-back" style="margin-top:20px;" onclick="switchScreen('screen-menu')">返回主目錄</button>
 </div>
-
 <div id="screen-difficulty" class="screen">
 <h2 style="color:var(--primary-blue);">請選擇難度級別</h2>
 <div style="text-align:center; margin-bottom:15px; color:#555;">
@@ -247,11 +236,10 @@
 <button class="difficulty-btn btn-junior" onclick="initGame('junior')">初階 (多項選擇)</button>
 <button class="difficulty-btn btn-senior" onclick="initGame('senior')">高階 (填寫答案)</button>
 <div style="display:flex; gap:10px; width:100%; max-width:400px; justify-content:center; margin-top:30px;">
-    <button class="btn-secondary" style="background:#f1c40f; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="backToChapterSelection()">返回選單</button>
-    <button class="btn-secondary" style="background:#7f8c8d; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="resetMenu(); switchScreen('screen-menu')">返回主目錄</button>
+<button class="btn-secondary" style="background:#f1c40f; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="backToChapterSelection()">返回選單</button>
+<button class="btn-secondary" style="background:#7f8c8d; color:white; flex:1; font-size:1rem; padding:10px 0;" onclick="resetMenu(); switchScreen('screen-menu')">返回主目錄</button>
 </div>
 </div>
-
 <div id="screen-game" class="screen">
 <canvas id="particleCanvas"></canvas>
 <div class="battle-hud">
@@ -289,7 +277,6 @@
 <button class="btn-bottom-back" onclick="goHome()">返回主目錄</button>
 </div>
 </div>
-
 <div id="screen-result" class="screen">
 <div id="resultImageContainer">
 <img id="resultImg" src="" alt="Result">
@@ -305,11 +292,10 @@
 </table>
 </div>
 <div style="display:flex; gap:15px; width:100%; max-width:500px; justify-content:center; margin-top:20px;">
-    <button class="btn-main" style="background:var(--primary-red); flex:1; margin:0;" onclick="backToChapterSelection()">繼續挑戰！</button>
-    <button class="btn-main" style="background:#7f8c8d; flex:1; margin:0;" onclick="backToMenuFromEnd()">返回主目錄</button>
+<button class="btn-main" style="background:var(--primary-red); flex:1; margin:0;" onclick="backToChapterSelection()">繼續挑戰！</button>
+<button class="btn-main" style="background:#7f8c8d; flex:1; margin:0;" onclick="backToMenuFromEnd()">返回主目錄</button>
 </div>
 </div>
-
 <div id="contentModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -335,7 +321,6 @@
 </div>
 </div>
 </div>
-
 <div id="statsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center;">
 <div class="modal-content" style="max-width:500px; background:#fff; border-radius:15px; overflow:hidden;">
 <div class="modal-header">
@@ -350,7 +335,6 @@
 </div>
 </div>
 </div>
-
 <div id="titlesModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -362,7 +346,6 @@
 </div>
 </div>
 </div>
-
 <div id="helpModal">
 <div class="modal-content">
 <div class="modal-header">
@@ -392,7 +375,6 @@
 </div>
 </div>
 </div>
-
 <div id="unlockModal">
 <div class="modal-content" style="max-width:400px; text-align:center;">
 <div class="modal-header" style="background:var(--xp-gold); color:#d35400;">
@@ -404,7 +386,6 @@
 </div>
 </div>
 </div>
-
 <div id="dropModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content" style="max-width:400px; text-align:center;">
 <div class="modal-header modal-header-red">
@@ -413,11 +394,10 @@
 <div class="modal-body" id="dropModalBody" style="padding: 30px 20px;">
 </div>
 <div style="padding:15px; background:#f9f9f9;">
-    <button class="btn-main" style="margin:0; background:var(--primary-blue); font-size:1rem; padding:10px 30px;" onclick="document.getElementById('dropModal').style.display='none'; updateCoreButtonVisibility();">馬上收下！</button>
+<button class="btn-main" style="margin:0; background:var(--primary-blue); font-size:1rem; padding:10px 30px;" onclick="document.getElementById('dropModal').style.display='none'; updateCoreButtonVisibility();">馬上收下！</button>
 </div>
 </div>
 </div>
-
 <div id="gachaModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content" style="max-width:400px; text-align:center;">
 <div class="modal-header modal-header-green">
@@ -426,11 +406,10 @@
 <div class="modal-body" id="gachaModalBody" style="padding: 30px 20px;">
 </div>
 <div style="padding:15px; background:#f9f9f9;">
-    <button class="btn-main" style="margin:0; background:#2ecc71; font-size:1rem; padding:10px 30px;" onclick="document.getElementById('gachaModal').style.display='none'; updateCoreButtonVisibility();">收下</button>
+<button class="btn-main" style="margin:0; background:#2ecc71; font-size:1rem; padding:10px 30px;" onclick="document.getElementById('gachaModal').style.display='none'; updateCoreButtonVisibility();">收下</button>
 </div>
 </div>
 </div>
-
 <div id="smeltSelectModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content" style="width:90%; max-width:500px;">
 <div class="modal-header">
@@ -438,11 +417,10 @@
 <span class="modal-close" onclick="document.getElementById('smeltSelectModal').style.display='none'">×</span>
 </div>
 <div class="modal-body">
-    <div class="pokedex-grid" id="smeltInventoryGrid" style="max-height:300px; overflow-y:auto;"></div>
+<div class="pokedex-grid" id="smeltInventoryGrid" style="max-height:300px; overflow-y:auto;"></div>
 </div>
 </div>
 </div>
-
 <div id="deleteModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content" style="max-width:300px;">
 <div class="modal-header">刪除物品</div>
@@ -450,13 +428,12 @@
 <p id="deleteItemName">物品名稱</p>
 <input type="number" id="deleteCount" value="1" min="1" style="width:80%; padding:10px; font-size:1.2rem; text-align:center; margin:10px 0;">
 <div style="display:flex; justify-content:center; gap:10px;">
-<button class="btn-secondary" style="background:#e74c3c;" onclick="confirmDelete()">確認刪除</button>
+<button id="btnConfirmSell" class="btn-secondary" style="background:#e74c3c;" onclick="confirmDelete()">確認刪除</button>
 <button class="btn-secondary" onclick="document.getElementById('deleteModal').style.display='none'">取消</button>
 </div>
 </div>
 </div>
 </div>
-
 <div id="smeltConfirmModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content" style="max-width:300px;">
 <div class="modal-header">確認合成</div>
@@ -469,7 +446,6 @@
 </div>
 </div>
 </div>
-
 <div id="recipeModal" class="modal-backdrop" style="display:none;">
 <div class="modal-content">
 <div class="modal-header">
@@ -481,40 +457,47 @@
 </div>
 </div>
 </div>
-
-<div id="radialMenuContainer" class="radial-menu-container">
-    <div class="radial-items">
-        <div class="stack-item">
-            <button class="stack-btn" onclick="renderDailyTasks()">
-                <img src="images/ui/btn_daily.PNG" alt="Daily">
-            </button>
-            <span class="stack-label">每日任務</span>
-        </div>
-        <div class="stack-item">
-            <button class="stack-btn" onclick="renderShop()">
-                <img src="images/ui/btn_store.PNG" alt="Store">
-            </button>
-            <span class="stack-label">資源商店</span>
-        </div>
-        <div class="stack-item">
-            <button class="stack-btn" onclick="renderInventory()">
-                <img src="images/ui/btn_inventory.PNG" alt="Inventory">
-            </button>
-            <span class="stack-label">勇者背包</span>
-        </div>
-        <div class="stack-item">
-            <button class="stack-btn" onclick="renderPets()">
-                <img src="images/ui/btn_pet.PNG" alt="Pet">
-            </button>
-            <span class="stack-label">龍魄靈獸</span>
-        </div>
-    </div>
-    <button id="radialMainBtn" onclick="toggleRadialMenu()">
-        <div class="pulse-ring"></div>
-        <img src="images/ui/icon_core.PNG" alt="Menu">
-    </button>
+<div id="detailModal" class="modal-backdrop" style="display:none;">
+<div class="modal-content" style="max-width:400px; text-align:center; position:relative;">
+<div class="modal-header" id="detailModalHeader">
+<span id="detailModalTitle">詳情</span>
+<span class="modal-close" onclick="document.getElementById('detailModal').style.display='none'" style="position:absolute; right:10px; top:10px; color:white; opacity:1;">×</span>
 </div>
-
+<div class="modal-body" id="detailModalBody" style="padding:30px 20px;"></div>
+</div>
+</div>
+<div id="radialMenuContainer" class="radial-menu-container">
+<div class="radial-items">
+<div class="stack-item">
+<button class="stack-btn" onclick="renderDailyTasks()">
+<img src="images/ui/btn_daily.PNG" alt="Daily">
+</button>
+<span class="stack-label">每日任務</span>
+</div>
+<div class="stack-item">
+<button class="stack-btn" onclick="renderShop()">
+<img src="images/ui/btn_store.PNG" alt="Store">
+</button>
+<span class="stack-label">資源商店</span>
+</div>
+<div class="stack-item">
+<button class="stack-btn" onclick="renderInventory()">
+<img src="images/ui/btn_inventory.PNG" alt="Inventory">
+</button>
+<span class="stack-label">勇者背包</span>
+</div>
+<div class="stack-item">
+<button class="stack-btn" onclick="renderPets()">
+<img src="images/ui/btn_pet.PNG" alt="Pet">
+</button>
+<span class="stack-label">龍魄靈獸</span>
+</div>
+</div>
+<button id="radialMainBtn" onclick="toggleRadialMenu()">
+<div class="pulse-ring"></div>
+<img src="images/ui/icon_core.PNG" alt="Menu">
+</button>
+</div>
 <div id="floatingMenuContainer">
 <div id="floatingSubMenu" class="hidden">
 <button class="btn-control-float" onclick="showHelp()">
