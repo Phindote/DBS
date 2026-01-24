@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <div class="modal-body" style="padding:20px; font-weight:bold; font-size:1.1rem; color:#2c3e50;">
                     手速太快了！放慢一點！
                 </div>
-                <div class="modal-footer" style="justify-content:center;">
-                    <button class="btn-main" onclick="document.getElementById('spamModal').style.display='none'">我知道了</button>
+                <div style="display:flex; justify-content:center; align-items:center; padding-bottom:25px; width:100%;">
+                    <button class="btn-main" style="background:#e74c3c; color:white; margin:0; width:auto; padding:10px 40px; border-radius:50px; box-shadow:none; display:flex; justify-content:center; align-items:center;" onclick="document.getElementById('spamModal').style.display='none'">我知道了</button>
                 </div>
             </div>
         `;

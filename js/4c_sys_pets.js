@@ -39,13 +39,15 @@ function renderPets() {
 }
 
 function showPetDetail(pet, unlocked = true) {
-    const modal = document.getElementById("contentModal");
-    const header = modal.querySelector(".modal-header");
-    const body = document.getElementById("contentModalBody");
-    const btn = modal.querySelector(".btn-main");
+    const modal = document.getElementById("detailModal");
+    const header = document.getElementById("detailModalHeader");
+    const title = document.getElementById("detailModalTitle");
+    const body = document.getElementById("detailModalBody");
 
-    header.innerText = "靈獸";
-    
+    title.innerText = "靈獸";
+    header.style.background = "#8e44ad"; 
+    header.style.color = "white";
+
     const imgSrc = unlocked ? `images/items/${pet.img}` : `images/items/pet_unknown.PNG`;
     const nameStr = unlocked ? pet.name : "未獲得";
     const descStr = unlocked ? pet.desc : "???";
@@ -56,9 +58,7 @@ function showPetDetail(pet, unlocked = true) {
         <div style="font-size:0.9rem; color:#d35400; margin-bottom:10px;">${RARITY_MAP[pet.rarity]}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${descStr}</div>
     `;
-    
-    if(btn) btn.style.display = "none";
-    
+
     modal.style.display = "flex";
     updateCoreButtonVisibility();
 }

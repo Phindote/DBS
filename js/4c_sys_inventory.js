@@ -152,23 +152,26 @@ function showItemDetail(index) {
     const item = gameState.inventory[index];
     if(!item) return;
     
-    const modal = document.getElementById("contentModal");
-    const header = modal.querySelector(".modal-header");
-    const body = document.getElementById("contentModalBody");
-    const btn = modal.querySelector(".btn-main");
-
-    if(item.type === 'fragment') header.innerText = "碎片";
-    else if(item.type === 'product') header.innerText = "成品";
-    else header.innerText = "物品";
+    const modal = document.getElementById("detailModal");
+    const header = document.getElementById("detailModalHeader");
+    const title = document.getElementById("detailModalTitle");
+    const body = document.getElementById("detailModalBody");
     
+    if(item.type === 'fragment') {
+        title.innerText = "碎片";
+        header.style.background = "#3498db";
+    } else {
+        title.innerText = "成品";
+        header.style.background = "#2c3e50";
+    }
+    header.style.color = "white";
+
     body.innerHTML = `
         <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${item.name}</div>
         <div style="font-size:0.9rem; color:#d35400; margin-bottom:10px;">${RARITY_MAP[item.rarity]}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${item.desc}</div>
     `;
-    
-    if(btn) btn.style.display = "none";
     
     modal.style.display = "flex";
     updateCoreButtonVisibility();
@@ -180,23 +183,22 @@ function promptSellItem(event, index) {
     const item = gameState.inventory[index];
     
     const modal = document.getElementById("deleteModal");
+    
     const header = modal.querySelector(".modal-header");
-    if(header) header.innerText = "出售物品？";
-    else {
-        const h3 = modal.querySelector("h3");
-        if(h3) h3.innerText = "出售物品？";
-    }
+    header.innerText = "出售物品";
+    header.style.background = "#f1c40f";
+    header.style.color = "#d35400";
 
     document.getElementById("deleteItemName").innerText = "出售: " + item.name + " (擁有: " + item.count + ")";
     document.getElementById("deleteCount").value = 1;
     document.getElementById("deleteCount").max = item.count;
     
-    const deleteBtn = document.getElementById("deleteConfirmBtn") || modal.querySelector(".btn-main");
-    if(deleteBtn) {
-        deleteBtn.innerText = "確認出售";
-        deleteBtn.onclick = confirmSell;
-        deleteBtn.style.background = "#f1c40f";
-        deleteBtn.style.color = "#d35400";
+    const confirmBtn = document.getElementById("btnConfirmSell");
+    if(confirmBtn) {
+        confirmBtn.innerText = "確認出售";
+        confirmBtn.onclick = confirmSell;
+        confirmBtn.style.background = "#f1c40f";
+        confirmBtn.style.color = "#d35400";
     }
     
     modal.style.display = "flex";
