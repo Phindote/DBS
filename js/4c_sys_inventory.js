@@ -8,7 +8,7 @@ function renderShopSmelt() {
     container.innerHTML = `
         <div class="smelt-grid-container" id="smeltContainer" style="margin-top:10px;"></div>
         <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
-            <button class="btn-main" style="margin:0; background:#8e44ad;" onclick="showRecipes()">合成公式</button>
+            <button class="btn-main" style="margin:0; background:#8e44ad; color:white;" onclick="showRecipes()">合成公式</button>
             <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
         </div>
     `;
@@ -327,7 +327,7 @@ function renderRecipePage() {
     
     const pageTitle = document.createElement("div");
     pageTitle.style.cssText = "text-align:center; font-size:1.5rem; color:var(--primary-blue); margin:10px 0 20px 0; font-weight:bold;";
-    pageTitle.innerText = RARITY_MAP[rarity] + "配方";
+    pageTitle.innerText = "【" + RARITY_MAP[rarity] + "】";
     body.appendChild(pageTitle);
 
     if (items.length === 0) {
@@ -339,7 +339,7 @@ function renderRecipePage() {
     } else {
         items.forEach(item => {
             const row = document.createElement("div");
-            row.style.cssText = "display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee; gap:15px; background:#fff; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05);";
+            row.style.cssText = "display:flex; align-items:center; padding:15px; border-bottom:1px solid #eee; gap:15px; background:#fff; margin-bottom:10px; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.05); width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;";
             
             const recipeNames = item.recipe.map(rid => {
                 const material = MASTER_ITEMS.find(m => m.id === rid);
@@ -359,15 +359,11 @@ function renderRecipePage() {
 }
 
 function nextRecipePage() {
-    if (currentRecipePage < RECIPE_RARITY_ORDER.length - 1) {
-        currentRecipePage++;
-        renderRecipePage();
-    }
+    currentRecipePage = (currentRecipePage + 1) % RECIPE_RARITY_ORDER.length;
+    renderRecipePage();
 }
 
 function prevRecipePage() {
-    if (currentRecipePage > 0) {
-        currentRecipePage--;
-        renderRecipePage();
-    }
+    currentRecipePage = (currentRecipePage - 1 + RECIPE_RARITY_ORDER.length) % RECIPE_RARITY_ORDER.length;
+    renderRecipePage();
 }

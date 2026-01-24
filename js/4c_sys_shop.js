@@ -61,7 +61,8 @@ function showDropModal(img, text) {
     `;
     const btn = modal.querySelector(".btn-main");
     if(btn) {
-        btn.style.background = "#e74c3c";
+        btn.style.background = "#2ecc71";
+        btn.style.color = "white";
         btn.innerText = "馬上收下！";
         btn.style.display = "block";
         btn.style.margin = "20px auto 0 auto"; 
@@ -77,7 +78,7 @@ function showGachaModal(img, text) {
     const imgSrc = img ? `images/items/${img}` : `images/ui/icon_core.PNG`;
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.4rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${text}</div>
     `;
     modal.style.display = 'flex';
@@ -93,6 +94,7 @@ function renderShop() {
         const el = document.getElementById(id);
         el.classList.remove('active');
         el.style.backgroundColor = '';
+        el.style.color = '';
     });
     
     if (currentShopTab === 'buy') {
@@ -102,6 +104,7 @@ function renderShop() {
         const el = document.getElementById('tabSmelt');
         el.classList.add('active');
         el.style.backgroundColor = '#8e44ad';
+        el.style.color = 'white';
         renderShopSmelt();
     } else if (currentShopTab === 'gacha') {
         document.getElementById('tabGacha').classList.add('active');
@@ -143,7 +146,7 @@ function renderShopBuy() {
             <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="shop-title">${item.name}</div>
             <div class="shop-price">$${item.price}</div>
-            <button class="btn-main" style="width:100%; margin:5px 0 0 0; background-color: #e74c3c;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
+            <button class="btn-main" style="width:100%; margin:5px 0 0 0; background-color: #e74c3c; color: white;" onclick="buyItem('${item.id}', ${item.price})">購買</button>
         `;
         grid.appendChild(card);
     });
@@ -232,9 +235,10 @@ function renderShopGacha() {
             <div id="gachaEgg" class="css-golden-egg"></div>
             <div id="gachaFlash" class="gacha-flash"></div>
             <div style="text-align:center; color:var(--primary-blue); font-weight:bold; margin-bottom:10px;">
-                龍蛋祈願 (花費: ${GACHA_CONFIG.COST} 金幣)
+                龍蛋祈願
             </div>
-            <button class="btn-main" style="background:#f1c40f; color:#d35400;" onclick="playGacha()">立即祈願</button>
+            <button class="btn-main" style="background:#f1c40f; color:white; margin-bottom:5px;" onclick="playGacha()">立即祈願</button>
+            <div style="font-size:0.8rem; color:#999; text-align:center;">花費 ${GACHA_CONFIG.COST} 金幣</div>
         </div>
     `;
 }
