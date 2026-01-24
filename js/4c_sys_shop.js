@@ -1,9 +1,8 @@
-let currentShopTab = 'buy'; 
+let currentShopTab = 'buy';
 let currentShopBuyFilter = 'all';
 let isGachaAnimating = false;
 let currentBuyItem = null;
 
-// Re-defining here just in case, though shared context is better.
 const ITEM_RARITY_COLORS = {
     'T4': '#333333',
     'T3': '#e74c3c',
@@ -27,7 +26,7 @@ function triggerDrop(scenario) {
     if (!gameState.user.name) return;
 
     const rate = DROP_SYSTEM_CONFIG[scenario] || 0;
-    if (Math.random() > rate) return; 
+    if (Math.random() > rate) return;
 
     const rand = Math.random();
     let rarity = 'T4';
@@ -83,8 +82,6 @@ function showDropModal(item, count) {
         btn.style.background = "#2ecc71";
         btn.style.color = "white";
         btn.innerText = "馬上收下！";
-        btn.style.display = "block";
-        btn.style.margin = "20px auto 0 auto"; 
     }
     modal.style.display = 'flex';
     updateCoreButtonVisibility();
@@ -167,6 +164,8 @@ function renderShopBuy() {
         card.className = "shop-card";
         const color = ITEM_RARITY_COLORS[item.rarity] || '#333';
         
+        card.style.border = `2px solid ${color}`;
+
         card.innerHTML = `
             <img src="images/items/${item.img}" class="shop-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="shop-title" style="color:${color}">${item.name}</div>
@@ -277,20 +276,20 @@ function playGacha() {
     isGachaAnimating = true;
     gameState.user.coins -= GACHA_CONFIG.COST;
     saveGame();
-    updateShopUI(); 
+    updateShopUI();
     
     const egg = document.getElementById("gachaEgg");
     const flash = document.getElementById("gachaFlash");
     
     egg.classList.remove("cracked");
     egg.classList.add("gacha-shake");
-    playSFX('click'); 
+    playSFX('click');
     
     setTimeout(() => {
         egg.classList.remove("gacha-shake");
-        egg.classList.add("cracked"); 
+        egg.classList.add("cracked");
         flash.classList.add("active");
-        playSFX('correct'); 
+        playSFX('correct');
         
         const rand = Math.random();
         let rarity = 'T4';

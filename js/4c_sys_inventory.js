@@ -4,11 +4,11 @@ let currentRecipePage = 0;
 const RECIPE_RARITY_ORDER = ["T4", "T3", "T2", "T1", "T0"];
 
 const RARITY_COLORS = {
-    'T4': '#333333', // Black
-    'T3': '#e74c3c', // Red
-    'T2': '#3498db', // Blue
-    'T1': '#8e44ad', // Purple
-    'T0': '#f1c40f', // Gold
+    'T4': '#333333',
+    'T3': '#e74c3c',
+    'T2': '#3498db',
+    'T1': '#8e44ad',
+    'T0': '#f1c40f',
     'SP': '#f1c40f'
 };
 
@@ -82,6 +82,9 @@ function renderSmeltInventory() {
         const card = document.createElement("div");
         card.className = "pokedex-card";
         const color = RARITY_COLORS[item.rarity] || '#333';
+        
+        card.style.border = `2px solid ${color}`;
+
         card.innerHTML = `
             <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
             <div class="pokedex-title" style="color:${color}">${item.name}</div>
@@ -95,7 +98,7 @@ function renderSmeltInventory() {
 function selectSmeltItem(invIndex) {
     const item = gameState.inventory[invIndex];
     if(item) {
-        smeltSlots[currentSmeltSlotIndex] = { ...item, originalIndex: invIndex }; 
+        smeltSlots[currentSmeltSlotIndex] = { ...item, originalIndex: invIndex };
         document.getElementById("smeltSelectModal").style.display = "none";
         renderShop();
     }
@@ -131,13 +134,15 @@ function renderInventory() {
     
     for(let i=0; i<slots; i++) {
         const card = document.createElement("div");
-        card.className = "pokedex-card"; 
+        card.className = "pokedex-card";
         
         if(i < filteredItems.length && filteredItems[i]) {
             const item = filteredItems[i];
             const realIndex = item.originalIndex;
             const color = RARITY_COLORS[item.rarity] || '#333';
             
+            card.style.border = `2px solid ${color}`;
+
              card.innerHTML = `
                 <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
                 <div class="pokedex-title" style="color:${color}">${item.name}</div>
@@ -320,7 +325,7 @@ function executeSmelt() {
 
     saveGame();
     smeltSlots = [null, null, null, null];
-    renderShop(); 
+    renderShop();
     updateCoreButtonVisibility();
 }
 

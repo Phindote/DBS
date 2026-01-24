@@ -16,7 +16,6 @@ function renderPets() {
                 card.innerHTML = `
                     <img src="images/items/${petData.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
                     <div class="pokedex-title">${petData.name}</div>
-                    <div style="font-size:0.7rem; color:#d35400;">${RARITY_MAP[petData.rarity]}</div>
                 `;
                 card.onclick = () => showPetDetail(petData);
             } else {
@@ -25,7 +24,6 @@ function renderPets() {
                 card.innerHTML = `
                     <img src="images/items/pet_unknown.PNG" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
                     <div class="pokedex-title">未獲得</div>
-                    <div style="font-size:0.7rem; color:#d35400;">${RARITY_MAP[petData.rarity]}</div>
                 `;
                 card.onclick = () => showPetDetail(petData, false);
             }
@@ -45,7 +43,7 @@ function showPetDetail(pet, unlocked = true) {
     const body = document.getElementById("detailModalBody");
 
     title.innerText = "靈獸";
-    header.style.background = "#8e44ad"; 
+    header.style.background = "#8e44ad";
     header.style.color = "white";
 
     const imgSrc = unlocked ? `images/items/${pet.img}` : `images/items/pet_unknown.PNG`;
@@ -55,7 +53,6 @@ function showPetDetail(pet, unlocked = true) {
     body.innerHTML = `
         <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${nameStr}</div>
-        <div style="font-size:0.9rem; color:#d35400; margin-bottom:10px;">${RARITY_MAP[pet.rarity]}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${descStr}</div>
     `;
 
