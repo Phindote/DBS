@@ -7,7 +7,7 @@ let currentHelpPage = 0;
 const HELP_PAGES = [
     `
     <div style="text-align:center; font-weight:bold; font-size:1.1rem; margin-bottom:10px;">歡迎來到拔萃之魂的試煉世界。</div>
-    <p>既然重生於此，你手中的十二篇古籍便是你斬殺惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
+    <p>既然重生於此，你手中的十二篇古籍便是你馴化惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
     `,
     `
     <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">生存與代價⏳</h3>
@@ -166,13 +166,33 @@ function showHelp() {
 
     currentHelpPage = 0;
     renderHelpPage();
+
     updateCoreButtonVisibility();
 }
 
 function renderHelpPage() {
     const body = document.getElementById("helpBody");
     if(body) {
-        body.innerHTML = HELP_PAGES[currentHelpPage];
+        body.innerHTML = "";
+        
+        const contentDiv = document.createElement("div");
+        contentDiv.style.width = "100%";
+        contentDiv.innerHTML = HELP_PAGES[currentHelpPage].trim();
+        body.appendChild(contentDiv);
+    }
+    
+    let indicator = document.getElementById("helpPageIndicator");
+    if (!indicator) {
+        const modalContent = document.querySelector("#helpModal .modal-content");
+        if(modalContent) {
+            indicator = document.createElement("div");
+            indicator.id = "helpPageIndicator";
+            indicator.style.cssText = "text-align:center; padding-bottom:15px; color:#888; font-size:0.9rem;";
+            modalContent.appendChild(indicator);
+        }
+    }
+    if(indicator) {
+        indicator.innerText = `${currentHelpPage + 1} / ${HELP_PAGES.length}`;
     }
 }
 
