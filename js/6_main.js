@@ -328,17 +328,20 @@ function initGodMode() {
     // 初始化記錄物件
     if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
     if(!gameState.collectionDates) gameState.collectionDates = {};
+    if(!gameState.perfectClearDates) gameState.perfectClearDates = {};
     
     // 設定混合模式時間
     gameState.chapterLastPlayed['mix'] = now;
+    gameState.perfectClearDates['mix'] = now;
     
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
         gameState.masteredChapters.push('mix');
         
-        // 設定該篇章的上回挑戰時間為現在
+        // 設定該篇章的上回挑戰時間和首次完美通關時間為現在
         gameState.chapterLastPlayed[k] = now;
+        gameState.perfectClearDates[k] = now;
         
         if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
         if(db[k].senior) db[k].senior.forEach(q => gameState.solvedQuestionIds.push(q.id));

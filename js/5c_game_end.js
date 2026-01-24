@@ -4,7 +4,7 @@ function endGame() {
     const isFail = isDead || isTooManyWrong;
     const isPerfect = (!isFail && gameState.wrongCount === 0);
 
-    let resultImg = "img_defeat.PNG";
+    let resultImg = "images/results/img_defeat.PNG";
     let title = "挑戰失敗";
     let earnedCoins = 0;
     let gainedEnergy = 0;
@@ -33,78 +33,74 @@ function endGame() {
         }
 
         let chapterCount = (gameState.mode === 'mix') ? gameState.mixSelectedKeys.length : 1;
-        let energyPerChapter = (gameState.difficulty === 'junior') ? (isPerfect ? 3 : 2) : (isPerfect ? 6 : 4);
-        gainedEnergy = energyPerChapter * chapterCount;
-        gameState.user.energy = Math.min(100, gameState.user.energy + gainedEnergy);
-
+        
         if (isPerfect) {
-            resultImg = "img_perfect.PNG";
+            resultImg = "images/results/img_perfect.PNG";
             title = "完美通關！";
-            finalMusic = 'bgm_victory';
-
+            gainedEnergy = GAME_CONFIG.ENERGY_REWARD_PERFECT * chapterCount;
             gameState.stats.consecutivePerfect++;
-            if (gameState.stats.consecutivePerfect >= 5) checkAchievements();
-
-            const modeKey = gameState.mode === 'single' ? pendingSingleChapterKey : 'mix';
-            if (modeKey !== 'mix') {
-                let diffKey = modeKey + '_' + gameState.difficulty;
-                if (!gameState.masteredChapters.includes(diffKey)) {
-                    gameState.masteredChapters.push(diffKey);
-                }
-            }
-
-            const dailyIdx = (gameState.difficulty === 'junior') ? 2 : 3;
-            const targetIdx = (gameState.difficulty === 'junior') ? 6 : 7;
+            finalMusic = 'bgm_victory';
             
-            if(gameState.dailyTasks[dailyIdx].progress < 5) {
-                let diffTag = gameState.difficulty === 'junior' ? '_jr' : '_sr';
-                if(!gameState.stats.perfectChapterIds.includes(modeKey + diffTag)) {
-                    gameState.dailyTasks[dailyIdx].progress++;
-                    gameState.stats.perfectChapterIds.push(modeKey + diffTag);
-                }
+            if(!gameState.chapterFirstPerfect) gameState.chapterFirstPerfect = {};
+            const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
+            if(!gameState.chapterFirstPerfect[chKey]) {
+                gameState.chapterFirstPerfect[chKey] = new Date().getTime();
             }
-            const tQuest = gameState.dailyTasks.find(t => t.id === targetIdx);
-            if(tQuest && tQuest.targetKey === modeKey) tQuest.progress = 1;
+
+            if (gameState.mode === 'single') {
+                const jrKey = gameState.currentChapterKey + '_junior';
+                const srKey = gameState.currentChapterKey + '_senior';
+                
+                if (!gameState.stats.perfectChapterIds.includes(gameState.currentChapterKey)) {
+                    gameState.stats.perfectChapterIds.push(gameState.currentChapterKey);
+                }
+                gameState.stats.lastPerfectChapter = gameState.currentChapterKey;
+
+                if (gameState.difficulty === 'junior') {
+                    if (!gameState.masteredChapters.includes(jrKey)) gameState.masteredChapters.push(jrKey);
+                } else {
+                    if (!gameState.masteredChapters.includes(srKey)) gameState.masteredChapters.push(srKey);
+                }
+            } else {
+                if (countMixSelect(16) && isPerfect) gameState.stats.mixPerfect16++;
+            }
 
         } else {
-            resultImg = "img_success.PNG";
+            resultImg = "images/results/img_success.PNG";
             title = "挑戰成功！";
-            finalMusic = 'bgm_success';
+            gainedEnergy = GAME_CONFIG.ENERGY_REWARD_SUCCESS * chapterCount;
             gameState.stats.consecutivePerfect = 0;
         }
 
+        gameState.user.energy = Math.min(100, gameState.user.energy + gainedEnergy);
+        gameState.stats.energyRecovered += gainedEnergy;
+
         if (gameState.mode === 'mix') {
             gameState.stats.mixWinCount++;
-            const mixLen = gameState.mixSelectedKeys.length;
-            if(mixLen >= 5) gameState.stats.mixWinCount5++;
-            if(mixLen >= 10) gameState.stats.mixWinCount10++;
-            if(mixLen === Object.keys(db).length) {
-                gameState.stats.mixWinCount16++;
-                if(isPerfect && !gameState.masteredChapters.includes('mix')) {
-                    gameState.masteredChapters.push('mix');
-                }
-            }
-            const q5 = gameState.dailyTasks.find(t => t.id === 5);
-            if(q5 && q5.progress < 2) q5.progress++;
+            if (countMixSelect(5)) gameState.stats.mixWinCount5++;
+            if (countMixSelect(10)) gameState.stats.mixWinCount10++;
+            if (countMixSelect(16)) gameState.stats.mixWinCount16++;
+            if (gameState.difficulty === 'random') gameState.stats.randomWinCount++;
         }
     }
 
+    gameState.chapterLastPlayed[gameState.mode === 'single' ? gameState.currentChapterKey : 'mix'] = new Date().getTime();
+
+    checkAchievements();
     saveGame();
-    updateLevel(); 
+    updateUserDisplay();
 
     switchScreen("screen-result");
-    playMusic(finalMusic); 
+    playMusic(finalMusic);
 
-    document.getElementById("resultImg").src = "images/results/" + resultImg;
     document.getElementById("endTitle").innerText = title;
-    document.getElementById("endStatsRow").innerText = `獲得${gameState.currentSessionXP}點經驗，${earnedCoins}個金幣，回復${gainedEnergy}點浩然之氣！`;
+    document.getElementById("resultImg").src = resultImg;
 
-    const tableHeaders = document.querySelectorAll(".result-table th");
-    let headerColor = "#95a5a6"; 
-    if (isPerfect) headerColor = "#f1c40f"; 
-    else if (isFail) headerColor = "#c0392b"; 
-    
-    tableHeaders.forEach(th => th.style.backgroundColor = headerColor);
+    let statsHtml = `獲得金幣：${earnedCoins}`;
+    if (gainedEnergy > 0) {
+        statsHtml += ` | 回復浩然之氣：${gainedEnergy}`;
+    }
+    document.getElementById("endStatsRow").innerText = statsHtml;
 
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
@@ -129,21 +125,51 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
-    let tipText = "同一條題目答錯超過三次也會算為戰敗喔！";
+    // 獨立判斷：只要有歷史紀錄，無論本次成敗都顯示日期
+    let firstPerfectHTML = "";
+    const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
+    if (gameState.chapterFirstPerfect && gameState.chapterFirstPerfect[chKey]) {
+        const date = gameState.chapterFirstPerfect[chKey];
+        firstPerfectHTML = `<div class="stat-perfect-date">首次完美通關：${getFormattedDate(date)}</div>`;
+    }
+
+    // 提示文字邏輯
+    let tipText = "超過一半題目曾經錯誤或同一道題目答錯超過兩次，也算為戰敗喔！";
     if (isPerfect) {
         tipText = "努力保持這種水準，答案一擊即中就是完美！";
     } else if (!isFail) {
         tipText = "假如曾經答錯，也不算完美喔！繼續加油！";
     }
 
-    const tipBubble = document.createElement("div");
-    tipBubble.className = "result-tip-bubble";
-    tipBubble.innerText = tipText;
-    tbody.parentElement.parentElement.appendChild(tipBubble);
+    const resultContainer = document.getElementById("screen-result");
+    const existingDate = resultContainer.querySelector(".stat-perfect-date");
+    if(existingDate) existingDate.remove();
+
+    const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
+    
+    const tipDiv = document.createElement("div");
+    tipDiv.className = "result-tip-bubble";
+    tipDiv.innerText = tipText;
+
+    if (firstPerfectHTML) {
+        const dateDiv = document.createElement("div");
+        dateDiv.innerHTML = firstPerfectHTML;
+        dateDiv.style.textAlign = "center";
+        tableContainer.parentNode.insertBefore(dateDiv, tableContainer.nextSibling); 
+        dateDiv.parentNode.insertBefore(tipDiv, dateDiv.nextSibling);
+    } else {
+        tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
+    }
 }
 
 function backToMenuFromEnd() {
+    gameState.currentIndex = 0;
+    gameState.wrongCount = 0;
+    gameState.history = [];
     resetMenu();
     switchScreen("screen-menu");
-    updateUserDisplay();
+}
+
+function countMixSelect(num) {
+    return gameState.mixSelectedKeys.length >= num;
 }

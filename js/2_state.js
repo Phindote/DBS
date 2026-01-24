@@ -24,8 +24,9 @@ let gameState = {
     mixSelectedKeys: [],
     wrongGuesses: [],
     unlockedAchievements: [],
-    chapterLastPlayed: {}, // New: Stores timestamp of last play per chapter
-    collectionDates: {}    // New: Stores timestamp of when pets/achievements were obtained
+    chapterLastPlayed: {}, 
+    chapterFirstPerfect: {}, // New: Stores timestamp of FIRST perfect clear
+    collectionDates: {}    
 };
 let pendingSingleChapterKey = "";
 let inputLock = false;
@@ -44,6 +45,7 @@ function saveGame() {
         solvedQuestionIds: gameState.solvedQuestionIds,
         unlockedAchievements: gameState.unlockedAchievements,
         chapterLastPlayed: gameState.chapterLastPlayed,
+        chapterFirstPerfect: gameState.chapterFirstPerfect, // Save
         collectionDates: gameState.collectionDates
     };
     localStorage.setItem("dbs_dragon_save_v3", btoa(encodeURIComponent(JSON.stringify(data))));
@@ -87,6 +89,7 @@ function applyGameData(parsed) {
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
     gameState.chapterLastPlayed = parsed.chapterLastPlayed || {};
+    gameState.chapterFirstPerfect = parsed.chapterFirstPerfect || {}; // Load
     gameState.collectionDates = parsed.collectionDates || {};
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
