@@ -16,7 +16,7 @@ const GAME_CONFIG = {
 
 const GACHA_CONFIG = {
     COST: 100,
-    RATES: { T0: 0.001, T1: 0.01, T2: 0.05, T3: 0.20, T4: 0.739 }
+    RATES: { T0: 0.0001, T1: 0.001, T2: 0.005, T3: 0.10, T4: 0.80 }
 };
 
 const RARITY_MAP = {
@@ -36,8 +36,8 @@ const DROP_SYSTEM_CONFIG = {
     ON_CLEAR_PERFECT: 0.30,    
     ON_CLEAR_MIX: 0.50,        
     ON_DAILY_LOGIN: 1.0,       
-    ON_STUDY_MINUTE: 0.10,     
-    ON_PLAY_TIME_10MIN: 0.20,  
+    ON_STUDY_MINUTE: 0.3,     
+    ON_PLAY_TIME_10MIN: 0.1,  
     SPECIFIC_TIME_BONUS: 0.50, 
     LOGIN_MOMENT_BONUS: 0.80   
 };

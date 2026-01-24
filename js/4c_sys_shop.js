@@ -30,9 +30,9 @@ function triggerDrop(scenario) {
 
     const rand = Math.random();
     let rarity = 'T4';
-    if (rand < 0.001) rarity = 'T0';
-    else if (rand < 0.01) rarity = 'T1';
-    else if (rand < 0.05) rarity = 'T2';
+    if (rand < 0.0001) rarity = 'T0';
+    else if (rand < 0.001) rarity = 'T1';
+    else if (rand < 0.005) rarity = 'T2';
     else if (rand < 0.20) rarity = 'T3';
 
     const pool = DROP_ITEMS_POOL[rarity];
