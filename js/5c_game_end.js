@@ -12,9 +12,24 @@ function endGame() {
 
     const db = window.questionsDB || {};
 
+    // --- 成就檢查邏輯 ---
+    if (!isFail) {
+        if (gameState.user.hp < 10) checkAndUnlock("ach_8");
+        if (gameState.user.hp < 5) checkAndUnlock("ach_9");
+    }
+
+    if (!isFail && gameState.user.hp === 100 && gameState.mode === 'single') {
+        if (!gameState.stats.perfectFullHpChapterIds.includes(gameState.currentChapterKey)) {
+            gameState.stats.perfectFullHpChapterIds.push(gameState.currentChapterKey);
+        }
+        if (gameState.stats.perfectFullHpChapterIds.length >= 3) checkAndUnlock("ach_7");
+    }
+    // --- 成就檢查結束 ---
+
     if (isFail) {
         finalMusic = 'bgm_defeat';
         title = "勝敗乃兵家常事...";
+        gameState.stats.consecutivePerfect = 0; 
     } else {
         const totalQ = gameState.pool.length;
         const correctCount = gameState.history.filter(h => h.isCorrect).length;
@@ -43,7 +58,6 @@ function endGame() {
             
             if(!gameState.chapterFirstPerfect) gameState.chapterFirstPerfect = {};
             const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
-            // 如果還沒有紀錄，才寫入 (First Time Only)
             if(!gameState.chapterFirstPerfect[chKey]) {
                 gameState.chapterFirstPerfect[chKey] = new Date().getTime();
             }
@@ -55,6 +69,8 @@ function endGame() {
                 if (!gameState.stats.perfectChapterIds.includes(gameState.currentChapterKey)) {
                     gameState.stats.perfectChapterIds.push(gameState.currentChapterKey);
                 }
+                if (gameState.stats.perfectChapterIds.length >= 3) checkAndUnlock("ach_10");
+
                 gameState.stats.lastPerfectChapter = gameState.currentChapterKey;
 
                 if (gameState.difficulty === 'junior') {
@@ -64,13 +80,17 @@ function endGame() {
                 }
             } else {
                 if (countMixSelect(16) && isPerfect) gameState.stats.mixPerfect16++;
+                if (countMixSelect(16)) checkAndUnlock("ach_23"); 
             }
+            
+            if (gameState.stats.consecutivePerfect >= 5) checkAndUnlock("ach_11");
+            if (gameState.stats.consecutivePerfect >= 10) checkAndUnlock("ach_12");
 
         } else {
             resultImg = "images/results/img_success.PNG";
             title = "挑戰成功！";
             gainedEnergy = GAME_CONFIG.ENERGY_REWARD_SUCCESS * chapterCount;
-            gameState.stats.consecutivePerfect = 0;
+            gameState.stats.consecutivePerfect = 0; 
         }
 
         gameState.user.energy = Math.min(100, gameState.user.energy + gainedEnergy);
@@ -78,10 +98,22 @@ function endGame() {
 
         if (gameState.mode === 'mix') {
             gameState.stats.mixWinCount++;
-            if (countMixSelect(5)) gameState.stats.mixWinCount5++;
-            if (countMixSelect(10)) gameState.stats.mixWinCount10++;
-            if (countMixSelect(16)) gameState.stats.mixWinCount16++;
-            if (gameState.difficulty === 'random') gameState.stats.randomWinCount++;
+            if (countMixSelect(5)) {
+                gameState.stats.mixWinCount5++;
+                checkAndUnlock("ach_21");
+            }
+            if (countMixSelect(10)) {
+                gameState.stats.mixWinCount10++;
+                checkAndUnlock("ach_22");
+            }
+            if (countMixSelect(16)) {
+                gameState.stats.mixWinCount16++;
+            }
+            if (gameState.isRandomSelection) {
+                gameState.stats.randomWinCount++;
+                checkAndUnlock("ach_24");
+                if (gameState.stats.randomWinCount >= 10) checkAndUnlock("ach_25");
+            }
         }
     }
 
@@ -97,11 +129,12 @@ function endGame() {
     document.getElementById("endTitle").innerText = title;
     document.getElementById("resultImg").src = resultImg;
 
+    const statsRow = document.getElementById("endStatsRow");
     let statsHtml = `獲得金幣：${earnedCoins}`;
     if (gainedEnergy > 0) {
         statsHtml += ` | 回復浩然之氣：${gainedEnergy}`;
     }
-    document.getElementById("endStatsRow").innerText = statsHtml;
+    statsRow.innerText = statsHtml;
 
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
@@ -126,7 +159,7 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
-    // Logic: 只要該篇章有首次完美紀錄，無論本次結局如何，都顯示該日期
+    // 改回單行格式
     let firstPerfectHTML = "";
     const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
     if (gameState.chapterFirstPerfect && gameState.chapterFirstPerfect[chKey]) {
@@ -134,7 +167,6 @@ function endGame() {
         firstPerfectHTML = `<div class="stat-perfect-date">首次完美通關：${getFormattedDate(date)}</div>`;
     }
 
-    // 提示文字邏輯 (更新戰敗文字)
     let tipText = "超過一半題目曾經錯誤或同一道題目答錯超過兩次，也算為戰敗喔！";
     if (isPerfect) {
         tipText = "努力保持這種水準，答案一擊即中就是完美！";
@@ -146,22 +178,19 @@ function endGame() {
     const existingDate = resultContainer.querySelector(".stat-perfect-date");
     if(existingDate) existingDate.remove();
 
-    const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
-    
-    const tipDiv = document.createElement("div");
-    tipDiv.className = "result-tip-bubble";
-    tipDiv.innerText = tipText;
-
-    // 將日期插入表格下方、Tip上方
+    // 調整插入位置：StatsRow 之後 (即紅色獲得金幣文字下方)
     if (firstPerfectHTML) {
         const dateDiv = document.createElement("div");
         dateDiv.innerHTML = firstPerfectHTML;
         dateDiv.style.textAlign = "center";
-        tableContainer.parentNode.insertBefore(dateDiv, tableContainer.nextSibling); 
-        dateDiv.parentNode.insertBefore(tipDiv, dateDiv.nextSibling);
-    } else {
-        tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
+        statsRow.parentNode.insertBefore(dateDiv, statsRow.nextSibling);
     }
+
+    const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
+    const tipDiv = document.createElement("div");
+    tipDiv.className = "result-tip-bubble";
+    tipDiv.innerText = tipText;
+    tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
 }
 
 function backToMenuFromEnd() {
@@ -174,4 +203,12 @@ function backToMenuFromEnd() {
 
 function countMixSelect(num) {
     return gameState.mixSelectedKeys.length >= num;
+}
+
+function checkAndUnlock(id) {
+    if (!gameState.unlockedAchievements.includes(id)) {
+        gameState.unlockedAchievements.push(id);
+        gameState.collectionDates[id] = new Date().getTime();
+        showUnlockNotification([id]);
+    }
 }

@@ -16,11 +16,15 @@ function renderPets() {
                 const date = gameState.collectionDates[petData.id];
                 const dateStr = date ? getFormattedDate(date) : "舊有記錄";
                 
+                // 格式優化：換行顯示
                 card.className = "pokedex-card";
                 card.innerHTML = `
                     <img src="images/items/${petData.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
                     <div class="pokedex-title">${petData.name}</div>
-                    <span class="stat-badge stat-pet-date">獲得時間：${dateStr}</span>
+                    <span class="stat-badge stat-pet-date">
+                        <div>獲得時間：</div>
+                        <div style="font-weight:normal; font-size:90%;">${dateStr}</div>
+                    </span>
                 `;
                 card.onclick = () => showPetDetail(petData);
             } else {

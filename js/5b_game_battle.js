@@ -63,12 +63,10 @@ function initGame(modeOrDifficulty) {
     let selectedChapters = [];
     if (mode === 'single') {
         selectedChapters.push(pendingSingleChapterKey);
-        // Record last played time for Single mode
         if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
         gameState.chapterLastPlayed[pendingSingleChapterKey] = new Date().getTime();
     } else {
         selectedChapters = gameState.mixSelectedKeys;
-        // Record last played time for Mix mode
         if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
         gameState.chapterLastPlayed['mix'] = new Date().getTime();
     }
@@ -213,6 +211,9 @@ function checkAnswer(userAns, btnElement) {
 
     const q = gameState.pool[gameState.currentIndex];
     
+    // 增加嘗試次數統計 (ach_32)
+    gameState.stats.tryCount++;
+
     let isCorrect = false;
     if (gameState.difficulty === 'senior' && q.answer.includes('/')) {
         const possibleAnswers = q.answer.split('/');
@@ -249,8 +250,11 @@ function checkAnswer(userAns, btnElement) {
             gameState.solvedQuestionIds.push(q.id);
         }
         
-        gameState.stats.totalCorrect++;
-        if(gameState.difficulty === 'senior') gameState.stats.srCorrect++;
+        // 增加正確題數統計
+        gameState.stats.totalCorrect++; // ach_26, 27, 28
+        if(gameState.difficulty === 'senior') {
+            gameState.stats.srCorrect++; // ach_29, 30, 31
+        }
         
         const box = document.getElementById("questionBox");
         box.classList.remove("correct-flash"); 
@@ -284,6 +288,8 @@ function checkAnswer(userAns, btnElement) {
         }, 100);
 
         updateBars();
+        // 檢查成就
+        checkAchievements();
         
         setTimeout(() => {
             gameState.currentIndex++;
@@ -300,8 +306,7 @@ function checkAnswer(userAns, btnElement) {
         gameState.user.hp = Math.max(0, gameState.user.hp - GAME_CONFIG.HP_PENALTY);
         
         gameState.wrongCount++;
-        gameState.stats.wrongCountTotal++;
-        gameState.stats.tryCount++;
+        gameState.stats.wrongCountTotal++; // ach_33
         gameState.currentAttempts++;
         
         if(!gameState.wrongGuesses.includes(q.id)) gameState.wrongGuesses.push(q.id);
@@ -320,6 +325,9 @@ function checkAnswer(userAns, btnElement) {
         triggerAnimation(document.getElementById("questionBox"), "shake-box");
         updateCrackStage();
         updateBars();
+        
+        // 檢查成就
+        checkAchievements();
 
         if (gameState.user.hp <= 0) {
             setTimeout(endGame, 1000); 

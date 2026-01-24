@@ -37,17 +37,24 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
     const lastTime = gameState.chapterLastPlayed && gameState.chapterLastPlayed[key];
     const timeStr = lastTime ? getFormattedDate(lastTime) : "尚未挑戰";
 
+    // 格式優化：換行顯示
     if (key === 'mix') {
         statsHTML = `
             <span class="stat-badge stat-jr">特殊挑戰</span>
-            <span class="stat-badge stat-last">上回挑戰：${timeStr}</span>
+            <span class="stat-badge stat-last">
+                <div>上回挑戰：</div>
+                <div style="font-weight:normal; font-size:90%;">${timeStr}</div>
+            </span>
         `;
     } else {
         statsHTML = `
         <div class="pokedex-stats">
         <span class="stat-badge stat-jr">初階: 全 ${jrData.total} | 已破 ${jrData.solved}</span>
         <span class="stat-badge stat-sr">高階: 全 ${srData.total} | 已破 ${srData.solved}</span>
-        <span class="stat-badge stat-last">上回挑戰：${timeStr}</span>
+        <span class="stat-badge stat-last">
+            <div>上回挑戰：</div>
+            <div style="font-weight:normal; font-size:90%;">${timeStr}</div>
+        </span>
         </div>
         `;
     }
@@ -106,6 +113,15 @@ function closeContentModal() {
         gameState.user.energy = Math.min(100, gameState.user.energy + earned);
         gameState.stats.totalStudyMins += minutes;
         gameState.stats.energyRecovered += earned;
+        
+        // 檢查 ach_34 (剛好1分鐘)
+        if (minutes === 1 && !gameState.unlockedAchievements.includes("ach_34")) {
+            gameState.unlockedAchievements.push("ach_34");
+            if(!gameState.collectionDates["ach_34"]) gameState.collectionDates["ach_34"] = new Date().getTime();
+            saveGame();
+            showUnlockNotification(["ach_34"]);
+        }
+
         checkAchievements();
         
         let quest2 = gameState.dailyTasks.find(t => t.id === 2);
@@ -117,12 +133,6 @@ function closeContentModal() {
         saveGame();
         updateUserDisplay();
         alert(`溫習了 ${minutes} 分鐘，浩然之氣 +${earned}！`);
-        if (minutes === 1 && !gameState.unlockedAchievements.includes("ach_34")) {
-            gameState.unlockedAchievements.push("ach_34");
-            // Add date for this specific unlock as well
-            if(!gameState.collectionDates["ach_34"]) gameState.collectionDates["ach_34"] = new Date().getTime();
-            saveGame();
-        }
     } else {
         alert("溫習時間不足1分鐘，未獲得浩然之氣。");
     }
@@ -131,7 +141,6 @@ function closeContentModal() {
 
 function showAchievements() {
     switchScreen("screen-achievements");
-    // Original implementation stub
 }
 
 function showDragonSeal() {
@@ -152,7 +161,12 @@ function showDragonSeal() {
         if(isUnlocked) {
             const date = gameState.collectionDates[ach.id];
             const dateStr = date ? getFormattedDate(date) : "舊有記錄";
-            dateHTML = `<span class="stat-badge stat-ach-date">獲得時間：${dateStr}</span>`;
+            // 格式優化：換行顯示
+            dateHTML = `
+            <span class="stat-badge stat-ach-date">
+                <div>獲得時間：</div>
+                <div style="font-weight:normal; font-size:90%;">${dateStr}</div>
+            </span>`;
         }
 
         card.innerHTML = `

@@ -40,117 +40,144 @@ function backToChapterSelection() {
 }
 
 function resetMenu() {
-    document.getElementById("subMenuSingle").style.display = "none";
-    document.getElementById("subMenuMix").style.display = "none";
     document.querySelector(".menu-layout").style.display = "grid";
     const profileCard = document.querySelector(".profile-card");
     if(profileCard) profileCard.style.display = "flex";
     
-    setTimeout(updateCoreButtonVisibility, 50);
-
-    document.getElementById("singleConfirmArea").style.display = "none";
-    document.querySelectorAll(".chapter-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("subMenuSingle").style.display = "none";
+    document.getElementById("subMenuMix").style.display = "none";
+    
     pendingSingleChapterKey = "";
     gameState.mixSelectedKeys = [];
-    const chks = document.querySelectorAll("#mixChapterList input");
-    chks.forEach(c => c.checked = false);
-    document.getElementById("mixCount").innerText = "已選：0";
+    gameState.isRandomSelection = false; // Reset random flag on menu reset
+    
+    updateCoreButtonVisibility();
 }
 
 function renderSingleList() {
+    const list = document.getElementById("singleChapterList");
+    list.innerHTML = "";
     const db = window.questionsDB || {};
-    const div = document.getElementById("singleChapterList");
-    div.innerHTML = "";
-    document.getElementById("singleConfirmArea").style.display = "none";
-    Object.keys(db).forEach(k => {
+    
+    Object.keys(db).forEach(key => {
+        const item = db[key];
         const btn = document.createElement("button");
         btn.className = "chapter-btn";
-        btn.innerText = db[k].title;
-        btn.onclick = () => selectSingleChapter(k, db[k].title, btn);
-        div.appendChild(btn);
+        btn.innerText = item.title;
+        btn.onclick = () => selectSingleChapter(key, item.title, btn);
+        list.appendChild(btn);
     });
 }
 
-function selectSingleChapter(key, title, btnElement) {
-    document.querySelectorAll("#singleChapterList .chapter-btn").forEach(b => b.classList.remove("active"));
-    btnElement.classList.add("active");
+function selectSingleChapter(key, title, btn) {
     pendingSingleChapterKey = key;
     document.getElementById("singleSelectedTitle").innerText = title;
+    
+    const all = document.querySelectorAll("#singleChapterList .chapter-btn");
+    all.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    
     document.getElementById("singleConfirmArea").style.display = "block";
 }
 
 function renderMixList() {
+    const list = document.getElementById("mixChapterList");
+    list.innerHTML = "";
     const db = window.questionsDB || {};
-    const div = document.getElementById("mixChapterList");
-    div.innerHTML = "";
-    Object.keys(db).forEach(k => {
+    
+    Object.keys(db).forEach(key => {
+        const item = db[key];
         const label = document.createElement("label");
         label.className = "mix-item";
-        label.innerHTML = `<input type="checkbox" value="${k}" onchange="checkMixCount()"> ${db[k].title}`;
-        div.appendChild(label);
+        label.innerHTML = `
+            <input type="checkbox" value="${key}" onchange="checkMixCount()">
+            <span>${item.title}</span>
+        `;
+        list.appendChild(label);
     });
     checkMixCount();
 }
 
 function checkMixCount() {
-    const c = document.querySelectorAll("#mixChapterList input:checked").length;
-    document.getElementById("mixCount").innerText = `已選：${c}`;
-    updateMixStyles();
-}
-
-function updateMixStyles() {
-    document.querySelectorAll(".mix-item").forEach(label => {
-        const chk = label.querySelector("input");
-        if(chk.checked) label.classList.add("active");
-        else label.classList.remove("active");
-    });
+    const inputs = document.querySelectorAll("#mixChapterList input:checked");
+    gameState.mixSelectedKeys = Array.from(inputs).map(i => i.value);
+    document.getElementById("mixCount").innerText = "已選：" + gameState.mixSelectedKeys.length;
 }
 
 function selectAllMix() {
-    document.querySelectorAll("#mixChapterList input[type='checkbox']").forEach(c => c.checked = true);
+    const inputs = document.querySelectorAll("#mixChapterList input");
+    inputs.forEach(i => i.checked = true);
     checkMixCount();
 }
 
 function deselectAllMix() {
-    document.querySelectorAll("#mixChapterList input[type='checkbox']").forEach(c => c.checked = false);
+    const inputs = document.querySelectorAll("#mixChapterList input");
+    inputs.forEach(i => i.checked = false);
     checkMixCount();
 }
 
 function randomSelectMix() {
-    const count = parseInt(document.getElementById("mixRandomCount").value);
+    const countSelect = document.getElementById("mixRandomCount");
+    const count = parseInt(countSelect.value);
     const db = window.questionsDB || {};
     const keys = Object.keys(db);
     
-    if (count > keys.length) return alert("選擇數量超過現有篇章總數！");
+    if (keys.length < count) return alert("篇章數量不足！");
+    
+    // Reset selection first
+    deselectAllMix();
     
     gameState.mixSelectedKeys = [];
-    const shuffled = keys.sort(() => 0.5 - Math.random());
-    gameState.mixSelectedKeys = shuffled.slice(0, count);
+    while(gameState.mixSelectedKeys.length < count) {
+        const r = keys[Math.floor(Math.random() * keys.length)];
+        if(!gameState.mixSelectedKeys.includes(r)) {
+            gameState.mixSelectedKeys.push(r);
+        }
+    }
     
-    const jrCost = GAME_CONFIG.ENERGY_COST_JR_SINGLE * count;
-    const srCost = GAME_CONFIG.ENERGY_COST_SR_SINGLE * count;
+    // Set flag for achievement tracking
+    gameState.isRandomSelection = true;
     
-    const infoDiv = document.getElementById("energyCostInfo");
-    infoDiv.innerHTML = `
-            <div style="display:inline-flex; align-items:center; justify-content:center; gap:15px; background:white; padding:10px 25px; border-radius:50px; border:2px solid #1abc9c; box-shadow:0 5px 15px rgba(26, 188, 156, 0.2);">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <div style="width:12px; height:12px; background:#1abc9c; border-radius:50%; box-shadow:0 0 8px #1abc9c;"></div>
-                    <span style="font-weight:bold; color:#16a085; font-size:1.1rem;">浩然之氣</span>
-                </div>
-                <div style="height:20px; width:2px; background:#eee;"></div>
-                <div style="display:flex; gap:15px;">
-                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#2980b9;">
-                        <span style="font-size:1rem;">初階</span>
-                        <span style="font-size:1.4rem; line-height:1;">-${jrCost}</span>
-                    </div>
-                    <div style="display:flex; align-items:baseline; gap:4px; font-weight:bold; color:#c0392b;">
-                        <span style="font-size:1rem;">高階</span>
-                        <span style="font-size:1.4rem; line-height:1;">-${srCost}</span>
-                    </div>
-                </div>
-            </div>
-    `;
+    saveGame();
+    // Immediately start game for random mode to ensure flag is captured
+    initGame('mix'); 
+}
+
+function updateLevel() {
+    const newLevel = Math.floor(gameState.user.xp / 100) + 1;
+    gameState.user.level = newLevel > GAME_CONFIG.MAX_LEVEL ? GAME_CONFIG.MAX_LEVEL : newLevel;
+    if (gameState.user.level === GAME_CONFIG.MAX_LEVEL && gameState.user.xp >= GAME_CONFIG.MAX_XP) {
+        gameState.user.title = "龍脈•降龍無悔";
+    } else {
+        let titleIndex = Math.floor((gameState.user.level - 1) / 5.5);
+        if (titleIndex >= TITLES.length) titleIndex = TITLES.length - 1;
+        gameState.user.title = TITLES[titleIndex];
+    }
+    if (gameState.user.level >= 99) {
+        gameState.user.unlockedReplayXP = true;
+    }
+    checkAchievements();
+    saveGame();
+    updateUserDisplay();
+    updateBars();
+}
+
+function confirmSingleGame() {
+    if (!pendingSingleChapterKey) return;
+    initGame('single');
+}
+
+function confirmMixMode() {
+    const count = document.querySelectorAll("#mixChapterList input:checked").length;
+    if (count < 2) return alert("請至少選擇 2 篇範文！");
     
-    gameState.mode = 'mix';
-    switchScreen('screen-difficulty');
+    gameState.mixSelectedKeys = [];
+    document.querySelectorAll("#mixChapterList input:checked").forEach(i => {
+        gameState.mixSelectedKeys.push(i.value);
+    });
+    
+    // Manual confirmation resets random flag
+    gameState.isRandomSelection = false;
+    
+    initGame('mix');
 }
