@@ -1,5 +1,5 @@
 .modal-header-red {
-    background: #e74c3c !important; 
+    background: #e74c3c !important;
     color: white !important;
     font-weight: bold;
     padding: 15px;
@@ -102,7 +102,7 @@
 }
 
 .css-golden-egg.cracked {
-    background: transparent; 
+    background: transparent;
     box-shadow: none;
 }
 .css-golden-egg.cracked::before {
@@ -140,4 +140,27 @@
     0% { opacity: 0; transform: translate(-50%, -50%) scale(0.1); }
     50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+}
+
+@keyframes pulse-green {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(46, 204, 113, 0.4)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(46, 204, 113, 0.8)); }
+    100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(46, 204, 113, 0.4)); }
+}
+
+.pulse-plus-icon {
+    animation: pulse-green 2s infinite ease-in-out;
+}
+
+.modal-content {
+    background: #fff;
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    max-height: 90vh;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
 }
