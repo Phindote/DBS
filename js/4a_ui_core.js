@@ -7,7 +7,7 @@ let currentHelpPage = 0;
 const HELP_PAGES = [
     `
     <div style="text-align:center; font-weight:bold; font-size:1.1rem; margin-bottom:10px;">歡迎來到拔萃之魂的試煉世界。</div>
-    <p>既然重生於此，你手中的十二篇古籍便是你馴化惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
+    <p>既然重生於此，你手中的十二篇古籍便是你斬殺惡龍的唯一利器。這條路註定佈滿荊棘，唯有智者方能登頂⋯⋯</p>
     `,
     `
     <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">生存與代價⏳</h3>
@@ -152,13 +152,17 @@ function updateBars() {
 
 function showHelp() {
     const modal = document.getElementById("helpModal");
-    modal.style.display = "flex";
-
     const header = modal.querySelector(".modal-header");
+    const modalContent = modal.querySelector(".modal-content");
+    
+    modal.style.display = "flex";
     if(header) header.style.background = "#2c3e50";
-
-    const body = document.getElementById("helpBody");
-    if(body) body.style.justifyContent = "center";
+    
+    if(modalContent) {
+        modalContent.style.height = "auto";
+        modalContent.style.minHeight = "auto";
+        modalContent.style.flex = "none";
+    }
 
     currentHelpPage = 0;
     renderHelpPage();
@@ -167,7 +171,9 @@ function showHelp() {
 
 function renderHelpPage() {
     const body = document.getElementById("helpBody");
-    body.innerHTML = HELP_PAGES[currentHelpPage];
+    if(body) {
+        body.innerHTML = HELP_PAGES[currentHelpPage];
+    }
 }
 
 function nextHelpPage() {

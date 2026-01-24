@@ -5,6 +5,7 @@ function showPokedex() {
     checkAchievements();
     const db = window.questionsDB || {};
     const container = document.getElementById("pokedexContainer");
+    container.className = "pokedex-grid-4";
     container.innerHTML = "";
     Object.keys(db).forEach(key => {
         const item = db[key];
@@ -92,8 +93,8 @@ function closeContentModal() {
     
     clearInterval(pokedexTimer);
     const minutes = Math.floor(pokedexSeconds / 60);
-    if (minutes >= 1) { 
-        const earned = Math.min(GAME_CONFIG.MAX_STUDY_MINS, minutes * GAME_CONFIG.ENERGY_REWARD_STUDY); 
+    if (minutes >= 1) {
+        const earned = Math.min(GAME_CONFIG.MAX_STUDY_MINS, minutes * GAME_CONFIG.ENERGY_REWARD_STUDY);
         gameState.user.energy = Math.min(100, gameState.user.energy + earned);
         gameState.stats.totalStudyMins += minutes;
         gameState.stats.energyRecovered += earned;
@@ -141,9 +142,10 @@ function showAchievements() {
 }
 
 function showDragonSeal() {
-    checkAchievements(); 
+    checkAchievements();
     switchScreen("screen-achievements");
     const container = document.getElementById("sealContainer");
+    container.className = "pokedex-grid-4";
     container.innerHTML = "";
     
     ACHIEVEMENTS.forEach((ach, index) => {
@@ -151,7 +153,7 @@ function showDragonSeal() {
         const card = document.createElement("div");
         card.className = "pokedex-card" + (isUnlocked ? " unlocked" : "");
         
-        const imgSrc = isUnlocked ? `images/achievements/ach_${index+1}.PNG` : "images/achievements/ach_locked.PNG"; 
+        const imgSrc = isUnlocked ? `images/achievements/ach_${index+1}.PNG` : "images/achievements/ach_locked.PNG";
         
         card.innerHTML = `
             <img src="${imgSrc}" class="pokedex-img" alt="Seal" onerror="this.src='images/achievements/ach_locked.PNG'">
@@ -176,7 +178,7 @@ function showTitlesModal() {
 
     TITLES.forEach((t, i) => {
         const div = document.createElement("div");
-        let status = "locked"; 
+        let status = "locked";
         let icon = "🔒";
         if (i < userIndex) { status = "passed"; icon = "✅"; }
         else if (i === userIndex) { status = "active"; icon = "📍"; }

@@ -126,43 +126,84 @@ function renderInventory() {
     
     if (currentInvTab === 'fragment') {
         filteredItems = filteredItems.filter(item => item && item.type === 'fragment');
+        filteredItems.forEach(item => {
+            renderInventoryItem(container, item, item.originalIndex);
+        });
     } else if (currentInvTab === 'item') {
         filteredItems = filteredItems.filter(item => item && item.type === 'product');
-    }
-    
-    const slots = 100;
-    
-    for(let i=0; i<slots; i++) {
-        const card = document.createElement("div");
-        card.className = "pokedex-card";
+        filteredItems.forEach(item => {
+            renderInventoryItem(container, item, item.originalIndex);
+        });
+    } else {
+        const currentCapacity = gameState.user.inventorySlots || 5;
+        const maxSlots = 100;
         
-        if(i < filteredItems.length && filteredItems[i]) {
-            const item = filteredItems[i];
-            const realIndex = item.originalIndex;
-            const color = RARITY_COLORS[item.rarity] || '#333';
-            
-            card.style.border = `2px solid ${color}`;
-
-             card.innerHTML = `
-                <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
-                <div class="pokedex-title" style="color:${color}">${item.name}</div>
-                <div class="inv-count-badge">x${item.count}</div>
-                <button class="btn-inv-delete" onclick="promptSellItem(event, ${realIndex})" style="background:none; border:none; padding:0; width:25px; height:25px; display:flex; align-items:center; justify-content:center; z-index:10;">
-                    <img src="images/ui/icon_coin.PNG" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='images/ui/icon_core.PNG'">
-                </button>
-             `;
-             card.onclick = (e) => {
-                 if(!e.target.closest('.btn-inv-delete')) {
-                     showItemDetail(realIndex);
-                 }
-             };
-        } else {
-             card.style.opacity = "0.5";
-             card.innerHTML = `
-                <div style="font-size:0.8rem; color:#ccc; margin-top:20px;">${i+1}</div>
-             `;
+        for(let i=0; i<currentCapacity; i++) {
+            if(i < filteredItems.length && filteredItems[i]) {
+                renderInventoryItem(container, filteredItems[i], filteredItems[i].originalIndex);
+            } else {
+                const card = document.createElement("div");
+                card.className = "pokedex-card";
+                card.style.opacity = "0.5";
+                card.innerHTML = `<div style="font-size:0.8rem; color:#ccc; margin-top:20px;">${i+1}</div>`;
+                container.appendChild(card);
+            }
         }
-        container.appendChild(card);
+        
+        if (currentCapacity < maxSlots) {
+             const card = document.createElement("div");
+             card.className = "pokedex-card";
+             card.style.background = "#f9f9f9";
+             card.style.border = "2px dashed #2ecc71";
+             card.style.cursor = "pointer";
+             card.innerHTML = `
+                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                    <svg viewBox="0 0 24 24" class="pulse-plus-icon" style="width:35px; height:35px; fill:none; stroke:#2ecc71; stroke-width:3; stroke-linecap:round; stroke-linejoin:round;">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </div>
+             `;
+             card.onclick = () => buyInventorySlot();
+             container.appendChild(card);
+        }
+    }
+}
+
+function renderInventoryItem(container, item, realIndex) {
+    const card = document.createElement("div");
+    card.className = "pokedex-card";
+    const color = RARITY_COLORS[item.rarity] || '#333';
+    
+    card.style.border = `2px solid ${color}`;
+    card.innerHTML = `
+        <img src="images/items/${item.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
+        <div class="pokedex-title" style="color:${color}">${item.name}</div>
+        <div class="inv-count-badge">x${item.count}</div>
+        <button class="btn-inv-delete" onclick="promptSellItem(event, ${realIndex})" style="background:none; border:none; padding:0; width:25px; height:25px; display:flex; align-items:center; justify-content:center; z-index:10;">
+            <img src="images/ui/icon_coin.PNG" style="width:100%; height:100%; object-fit:contain;" onerror="this.src='images/ui/icon_core.PNG'">
+        </button>
+    `;
+    card.onclick = (e) => {
+        if(!e.target.closest('.btn-inv-delete')) {
+            showItemDetail(realIndex);
+        }
+    };
+    container.appendChild(card);
+}
+
+function buyInventorySlot() {
+    const cost = 50;
+    if (confirm(`是否花費 ${cost} 金幣擴充 1 個背包欄位？`)) {
+        if (gameState.user.coins < cost) {
+            alert("金幣不足！");
+            return;
+        }
+        gameState.user.coins -= cost;
+        gameState.user.inventorySlots++;
+        saveGame();
+        renderInventory();
+        alert("擴充成功！");
     }
 }
 

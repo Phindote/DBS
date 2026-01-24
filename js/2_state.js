@@ -1,12 +1,12 @@
 let gameState = {
-    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 50, lastLoginDate: "" },
+    user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 50, lastLoginDate: "", inventorySlots: 5 },
     stats: {
         totalCorrect: 0, srCorrect: 0, consecutivePerfect: 0,
         mixWinCount: 0, mixWinCount5: 0, mixWinCount10: 0, mixWinCount16: 0, mixPerfect16: 0, randomWinCount: 0,
         totalStudyMins: 0, energyRecovered: 0, totalPlayTime: 0, tryCount: 0, wrongCountTotal: 0,
         perfectHistory: [], perfectChapterIds: [], lastPerfectChapter: ""
     },
-    inventory: [], 
+    inventory: [],
     pets: [],
     dailyTasks: [],
     mode: "",
@@ -16,7 +16,7 @@ let gameState = {
     currentAttempts: 0,
     wrongAnswersHistory: [],
     wrongCount: 0,
-    history: [], 
+    history: [],
     currentDragon: "",
     currentChapterKey: "",
     masteredChapters: [],
@@ -25,8 +25,8 @@ let gameState = {
     wrongGuesses: [],
     unlockedAchievements: []
 };
-let pendingSingleChapterKey = ""; 
-let inputLock = false; 
+let pendingSingleChapterKey = "";
+let inputLock = false;
 let pokedexTimer = null;
 let pokedexSeconds = 0;
 
@@ -65,17 +65,18 @@ function applyGameData(parsed) {
     if (typeof gameState.user.energy === 'undefined') gameState.user.energy = 100;
     if (typeof gameState.user.unlockedReplayXP === 'undefined') gameState.user.unlockedReplayXP = false;
     if (typeof gameState.user.coins === 'undefined') gameState.user.coins = 50;
+    if (typeof gameState.user.inventorySlots === 'undefined') gameState.user.inventorySlots = 5;
     
     gameState.stats = parsed.stats || {};
-    ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5', 
-     'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins', 
+    ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5',
+     'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins',
      'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
         if (typeof gameState.stats[key] === 'undefined') gameState.stats[key] = 0;
     });
 
     if(!Array.isArray(gameState.stats.perfectChapterIds)) gameState.stats.perfectChapterIds = [];
 
-    gameState.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : []; 
+    gameState.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : [];
     gameState.pets = Array.isArray(parsed.pets) ? parsed.pets : [];
     gameState.dailyTasks = Array.isArray(parsed.dailyTasks) ? parsed.dailyTasks : [];
     gameState.masteredChapters = parsed.masteredChapters || [];
@@ -105,7 +106,7 @@ function checkAchievements() {
     check(s.totalPlayTime >= 15, "ach_3");
     check(s.totalPlayTime >= 60, "ach_4");
     check(s.totalPlayTime >= 999, "ach_5");
-    check(gameState.masteredChapters.length > 0, "ach_6"); 
+    check(gameState.masteredChapters.length > 0, "ach_6");
     
     let jrCount = 0, srCount = 0, bothCount = 0;
     Object.keys(db).forEach(k => {

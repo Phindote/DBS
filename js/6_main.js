@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     setInterval(() => {
         if(typeof triggerDrop === 'function') {
-            triggerDrop('ON_PLAY_TIME_10MIN'); 
+            triggerDrop('ON_PLAY_TIME_10MIN');
             
             const h = new Date().getHours();
             if(h === 12) triggerDrop('SPECIFIC_TIME_BONUS');
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 triggerDrop('ON_STUDY_MINUTE');
             }
         }
-    }, 60000); 
+    }, 60000);
 });
 
 let clickSpamCount = 0;
@@ -318,6 +318,7 @@ function initGodMode() {
     gameState.user.energy = 100;
     gameState.user.coins = 9999999;
     gameState.user.title = TITLES[TITLES.length - 1];
+    gameState.user.inventorySlots = 100;
     
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
@@ -340,16 +341,16 @@ function initGodMode() {
             task = { id: quest.id, progress: 0, complete: false, claimed: false };
             gameState.dailyTasks.push(task);
         }
-        task.progress = quest.target; 
-        task.complete = false; 
-        task.claimed = false; 
+        task.progress = quest.target;
+        task.complete = false;
+        task.claimed = false;
     });
 
     gameState.inventory = [];
     gameState.pets = [];
     if (typeof MASTER_ITEMS !== 'undefined') {
         MASTER_ITEMS.forEach(item => {
-            if (item.type === 'fragment' || item.type === 'product' || item.type === 'material') {
+            if (item.type !== 'pet') {
                 gameState.inventory.push({ ...item, count: 99 });
             } else if (item.type === 'pet') {
                 gameState.pets.push(item.id);
@@ -359,7 +360,7 @@ function initGodMode() {
 
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
-    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，每日任務已可領取，全物品及寵物已解鎖！(點擊底部 3 次可還原)");
+    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，背包格子已擴充至上限，每日任務已可領取，全物品及寵物已解鎖！(點擊底部 3 次可還原)");
 }
 
 function revertGodMode() {
