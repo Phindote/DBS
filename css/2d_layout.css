@@ -330,3 +330,42 @@ select.form-input {
 #helpBody h3 {
     margin-top: 0;
 }
+
+/* New Badges Styles */
+.stat-badge {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: bold;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.stat-jr { 
+    background: #e8f4fd; 
+    color: #3498db; 
+    border: 1px solid #aed6f1;
+}
+.stat-sr { 
+    background: #fadbd8; 
+    color: #e74c3c; 
+    border: 1px solid #f5b7b1;
+}
+.stat-last {
+    background: #fef9e7;
+    color: #d4ac0d; 
+    border: 1px solid #f9e79f;
+}
+.stat-pet-date {
+    background: #e8f8f5;
+    color: #16a085;
+    border: 1px solid #a3e4d7;
+}
+.stat-ach-date {
+    background: #fdf2e9;
+    color: #d35400;
+    border: 1px solid #edbb99;
+}
