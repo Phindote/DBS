@@ -211,7 +211,6 @@ function checkAnswer(userAns, btnElement) {
 
     const q = gameState.pool[gameState.currentIndex];
     
-    // 增加嘗試次數統計 (ach_32)
     gameState.stats.tryCount++;
 
     let isCorrect = false;
@@ -250,10 +249,9 @@ function checkAnswer(userAns, btnElement) {
             gameState.solvedQuestionIds.push(q.id);
         }
         
-        // 增加正確題數統計
-        gameState.stats.totalCorrect++; // ach_26, 27, 28
+        gameState.stats.totalCorrect++; 
         if(gameState.difficulty === 'senior') {
-            gameState.stats.srCorrect++; // ach_29, 30, 31
+            gameState.stats.srCorrect++; 
         }
         
         const box = document.getElementById("questionBox");
@@ -288,7 +286,6 @@ function checkAnswer(userAns, btnElement) {
         }, 100);
 
         updateBars();
-        // 檢查成就
         checkAchievements();
         
         setTimeout(() => {
@@ -306,7 +303,7 @@ function checkAnswer(userAns, btnElement) {
         gameState.user.hp = Math.max(0, gameState.user.hp - GAME_CONFIG.HP_PENALTY);
         
         gameState.wrongCount++;
-        gameState.stats.wrongCountTotal++; // ach_33
+        gameState.stats.wrongCountTotal++; 
         gameState.currentAttempts++;
         
         if(!gameState.wrongGuesses.includes(q.id)) gameState.wrongGuesses.push(q.id);
@@ -326,7 +323,6 @@ function checkAnswer(userAns, btnElement) {
         updateCrackStage();
         updateBars();
         
-        // 檢查成就
         checkAchievements();
 
         if (gameState.user.hp <= 0) {
@@ -373,5 +369,12 @@ function checkAnswer(userAns, btnElement) {
                 }
             }, 1000);
         }
+    }
+}
+
+function goHome() {
+    if(confirm("確定要逃跑嗎？此舉將視為戰敗，而且不會回復浩然之氣！")) {
+         resetMenu();
+         switchScreen('screen-menu');
     }
 }
