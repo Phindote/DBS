@@ -63,8 +63,14 @@ function initGame(modeOrDifficulty) {
     let selectedChapters = [];
     if (mode === 'single') {
         selectedChapters.push(pendingSingleChapterKey);
+        // Record last played time for Single mode
+        if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
+        gameState.chapterLastPlayed[pendingSingleChapterKey] = new Date().getTime();
     } else {
         selectedChapters = gameState.mixSelectedKeys;
+        // Record last played time for Mix mode
+        if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
+        gameState.chapterLastPlayed['mix'] = new Date().getTime();
     }
     
     gameState.currentChapterKey = (mode === 'single') ? pendingSingleChapterKey : "mix"; 

@@ -13,10 +13,14 @@ function renderPets() {
         if(petData) {
             const isUnlocked = gameState.pets.includes(petData.id);
             if (isUnlocked) {
+                const date = gameState.collectionDates[petData.id];
+                const dateStr = date ? getFormattedDate(date) : "舊有記錄";
+                
                 card.className = "pokedex-card";
                 card.innerHTML = `
                     <img src="images/items/${petData.img}" class="pokedex-img" onerror="this.src='images/ui/icon_core.PNG'">
                     <div class="pokedex-title">${petData.name}</div>
+                    <span class="stat-badge stat-pet-date">獲得時間：${dateStr}</span>
                 `;
                 card.onclick = () => showPetDetail(petData);
             } else {
@@ -50,11 +54,17 @@ function showPetDetail(pet, unlocked = true) {
     const imgSrc = unlocked ? `images/items/${pet.img}` : `images/items/pet_unknown.PNG`;
     const nameStr = unlocked ? pet.name : "未獲得";
     const descStr = unlocked ? pet.desc : "???";
+    
+    let dateInfo = "";
+    if(unlocked && gameState.collectionDates[pet.id]) {
+        dateInfo = `<div style="margin-top:10px; font-size:0.9rem; color:#2ecc71; font-weight:bold;">獲得於：${getFormattedDate(gameState.collectionDates[pet.id])}</div>`;
+    }
 
     body.innerHTML = `
         <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${nameStr}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${descStr}</div>
+        ${dateInfo}
     `;
 
     modal.style.display = "flex";

@@ -344,6 +344,10 @@ function executeSmelt() {
     if (isPet) {
         if (!gameState.pets.includes(resultItem.id)) {
             gameState.pets.push(resultItem.id);
+            // Record unlock time
+            if(!gameState.collectionDates) gameState.collectionDates = {};
+            gameState.collectionDates[resultItem.id] = new Date().getTime();
+            
             alert(`合成成功！解鎖新龍魄靈獸：${resultItem.name}`);
         } else {
             alert(`合成成功！但你已經擁有 ${resultItem.name}，獲得 5000 金幣補償。`);

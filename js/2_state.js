@@ -23,7 +23,9 @@ let gameState = {
     solvedQuestionIds: [],
     mixSelectedKeys: [],
     wrongGuesses: [],
-    unlockedAchievements: []
+    unlockedAchievements: [],
+    chapterLastPlayed: {}, // New: Stores timestamp of last play per chapter
+    collectionDates: {}    // New: Stores timestamp of when pets/achievements were obtained
 };
 let pendingSingleChapterKey = "";
 let inputLock = false;
@@ -40,7 +42,9 @@ function saveGame() {
         dailyTasks: gameState.dailyTasks,
         masteredChapters: gameState.masteredChapters,
         solvedQuestionIds: gameState.solvedQuestionIds,
-        unlockedAchievements: gameState.unlockedAchievements
+        unlockedAchievements: gameState.unlockedAchievements,
+        chapterLastPlayed: gameState.chapterLastPlayed,
+        collectionDates: gameState.collectionDates
     };
     localStorage.setItem("dbs_dragon_save_v3", btoa(encodeURIComponent(JSON.stringify(data))));
 }
@@ -82,6 +86,8 @@ function applyGameData(parsed) {
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
+    gameState.chapterLastPlayed = parsed.chapterLastPlayed || {};
+    gameState.collectionDates = parsed.collectionDates || {};
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
 }
@@ -127,7 +133,13 @@ function checkAchievements() {
     check(s.energyRecovered >= 10, "ach_35");
 
     if(newUnlock.length > 0) {
-        newUnlock.forEach(id => gameState.unlockedAchievements.push(id));
+        const now = new Date().getTime();
+        newUnlock.forEach(id => {
+            gameState.unlockedAchievements.push(id);
+            if(!gameState.collectionDates[id]) {
+                gameState.collectionDates[id] = now;
+            }
+        });
         saveGame();
         if(typeof showUnlockNotification === 'function') {
             showUnlockNotification(newUnlock);

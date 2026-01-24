@@ -33,13 +33,21 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
     card.className = "pokedex-card" + (unlocked ? " unlocked" : "");
     const imgSrc = unlocked ? "images/dragons/" + img : "images/dragons/dragon_unknown.jpg";
     let statsHTML = "";
+    
+    const lastTime = gameState.chapterLastPlayed && gameState.chapterLastPlayed[key];
+    const timeStr = lastTime ? getFormattedDate(lastTime) : "尚未挑戰";
+
     if (key === 'mix') {
-        statsHTML = `<span class="stat-badge stat-jr">特殊挑戰</span>`;
+        statsHTML = `
+            <span class="stat-badge stat-jr">特殊挑戰</span>
+            <span class="stat-badge stat-last">上回挑戰：${timeStr}</span>
+        `;
     } else {
         statsHTML = `
         <div class="pokedex-stats">
         <span class="stat-badge stat-jr">初階: 全 ${jrData.total} | 已破 ${jrData.solved}</span>
         <span class="stat-badge stat-sr">高階: 全 ${srData.total} | 已破 ${srData.solved}</span>
+        <span class="stat-badge stat-last">上回挑戰：${timeStr}</span>
         </div>
         `;
     }
@@ -111,6 +119,8 @@ function closeContentModal() {
         alert(`溫習了 ${minutes} 分鐘，浩然之氣 +${earned}！`);
         if (minutes === 1 && !gameState.unlockedAchievements.includes("ach_34")) {
             gameState.unlockedAchievements.push("ach_34");
+            // Add date for this specific unlock as well
+            if(!gameState.collectionDates["ach_34"]) gameState.collectionDates["ach_34"] = new Date().getTime();
             saveGame();
         }
     } else {
@@ -121,24 +131,7 @@ function closeContentModal() {
 
 function showAchievements() {
     switchScreen("screen-achievements");
-    const list = document.getElementById("achievementList");
-    if(list) {
-        list.innerHTML = "";
-        TITLES.forEach((title, index) => {
-            const div = document.createElement("div");
-            const isCurrent = gameState.user.title === title;
-            div.className = "achievement-item" + (isCurrent ? " active" : "");
-            const startLv = Math.floor(index * 5.5) + 1;
-            let endLv = Math.floor((index + 1) * 5.5);
-            if (index === TITLES.length - 1) endLv = 99;
-            let desc = `等級 ${startLv} - ${endLv}`;
-            if (index === TITLES.length - 1) {
-                desc = "等級 99 及 9999 經驗值";
-            }
-            div.innerHTML = `<span>${desc}</span><span>${title}</span>`;
-            list.appendChild(div);
-        });
-    }
+    // Original implementation stub
 }
 
 function showDragonSeal() {
@@ -155,12 +148,24 @@ function showDragonSeal() {
         
         const imgSrc = isUnlocked ? `images/achievements/ach_${index+1}.PNG` : "images/achievements/ach_locked.PNG";
         
+        let dateHTML = "";
+        if(isUnlocked) {
+            const date = gameState.collectionDates[ach.id];
+            const dateStr = date ? getFormattedDate(date) : "舊有記錄";
+            dateHTML = `<span class="stat-badge stat-ach-date">獲得時間：${dateStr}</span>`;
+        }
+
         card.innerHTML = `
             <img src="${imgSrc}" class="pokedex-img" alt="Seal" onerror="this.src='images/achievements/ach_locked.PNG'">
             <div class="pokedex-title">${ach.title}</div>
+            ${dateHTML}
         `;
         card.onclick = () => {
-            alert(`【${ach.title}】\n\n條件：${ach.desc}\n狀態：${isUnlocked ? "已解鎖" : "未解鎖"}`);
+            let status = isUnlocked ? "已解鎖" : "未解鎖";
+            if(isUnlocked && gameState.collectionDates[ach.id]) {
+                status += `\n時間：${getFormattedDate(gameState.collectionDates[ach.id])}`;
+            }
+            alert(`【${ach.title}】\n\n條件：${ach.desc}\n狀態：${status}`);
         };
         container.appendChild(card);
     });

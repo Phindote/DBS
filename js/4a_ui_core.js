@@ -36,6 +36,20 @@ const HELP_CONTENT = `
     </div>
 `;
 
+function getFormattedDate(timestamp) {
+    if(!timestamp) return "尚未記錄";
+    const d = new Date(timestamp);
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    let hours = d.getHours();
+    const mins = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? "下午" : "上午";
+    if (hours > 12) hours -= 12;
+    if (hours === 0) hours = 12; 
+    return `${year}年${month}月${day}日${ampm}${hours}時${mins}分`;
+}
+
 function updateCoreButtonVisibility() {
     const coreBtn = document.getElementById("radialMenuContainer");
     const menuScreen = document.getElementById("screen-menu");
