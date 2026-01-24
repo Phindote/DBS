@@ -14,8 +14,8 @@ function endGame() {
 
     // --- 成就檢查邏輯 ---
     if (!isFail) {
-        if (gameState.user.hp < 10) checkAndUnlock("ach_8");
-        if (gameState.user.hp < 5) checkAndUnlock("ach_9");
+        if (gameState.user.hp < 10) checkAndUnlock("ach_8"); 
+        if (gameState.user.hp < 5) checkAndUnlock("ach_9"); 
     }
 
     if (!isFail && gameState.user.hp === 100 && gameState.mode === 'single') {
@@ -24,7 +24,6 @@ function endGame() {
         }
         if (gameState.stats.perfectFullHpChapterIds.length >= 3) checkAndUnlock("ach_7");
     }
-    // --- 成就檢查結束 ---
 
     if (isFail) {
         finalMusic = 'bgm_defeat';
@@ -56,6 +55,7 @@ function endGame() {
             gameState.stats.consecutivePerfect++;
             finalMusic = 'bgm_victory';
             
+            // 首次完美紀錄
             if(!gameState.chapterFirstPerfect) gameState.chapterFirstPerfect = {};
             const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
             if(!gameState.chapterFirstPerfect[chKey]) {
@@ -129,12 +129,12 @@ function endGame() {
     document.getElementById("endTitle").innerText = title;
     document.getElementById("resultImg").src = resultImg;
 
-    const statsRow = document.getElementById("endStatsRow");
     let statsHtml = `獲得金幣：${earnedCoins}`;
     if (gainedEnergy > 0) {
         statsHtml += ` | 回復浩然之氣：${gainedEnergy}`;
     }
-    statsRow.innerText = statsHtml;
+    const endStatsRow = document.getElementById("endStatsRow");
+    endStatsRow.innerText = statsHtml;
 
     const tbody = document.getElementById("resultBody");
     tbody.innerHTML = "";
@@ -159,7 +159,7 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
-    // 改回單行格式
+    // 首次完美通關：單行顯示，移至紅字下方
     let firstPerfectHTML = "";
     const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
     if (gameState.chapterFirstPerfect && gameState.chapterFirstPerfect[chKey]) {
@@ -178,18 +178,23 @@ function endGame() {
     const existingDate = resultContainer.querySelector(".stat-perfect-date");
     if(existingDate) existingDate.remove();
 
-    // 調整插入位置：StatsRow 之後 (即紅色獲得金幣文字下方)
+    const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
+    
+    const tipDiv = document.createElement("div");
+    tipDiv.className = "result-tip-bubble";
+    tipDiv.innerText = tipText;
+
+    // 插入位置調整：日期標籤插入到紅字統計 (endStatsRow) 的下方
     if (firstPerfectHTML) {
         const dateDiv = document.createElement("div");
         dateDiv.innerHTML = firstPerfectHTML;
         dateDiv.style.textAlign = "center";
-        statsRow.parentNode.insertBefore(dateDiv, statsRow.nextSibling);
+        
+        // 插入到 endStatsRow 的後面
+        endStatsRow.parentNode.insertBefore(dateDiv, endStatsRow.nextSibling);
     }
-
-    const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
-    const tipDiv = document.createElement("div");
-    tipDiv.className = "result-tip-bubble";
-    tipDiv.innerText = tipText;
+    
+    // 提示氣泡保持在表格下方
     tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
 }
 
