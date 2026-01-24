@@ -334,17 +334,20 @@ select.form-input {
     margin-top: 0;
 }
 
-/* 垂直居中修正：戰鬥與結算 */
-#screen-result, #screen-game {
+/* 結算畫面垂直居中 */
+#screen-result {
     justify-content: center;
 }
 
-/* 增加底部按鈕空間 */
-.game-footer-btn {
-    margin-top: 25px; 
-    width: 100%;
-    display: flex;
-    justify-content: center;
+/* 戰鬥畫面垂直居中與間距修正 */
+/* 將Boss區域的上方設為 auto，將按鈕的下方設為 auto */
+/* 這會讓中間這塊內容在 HUD 和 底部 之間垂直居中 */
+#screen-game .boss-area {
+    margin-top: auto;
+}
+#screen-game .game-footer-btn {
+    margin-bottom: auto;
+    margin-top: 15px; /* 按鈕與上方容器的距離 */
 }
 
 /* 標籤統一左對齊、小字體 */
@@ -387,21 +390,19 @@ select.form-input {
     color: #d35400;
     border: 1px solid #edbb99;
 }
-
-/* 改回單行樣式 */
+/* 綠色樣式：首次完美通關 (單行) */
 .stat-perfect-date {
     background: #e8f8f5;
     color: #16a085;
     border: 1px solid #a3e4d7;
     font-size: 0.6rem;
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 6px;
     margin-top: 8px;
-    display: block; /* 改為區塊以佔據整行，但內容置中由父元素控制 */
-    width: fit-content; /* 寬度隨內容 */
-    margin-left: auto;
-    margin-right: auto;
+    display: inline-block;
     font-weight: bold;
+    text-align: left;
+    line-height: 1.3;
 }
 
 .result-tip-bubble {
