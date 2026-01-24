@@ -156,7 +156,7 @@ function showHelp() {
     const modalContent = modal.querySelector(".modal-content");
     
     modal.style.display = "flex";
-    if(header) header.style.background = "#2c3e50";
+    if(header) header.style.background = "var(--primary-blue)";
     
     if(modalContent) {
         modalContent.style.height = "auto";

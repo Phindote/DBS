@@ -352,7 +352,7 @@ function initGodMode() {
         MASTER_ITEMS.forEach(item => {
             if (item.type !== 'pet') {
                 gameState.inventory.push({ ...item, count: 99 });
-            } else if (item.type === 'pet') {
+            } else {
                 gameState.pets.push(item.id);
             }
         });

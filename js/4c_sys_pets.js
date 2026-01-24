@@ -1,6 +1,7 @@
 function renderPets() {
     switchScreen("screen-pet");
     const container = document.getElementById("petContainer");
+    container.className = "pokedex-grid-4";
     container.innerHTML = "";
     
     const allPets = MASTER_ITEMS.filter(i => i.type === 'pet');
