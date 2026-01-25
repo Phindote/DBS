@@ -338,7 +338,7 @@ function executeSmelt() {
     }
 
     if (isAsh) {
-        resultItem = MASTER_ITEMS.find(i => i.id === 'item_ash');
+        resultItem = MASTER_ITEMS.find(i => i.id === 'f_001');
     }
 
     if (isPet) {
