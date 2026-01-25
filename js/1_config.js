@@ -15,7 +15,7 @@ const GAME_CONFIG = {
 };
 
 const GACHA_CONFIG = {
-    COST: 100,
+    COST: 120,
     RATES: { T0: 0.0001, T1: 0.001, T2: 0.005, T3: 0.10, T4: 0.80 }
 };
 
@@ -47,7 +47,7 @@ const DROP_ITEMS_POOL = { T0: [], T1: [], T2: [], T3: [], T4: [] };
 
 if (typeof MASTER_ITEMS !== 'undefined') {
     MASTER_ITEMS.forEach(item => {
-        if (item.price && item.price > 0 && item.type !== 'pet' && item.rarity !== 'T0' && item.rarity !== 'T1' && item.id !== 'item_ash') {
+        if (item.price && item.price > 0 && item.type !== 'pet' && item.rarity !== 'T0' && item.rarity !== 'T1' && item.id !== 'f_001') {
             SHOP_ITEMS.push(item);
         }
         if (item.rarity && DROP_ITEMS_POOL[item.rarity] && item.type !== 'pet') {

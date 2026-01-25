@@ -311,7 +311,6 @@ function initGodMode() {
     }
     
     const db = window.questionsDB || {};
-    // 獲取當前時間戳
     const now = new Date().getTime();
 
     window.godModeActive = true;
@@ -324,31 +323,31 @@ function initGodMode() {
     
     gameState.masteredChapters = [];
     gameState.solvedQuestionIds = [];
+    gameState.solvedSrQuestionIds = [];
     
-    // 初始化記錄物件
     if(!gameState.chapterLastPlayed) gameState.chapterLastPlayed = {};
     if(!gameState.collectionDates) gameState.collectionDates = {};
-    if(!gameState.perfectClearDates) gameState.perfectClearDates = {};
     
-    // 設定混合模式時間
     gameState.chapterLastPlayed['mix'] = now;
-    gameState.perfectClearDates['mix'] = now;
     
     Object.keys(db).forEach(k => {
         gameState.masteredChapters.push(k + '_junior');
         gameState.masteredChapters.push(k + '_senior');
         gameState.masteredChapters.push('mix');
         
-        // 設定該篇章的上回挑戰時間和首次完美通關時間為現在
         gameState.chapterLastPlayed[k] = now;
-        gameState.perfectClearDates[k] = now;
         
-        if(db[k].junior) db[k].junior.forEach(q => gameState.solvedQuestionIds.push(q.id));
-        if(db[k].senior) db[k].senior.forEach(q => gameState.solvedQuestionIds.push(q.id));
+        // 修正重點：上帝模式下填入不重複題目清單
+        if(db[k].junior) db[k].junior.forEach(q => {
+             if(!gameState.solvedQuestionIds.includes(q.id)) gameState.solvedQuestionIds.push(q.id);
+        });
+        if(db[k].senior) db[k].senior.forEach(q => {
+             if(!gameState.solvedQuestionIds.includes(q.id)) gameState.solvedQuestionIds.push(q.id);
+             if(!gameState.solvedSrQuestionIds.includes(q.id)) gameState.solvedSrQuestionIds.push(q.id);
+        });
     });
     
     gameState.unlockedAchievements = ACHIEVEMENTS.map(a => a.id);
-    // 設定所有成就獲得時間為現在
     gameState.unlockedAchievements.forEach(id => {
         gameState.collectionDates[id] = now;
     });
@@ -375,7 +374,6 @@ function initGodMode() {
                 gameState.inventory.push({ ...item, count: 99 });
             } else {
                 gameState.pets.push(item.id);
-                // 設定所有寵物獲得時間為現在
                 gameState.collectionDates[item.id] = now;
             }
         });

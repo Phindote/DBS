@@ -9,10 +9,10 @@ function endGame() {
     let earnedCoins = 0;
     let gainedEnergy = 0;
     let finalMusic = 'bgm_success';
+    let isCoinCapped = false;
 
     const db = window.questionsDB || {};
 
-    // --- 成就檢查邏輯 ---
     if (!isFail) {
         if (gameState.user.hp < 10) checkAndUnlock("ach_8"); 
         if (gameState.user.hp < 5) checkAndUnlock("ach_9"); 
@@ -37,6 +37,22 @@ function endGame() {
         let multiplier = (correctCount === totalQ && totalQ > 0) ? 2 : 1;
         earnedCoins = baseCoins * multiplier;
 
+        const today = new Date().toDateString();
+        if (gameState.dailyWinCounts.date !== today) {
+            gameState.dailyWinCounts.date = today;
+            gameState.dailyWinCounts.counts = {};
+        }
+        
+        let winKey = gameState.mode === 'single' ? (gameState.currentChapterKey + '_' + gameState.difficulty) : 'mix';
+        if (!gameState.dailyWinCounts.counts[winKey]) gameState.dailyWinCounts.counts[winKey] = 0;
+        
+        if (gameState.dailyWinCounts.counts[winKey] >= 2) {
+            earnedCoins = 0;
+            isCoinCapped = true;
+        } else {
+            gameState.dailyWinCounts.counts[winKey]++;
+        }
+
         gameState.user.coins = Math.min(gameState.user.coins + earnedCoins, GAME_CONFIG.MAX_COINS);
         gameState.stats.totalPlayTime += 1;
 
@@ -55,7 +71,6 @@ function endGame() {
             gameState.stats.consecutivePerfect++;
             finalMusic = 'bgm_victory';
             
-            // 首次完美紀錄
             if(!gameState.chapterFirstPerfect) gameState.chapterFirstPerfect = {};
             const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
             if(!gameState.chapterFirstPerfect[chKey]) {
@@ -159,12 +174,17 @@ function endGame() {
     const existingBubble = document.querySelector(".result-tip-bubble");
     if(existingBubble) existingBubble.remove();
     
-    // 首次完美通關：單行顯示，移至紅字下方
     let firstPerfectHTML = "";
     const chKey = gameState.mode === 'single' ? gameState.currentChapterKey : 'mix';
     if (gameState.chapterFirstPerfect && gameState.chapterFirstPerfect[chKey]) {
         const date = gameState.chapterFirstPerfect[chKey];
         firstPerfectHTML = `<div class="stat-perfect-date">首次完美通關：${getFormattedDate(date)}</div>`;
+    }
+
+    // 金幣上限警告 HTML
+    let coinLimitHTML = "";
+    if (isCoinCapped) {
+        coinLimitHTML = `<div class="stat-coin-limit">今天在此關卡獲得的金幣已達上限，請挑戰其他關卡！</div>`;
     }
 
     let tipText = "超過一半題目曾經錯誤或同一道題目答錯超過兩次，也算為戰敗喔！";
@@ -177,6 +197,8 @@ function endGame() {
     const resultContainer = document.getElementById("screen-result");
     const existingDate = resultContainer.querySelector(".stat-perfect-date");
     if(existingDate) existingDate.remove();
+    const existingLimit = resultContainer.querySelector(".stat-coin-limit");
+    if(existingLimit) existingLimit.remove();
 
     const tableContainer = document.querySelector("#screen-result > div[style*='overflow-y:auto']");
     
@@ -184,17 +206,25 @@ function endGame() {
     tipDiv.className = "result-tip-bubble";
     tipDiv.innerText = tipText;
 
-    // 插入位置調整：日期標籤插入到紅字統計 (endStatsRow) 的下方
     if (firstPerfectHTML) {
         const dateDiv = document.createElement("div");
         dateDiv.innerHTML = firstPerfectHTML;
         dateDiv.style.textAlign = "center";
-        
-        // 插入到 endStatsRow 的後面
         endStatsRow.parentNode.insertBefore(dateDiv, endStatsRow.nextSibling);
+        
+        if (coinLimitHTML) {
+            const limitDiv = document.createElement("div");
+            limitDiv.innerHTML = coinLimitHTML;
+            limitDiv.style.textAlign = "center";
+            dateDiv.parentNode.insertBefore(limitDiv, dateDiv.nextSibling);
+        }
+    } else if (coinLimitHTML) {
+        const limitDiv = document.createElement("div");
+        limitDiv.innerHTML = coinLimitHTML;
+        limitDiv.style.textAlign = "center";
+        endStatsRow.parentNode.insertBefore(limitDiv, endStatsRow.nextSibling);
     }
     
-    // 提示氣泡保持在表格下方
     tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
 }
 

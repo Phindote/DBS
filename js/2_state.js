@@ -21,13 +21,16 @@ let gameState = {
     currentChapterKey: "",
     masteredChapters: [],
     solvedQuestionIds: [],
+    solvedSrQuestionIds: [],
     mixSelectedKeys: [],
     wrongGuesses: [],
     unlockedAchievements: [],
     chapterLastPlayed: {}, 
     chapterFirstPerfect: {},
     collectionDates: {},
-    isRandomSelection: false // 追蹤隨機模式旗標
+    isRandomSelection: false,
+    questionStats: {},
+    dailyWinCounts: { date: "", counts: {} }
 };
 let pendingSingleChapterKey = "";
 let inputLock = false;
@@ -44,10 +47,13 @@ function saveGame() {
         dailyTasks: gameState.dailyTasks,
         masteredChapters: gameState.masteredChapters,
         solvedQuestionIds: gameState.solvedQuestionIds,
+        solvedSrQuestionIds: gameState.solvedSrQuestionIds,
         unlockedAchievements: gameState.unlockedAchievements,
         chapterLastPlayed: gameState.chapterLastPlayed,
         chapterFirstPerfect: gameState.chapterFirstPerfect,
-        collectionDates: gameState.collectionDates
+        collectionDates: gameState.collectionDates,
+        questionStats: gameState.questionStats,
+        dailyWinCounts: gameState.dailyWinCounts
     };
     localStorage.setItem("dbs_dragon_save_v3", btoa(encodeURIComponent(JSON.stringify(data))));
 }
@@ -75,7 +81,6 @@ function applyGameData(parsed) {
     if (typeof gameState.user.inventorySlots === 'undefined') gameState.user.inventorySlots = 5;
     
     gameState.stats = parsed.stats || {};
-    // 初始化所有統計欄位，確保不為 undefined
     ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5',
      'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins',
      'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
@@ -90,11 +95,14 @@ function applyGameData(parsed) {
     gameState.dailyTasks = Array.isArray(parsed.dailyTasks) ? parsed.dailyTasks : [];
     gameState.masteredChapters = parsed.masteredChapters || [];
     gameState.solvedQuestionIds = parsed.solvedQuestionIds || [];
+    gameState.solvedSrQuestionIds = parsed.solvedSrQuestionIds || [];
     gameState.unlockedAchievements = parsed.unlockedAchievements || [];
     gameState.chapterLastPlayed = parsed.chapterLastPlayed || {};
     gameState.chapterFirstPerfect = parsed.chapterFirstPerfect || {};
     gameState.collectionDates = parsed.collectionDates || {};
     gameState.isRandomSelection = false;
+    gameState.questionStats = parsed.questionStats || {};
+    gameState.dailyWinCounts = parsed.dailyWinCounts || { date: "", counts: {} };
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
 }
@@ -114,7 +122,6 @@ function checkAchievements() {
         }
     };
 
-    // 1. 成長與累積類
     check(u.level >= 5, "ach_1");
     check(u.xp >= 5000, "ach_2");
     check(s.totalPlayTime >= 15, "ach_3");
@@ -122,7 +129,6 @@ function checkAchievements() {
     check(s.totalPlayTime >= 999, "ach_5");
     check(gameState.masteredChapters.length > 0, "ach_6");
     
-    // 2. 篇章制霸類 (統計 masteredChapters)
     let jrCount = 0, srCount = 0, bothCount = 0;
     Object.keys(db).forEach(k => {
         const jr = gameState.masteredChapters.includes(k+'_junior');
@@ -138,39 +144,37 @@ function checkAchievements() {
     check(srCount >= totalChapters, "ach_15");
     check(bothCount >= totalChapters, "ach_16");
 
-    // 3. 圖鑑收集類 (ach_17 ~ ach_19)
-    // 解鎖圖鑑定義為：該篇章初階與高階皆通過 (bothCount)
     check(bothCount >= 1, "ach_17");
     check(bothCount >= 8, "ach_18");
     check(bothCount >= totalChapters, "ach_19");
 
-    // 4. 混合模式基本 (ach_20)
     check(s.mixWinCount >= 1, "ach_20");
 
-    // 5. 答題數據類 (ach_26 ~ ach_33)
-    check(s.totalCorrect >= 100, "ach_26");
-    check(s.totalCorrect >= 500, "ach_27");
-    check(s.totalCorrect >= 1000, "ach_28");
-    check(s.srCorrect >= 100, "ach_29");
-    check(s.srCorrect >= 300, "ach_30");
-    check(s.srCorrect >= 500, "ach_31");
+    // 修正重點：改為檢查「已解決題目ID列表」的長度，確保是不重複題目
+    const uniqueTotal = gameState.solvedQuestionIds.length;
+    check(uniqueTotal >= 100, "ach_26");
+    check(uniqueTotal >= 500, "ach_27");
+    check(uniqueTotal >= 1000, "ach_28");
+
+    // 修正重點：改為檢查「已解決高階題目ID列表」的長度
+    const uniqueSr = gameState.solvedSrQuestionIds.length;
+    check(uniqueSr >= 100, "ach_29");
+    check(uniqueSr >= 300, "ach_30");
+    check(uniqueSr >= 500, "ach_31");
+
     check(s.tryCount >= 3000, "ach_32");
     check(s.wrongCountTotal >= 111, "ach_33");
 
-    // 6. 溫習系統能量類 (ach_35 ~ ach_39)
     check(s.energyRecovered >= 10, "ach_35");
     check(s.energyRecovered >= 60, "ach_36");
     check(s.energyRecovered >= 180, "ach_37");
     check(s.energyRecovered >= 300, "ach_38");
     check(s.energyRecovered >= 600, "ach_39");
 
-    // 7. 終極成就 (ach_40) - 需解鎖前 39 個
-    // 計算已解鎖數量 (不含 ach_40 本身)
     let unlockedCount = unlocked.length + newUnlock.length;
     if (unlocked.includes("ach_40")) unlockedCount--; 
-    if (newUnlock.includes("ach_40")) unlockedCount--; // 避免重複計算
+    if (newUnlock.includes("ach_40")) unlockedCount--;
 
-    // 如果總共有 39 個其他成就已解鎖
     if (unlockedCount >= 39) {
         check(true, "ach_40");
     }

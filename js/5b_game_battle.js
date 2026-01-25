@@ -115,6 +115,23 @@ function initGame(modeOrDifficulty) {
     renderQuestion();
 }
 
+function updateStatsBar(q) {
+    if(!gameState.questionStats) gameState.questionStats = {};
+    const stats = gameState.questionStats[q.id] || { t: 0, c: 0, w: 0 };
+    
+    const progressEl = document.getElementById("gameProgress");
+    progressEl.innerHTML = `
+        <div class="q-stats-bar">
+            <div class="q-stat-seg q-stat-blue">關卡進度：<span style="color:black">${gameState.currentIndex + 1}/${gameState.pool.length}題</span></div>
+            <div class="q-stat-seg q-stat-yellow">曾經作答次數：<span style="color:black">${stats.t}</span></div>
+            <div class="q-stat-seg q-stat-red">曾經答錯次數：<span style="color:black">${stats.w}</span></div>
+            <div class="q-stat-seg q-stat-green">曾經答對次數：<span style="color:black">${stats.c}</span></div>
+        </div>
+    `;
+    progressEl.className = "progress-display"; 
+    progressEl.style.background = "transparent";
+}
+
 function renderQuestion() {
     if (document.activeElement instanceof HTMLElement) {
         document.activeElement.blur();
@@ -130,7 +147,9 @@ function renderQuestion() {
     inputLock = false;
     
     const q = gameState.pool[gameState.currentIndex];
-    document.getElementById("gameProgress").innerText = `進度：${gameState.currentIndex + 1} / ${gameState.pool.length}`;
+    
+    updateStatsBar(q);
+    
     document.getElementById("qLine").innerText = q.line;
     document.getElementById("qWord").innerText = q.word;
     document.getElementById("msgBox").innerText = "";
@@ -211,7 +230,11 @@ function checkAnswer(userAns, btnElement) {
 
     const q = gameState.pool[gameState.currentIndex];
     
+    if(!gameState.questionStats) gameState.questionStats = {};
+    if(!gameState.questionStats[q.id]) gameState.questionStats[q.id] = { t: 0, c: 0, w: 0 };
+    
     gameState.stats.tryCount++;
+    gameState.questionStats[q.id].t++;
 
     let isCorrect = false;
     if (gameState.difficulty === 'senior' && q.answer.includes('/')) {
@@ -223,7 +246,10 @@ function checkAnswer(userAns, btnElement) {
     
     if (isCorrect) {
         gameState.history.push({ q: q, userAns: userAns, isCorrect: true });
+        gameState.questionStats[q.id].c++;
         
+        updateStatsBar(q);
+
         playSFX('correct');
 
         if (btnElement) {
@@ -245,8 +271,17 @@ function checkAnswer(userAns, btnElement) {
         
         gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
         
+        // 修正重點：記錄總答對題目（不重複）
         if(!gameState.solvedQuestionIds.includes(q.id)) {
             gameState.solvedQuestionIds.push(q.id);
+        }
+        
+        // 修正重點：記錄高階答對題目（不重複）
+        if(gameState.difficulty === 'senior') {
+             if(!gameState.solvedSrQuestionIds) gameState.solvedSrQuestionIds = [];
+             if(!gameState.solvedSrQuestionIds.includes(q.id)) {
+                 gameState.solvedSrQuestionIds.push(q.id);
+             }
         }
         
         gameState.stats.totalCorrect++; 
@@ -295,7 +330,10 @@ function checkAnswer(userAns, btnElement) {
         
     } else {
         gameState.history.push({ q: q, userAns: userAns, isCorrect: false });
+        gameState.questionStats[q.id].w++;
         
+        updateStatsBar(q);
+
         playSFX('wrong');
         
         if (typeof triggerDrop === 'function') triggerDrop('ON_ANSWER_WRONG');
@@ -373,7 +411,7 @@ function checkAnswer(userAns, btnElement) {
 }
 
 function goHome() {
-    if(confirm("確定要逃跑嗎？此舉將視為戰敗，而且不會回復浩然之氣！")) {
+    if(confirm("確定要放棄當前戰鬥並返回主目錄嗎？")) {
          resetMenu();
          switchScreen('screen-menu');
     }
