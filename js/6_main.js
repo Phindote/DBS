@@ -79,6 +79,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 triggerDrop('ON_STUDY_MINUTE');
             }
         }
+        
+        if (!window.godModeActive) {
+            gameState.dailyPlayTime = (gameState.dailyPlayTime || 0) + 1;
+            if (gameState.dailyPlayTime >= 180) {
+                saveGame();
+                alert("【系統公告】\n\n勇者啊，你今日的修煉時間已達上限（180分鐘）。\n休息是為了走更長遠的路，請放下執念，明日再來！");
+                location.reload();
+            } else {
+                saveGame();
+            }
+        }
     }, 60000);
 });
 
@@ -288,6 +299,12 @@ function handleFooterClick() {
 
         if (pass === "DBS_Chinese") {
             initGodMode();
+        } else if (pass === "Clear") {
+            if(confirm("警告：此操作將刪除所有存檔並重置遊戲。確定嗎？")) {
+                localStorage.removeItem("dbs_dragon_save_v3");
+                alert("存檔已清除，正在重新啟動...");
+                location.reload();
+            }
         } else {
             alert("密碼錯誤");
         }
@@ -337,7 +354,6 @@ function initGodMode() {
         
         gameState.chapterLastPlayed[k] = now;
         
-        // 修正重點：上帝模式下填入不重複題目清單
         if(db[k].junior) db[k].junior.forEach(q => {
              if(!gameState.solvedQuestionIds.includes(q.id)) gameState.solvedQuestionIds.push(q.id);
         });
@@ -381,7 +397,7 @@ function initGodMode() {
 
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
-    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，背包格子已擴充至上限，每日任務已可領取，全物品及寵物已解鎖！(點擊底部 3 次可還原)");
+    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，防作弊及防沉迷限制已解除，全物品及寵物已解鎖！");
 }
 
 function revertGodMode() {

@@ -1,3 +1,6 @@
+window._acTime = Date.now();
+window._acPerf = performance.now();
+
 let gameState = {
     user: { name: "", class: "", hp: 100, xp: 0, level: 1, title: "初心新手", energy: 100, unlockedReplayXP: false, coins: 50, lastLoginDate: "", inventorySlots: 5 },
     stats: {
@@ -30,7 +33,9 @@ let gameState = {
     collectionDates: {},
     isRandomSelection: false,
     questionStats: {},
-    dailyWinCounts: { date: "", counts: {} }
+    dailyWinCounts: { date: "", counts: {} },
+    lastSaveTime: 0,
+    dailyPlayTime: 0
 };
 let pendingSingleChapterKey = "";
 let inputLock = false;
@@ -39,6 +44,7 @@ let pokedexSeconds = 0;
 
 function saveGame() {
     if (window.godModeActive) return;
+    gameState.lastSaveTime = Date.now();
     const data = {
         user: gameState.user,
         stats: gameState.stats,
@@ -53,7 +59,9 @@ function saveGame() {
         chapterFirstPerfect: gameState.chapterFirstPerfect,
         collectionDates: gameState.collectionDates,
         questionStats: gameState.questionStats,
-        dailyWinCounts: gameState.dailyWinCounts
+        dailyWinCounts: gameState.dailyWinCounts,
+        lastSaveTime: gameState.lastSaveTime,
+        dailyPlayTime: gameState.dailyPlayTime
     };
     localStorage.setItem("dbs_dragon_save_v3", btoa(encodeURIComponent(JSON.stringify(data))));
 }
@@ -103,6 +111,8 @@ function applyGameData(parsed) {
     gameState.isRandomSelection = false;
     gameState.questionStats = parsed.questionStats || {};
     gameState.dailyWinCounts = parsed.dailyWinCounts || { date: "", counts: {} };
+    gameState.lastSaveTime = parsed.lastSaveTime || 0;
+    gameState.dailyPlayTime = parsed.dailyPlayTime || 0;
     
     if(typeof updateUserDisplay === 'function') updateUserDisplay();
 }
@@ -150,13 +160,11 @@ function checkAchievements() {
 
     check(s.mixWinCount >= 1, "ach_20");
 
-    // 修正重點：改為檢查「已解決題目ID列表」的長度，確保是不重複題目
     const uniqueTotal = gameState.solvedQuestionIds.length;
     check(uniqueTotal >= 100, "ach_26");
     check(uniqueTotal >= 500, "ach_27");
     check(uniqueTotal >= 1000, "ach_28");
 
-    // 修正重點：改為檢查「已解決高階題目ID列表」的長度
     const uniqueSr = gameState.solvedSrQuestionIds.length;
     check(uniqueSr >= 100, "ach_29");
     check(uniqueSr >= 300, "ach_30");

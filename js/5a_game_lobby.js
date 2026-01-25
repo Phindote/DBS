@@ -3,16 +3,47 @@ function handleLogin() {
     const g = document.getElementById("inputGrade").value;
     const l = document.getElementById("inputClassLetter").value;
     if(!n || !g || !l) return alert("請輸入姓名及選擇班別");
+
+    if (!window.godModeActive) {
+        if (gameState.lastSaveTime && Date.now() < gameState.lastSaveTime) {
+            alert("時空秩序崩壞！系統檢測到時間回溯，請校準你的裝置時間後再嘗試登入。");
+            return;
+        }
+
+        const runTimeDate = Date.now() - window._acTime;
+        const runTimePerf = performance.now() - window._acPerf;
+        const drift = Math.abs(runTimeDate - runTimePerf);
+        
+        if (drift > 43200000) {
+             alert("時空秩序崩壞！系統檢測到時間流逝異常（運行時鐘不同步），請刷新頁面重新登入。");
+             return;
+        }
+    }
+    
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const lastLoginTime = gameState.user.lastLoginDate ? new Date(gameState.user.lastLoginDate).getTime() : 0;
+    const todayTime = new Date(todayStr).getTime();
+
+    if (todayTime > lastLoginTime) {
+        gameState.dailyPlayTime = 0;
+    }
+
+    if (!window.godModeActive) {
+        if (gameState.dailyPlayTime >= 180 && gameState.user.lastLoginDate === todayStr) {
+            alert("浩然之氣已耗盡！\n\n系統檢測到你今日累積修煉已超過180分鐘。\n過度修煉恐走火入魔，請明日養足精神再來挑戰！");
+            return;
+        }
+    }
     
     playMusic('theme'); 
 
     const c = g + l;
     gameState.user.name = n;
     gameState.user.class = c;
-    
-    const today = new Date().toDateString();
-    if(gameState.user.lastLoginDate !== today) {
-        gameState.user.lastLoginDate = today;
+
+    if(todayTime > lastLoginTime) {
+        gameState.user.lastLoginDate = todayStr;
         gameState.dailyTasks = [];
         
         for(let i=1; i<=5; i++) {
@@ -33,7 +64,7 @@ function handleLogin() {
             gameState.dailyTasks.push({ id: 7, progress: 0, complete: false, claimed: false, targetKey: randomKey2 });
         }
 
-        const hour = new Date().getHours();
+        const hour = now.getHours();
         if ((hour >= 7 && hour <= 9) || (hour >= 18 && hour <= 20)) {
             setTimeout(() => {
                 if (typeof triggerDrop === 'function') triggerDrop('LOGIN_MOMENT_BONUS');
