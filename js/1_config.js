@@ -10,7 +10,7 @@ const GAME_CONFIG = {
     MAX_STUDY_MINS: 10,
     MAX_LEVEL: 99,
     MAX_XP: 9999,
-    COIN_PER_Q: 10,
+    COIN_PER_Q: 1,
     MAX_COINS: 9999999
 };
 
