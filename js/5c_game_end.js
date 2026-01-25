@@ -34,7 +34,7 @@ function endGame() {
         const correctCount = gameState.history.filter(h => h.isCorrect).length;
 
         let baseCoins = correctCount * GAME_CONFIG.COIN_PER_Q;
-        let multiplier = (correctCount === totalQ && totalQ > 0) ? 2 : 1;
+        let multiplier = isPerfect ? 2 : 1;
         earnedCoins = baseCoins * multiplier;
 
         const today = new Date().toDateString();
@@ -181,7 +181,6 @@ function endGame() {
         firstPerfectHTML = `<div class="stat-perfect-date">首次完美通關：${getFormattedDate(date)}</div>`;
     }
 
-    // 金幣上限警告 HTML
     let coinLimitHTML = "";
     if (isCoinCapped) {
         coinLimitHTML = `<div class="stat-coin-limit">今天在此關卡獲得的金幣已達上限，請挑戰其他關卡！</div>`;
