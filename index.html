@@ -471,6 +471,21 @@
 <div class="modal-body" id="detailModalBody" style="padding:30px 20px;"></div>
 </div>
 </div>
+<div id="system-modal" class="modal-backdrop" style="display:none; z-index: 2147483647;">
+<div class="modal-content" style="max-width:350px; text-align:center; overflow:hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+<div class="modal-header" id="sys-modal-header" style="background:var(--primary-blue); color:white;">
+<span id="sys-modal-title">系統提示</span>
+</div>
+<div class="modal-body" style="padding: 25px 20px;">
+<div id="sys-modal-msg" style="color:#2c3e50; font-size:1.1rem; line-height:1.5; font-weight:bold;"></div>
+<input type="text" id="sys-modal-input" class="form-input" style="margin-top:15px; display:none; text-align:center;" autocomplete="off">
+</div>
+<div style="padding:15px; background:#f9f9f9; display:flex; gap:10px; justify-content:center;">
+<button id="sys-btn-cancel" class="btn-secondary" style="flex:1; display:none;">取消</button>
+<button id="sys-btn-ok" class="btn-main" style="margin:0; flex:1; font-size:1rem; padding:10px;">確定</button>
+</div>
+</div>
+</div>
 <div id="radialMenuContainer" class="radial-menu-container">
 <div class="radial-items">
 <div class="stack-item">
