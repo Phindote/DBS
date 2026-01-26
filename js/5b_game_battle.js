@@ -53,7 +53,7 @@ function initGame(modeOrDifficulty) {
         cost = unitCost * gameState.mixSelectedKeys.length;
     }
     
-    if (gameState.user.energy < cost) return alert("浩然之氣不足！請前往圖鑑溫習。");
+    if (gameState.user.energy < cost) return alert("浩然之氣不足！到惡龍圖鑑溫習即可回復。");
     
     gameState.user.energy -= cost;
     saveGame();
@@ -271,12 +271,10 @@ function checkAnswer(userAns, btnElement) {
         
         gameState.user.hp = Math.min(100, gameState.user.hp + GAME_CONFIG.HP_REWARD_CORRECT);
         
-        // 修正重點：記錄總答對題目（不重複）
         if(!gameState.solvedQuestionIds.includes(q.id)) {
             gameState.solvedQuestionIds.push(q.id);
         }
         
-        // 修正重點：記錄高階答對題目（不重複）
         if(gameState.difficulty === 'senior') {
              if(!gameState.solvedSrQuestionIds) gameState.solvedSrQuestionIds = [];
              if(!gameState.solvedSrQuestionIds.includes(q.id)) {

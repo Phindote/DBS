@@ -31,7 +31,7 @@ function handleLogin() {
 
     if (!window.godModeActive) {
         if (gameState.dailyPlayTime >= 180 && gameState.user.lastLoginDate === todayStr) {
-            alert("浩然之氣已耗盡！\n\n系統檢測到你今日累積修煉已超過180分鐘。\n過度修煉恐走火入魔，請明日養足精神再來挑戰！");
+            alert("精力已耗盡！\n\n系統檢測到你今日累積修煉已超過180分鐘。\n過度修煉恐走火入魔，請明日養足精神再來挑戰！");
             return;
         }
     }

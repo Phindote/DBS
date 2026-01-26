@@ -27,7 +27,7 @@ function endGame() {
 
     if (isFail) {
         finalMusic = 'bgm_defeat';
-        title = "勝敗乃兵家常事...";
+        title = "勝敗乃兵家常事⋯⋯";
         gameState.stats.consecutivePerfect = 0; 
     } else {
         const totalQ = gameState.pool.length;
@@ -186,7 +186,7 @@ function endGame() {
         coinLimitHTML = `<div class="stat-coin-limit">今天在此關卡獲得的金幣已達上限，請挑戰其他關卡！</div>`;
     }
 
-    let tipText = "超過一半題目曾經錯誤或同一道題目答錯超過兩次，也算為戰敗喔！";
+    let tipText = "超過一半題目曾經答錯或同一道題目答錯超過兩次，也算戰敗喔！";
     if (isPerfect) {
         tipText = "努力保持這種水準，答案一擊即中就是完美！";
     } else if (!isFail) {

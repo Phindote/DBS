@@ -300,9 +300,9 @@ function handleFooterClick() {
         if (pass === "DBS_Chinese") {
             initGodMode();
         } else if (pass === "Clear") {
-            if(confirm("警告：此操作將刪除所有存檔並重置遊戲。確定嗎？")) {
+            if(confirm("警告：此操作將回到重生的一刻！你確定嗎？")) {
                 localStorage.removeItem("dbs_dragon_save_v3");
-                alert("存檔已清除，正在重新啟動...");
+                alert("記憶正在清除⋯⋯");
                 location.reload();
             }
         } else {
@@ -311,7 +311,7 @@ function handleFooterClick() {
         window.footerClickCount = 0;
     }
     if (window.godModeActive && window.footerClickCount === 3) {
-        if(confirm("是否關閉上帝模式並還原存檔？")) {
+        if(confirm("是否關閉上帝模式並變回凡人？")) {
             revertGodMode();
         }
         window.footerClickCount = 0;
@@ -410,6 +410,6 @@ function revertGodMode() {
         updateUserDisplay();
         updateBars();
         if(typeof renderDailyTasks === 'function') renderDailyTasks();
-        alert("已還原至備份狀態。");
+        alert("已還原至凡人狀態。");
     }
 }

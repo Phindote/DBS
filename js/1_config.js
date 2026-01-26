@@ -59,10 +59,10 @@ if (typeof MASTER_ITEMS !== 'undefined') {
 }
 
 const TITLES = [
-    "初心新手", "鐵劍勇者", "龍影覓者", "鱗甲獵手", "龍息破者",
-    "血爪鬥士", "翼刃騎士", "獵心守護", "龍牙勇將", "雷霆屠夫",
-    "龍魂征服", "焚天劍豪", "滅鱗霸主", "龍血君王", "噬血龍將",
-    "破空龍屠", "蒼穹滅士", "究極•屠龍者", "龍脈•降龍無悔"
+    "初心新手", "鐵劍勇者", "龍影覓士", "鱗甲獵手", "龍息破者",
+    "狂爪鬥士", "翼刃騎士", "獵心守護", "龍牙勇將", "雷霆屠夫",
+    "龍魂征服", "五嶽劍豪", "滅鱗霸主", "馴龍之主", "龍的傳人",
+    "破空龍將", "蒼穹滅士", "究極•馴龍者", "龍脈•降龍無悔"
 ];
 
 const ACHIEVEMENTS = [
@@ -71,7 +71,7 @@ const ACHIEVEMENTS = [
     {id: "ach_3", title: "駐足常客", desc: "累積遊玩 15 分鐘"},
     {id: "ach_4", title: "流連忘返", desc: "累積遊玩 60 分鐘"},
     {id: "ach_5", title: "歲月如歌", desc: "累積遊玩 999 分鐘"},
-    {id: "ach_6", title: "初探龍巢", desc: "完成任意一篇試煉"},
+    {id: "ach_6", title: "初探龍穴", desc: "完成任意一篇試煉"},
     {id: "ach_7", title: "毫髮無傷", desc: "3篇不同篇章滿血通關"},
     {id: "ach_8", title: "險勝一籌", desc: "剩餘 HP < 10 通關"},
     {id: "ach_9", title: "絕地反擊", desc: "剩餘 HP < 5 通關"},
@@ -82,7 +82,7 @@ const ACHIEVEMENTS = [
     {id: "ach_14", title: "初階制霸", desc: "完成所有 16 篇初階試煉"},
     {id: "ach_15", title: "高階制霸", desc: "完成所有 16 篇高階試煉"},
     {id: "ach_16", title: "全域制霸", desc: "完成全 16 篇初階及高階"},
-    {id: "ach_17", title: "尋龍者", desc: "解鎖 1 張圖鑑"},
+    {id: "ach_17", title: "尋龍之端", desc: "解鎖 1 張圖鑑"},
     {id: "ach_18", title: "龍族獵人", desc: "解鎖 8 張圖鑑"},
     {id: "ach_19", title: "龍之博物館", desc: "解鎖全部 16 張圖鑑"},
     {id: "ach_20", title: "小試牛刀", desc: "混合模式獲勝 1 次"},
@@ -109,13 +109,13 @@ const ACHIEVEMENTS = [
 ];
 
 const DAILY_QUESTS = [
-    { id: 1, desc: "每日登入", target: 1, reward: 50, type: "login" },
-    { id: 2, desc: "溫習惡龍圖鑑 10 分鐘", target: 10, reward: 80, type: "study" },
-    { id: 3, desc: "初階完美通關 5 次 (不同篇)", target: 5, reward: 100, type: "perfect_jr_diff" },
-    { id: 4, desc: "高階完美通關 5 次 (不同篇)", target: 5, reward: 150, type: "perfect_sr_diff" },
-    { id: 5, desc: "混合篇章順利通關 2 次", target: 2, reward: 180, type: "mix_win" },
-    { id: 6, desc: "指定篇章初階完美通關 1 次", target: 1, reward: 50, type: "target_jr" },
-    { id: 7, desc: "指定篇章高階完美通關 1 次", target: 1, reward: 80, type: "target_sr" }
+    { id: 1, desc: "每日登入", target: 1, reward: 30, type: "login" },
+    { id: 2, desc: "溫習惡龍圖鑑 10 分鐘", target: 10, reward: 50, type: "study" },
+    { id: 3, desc: "初階完美通關 5 次 (不同篇)", target: 5, reward: 70, type: "perfect_jr_diff" },
+    { id: 4, desc: "高階完美通關 5 次 (不同篇)", target: 5, reward: 100, type: "perfect_sr_diff" },
+    { id: 5, desc: "混合篇章順利通關 2 次", target: 2, reward: 120, type: "mix_win" },
+    { id: 6, desc: "指定篇章初階完美通關 1 次", target: 1, reward: 35, type: "target_jr" },
+    { id: 7, desc: "指定篇章高階完美通關 1 次", target: 1, reward: 70, type: "target_sr" }
 ];
 
 const ASSETS_TO_LOAD = [
