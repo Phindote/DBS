@@ -71,6 +71,34 @@ function claimTaskReward(id) {
         playSFX('success');
         updateShopUI();
         renderDailyTasks();
-        alert(`成功領取獎勵：${quest.reward} 金幣！`);
+        
+        const modal = document.getElementById('system-modal');
+        if (modal) {
+            const titleEl = document.getElementById('sys-modal-title');
+            const headerEl = document.getElementById('sys-modal-header');
+            const msgEl = document.getElementById('sys-modal-msg');
+            const btnOk = document.getElementById('sys-btn-ok');
+            const btnCancel = document.getElementById('sys-btn-cancel');
+            const inputEl = document.getElementById('sys-modal-input');
+
+            if (titleEl) titleEl.innerText = "系統提示";
+            if (headerEl) headerEl.style.background = "#f5d6a9";
+            if (msgEl) msgEl.innerText = `成功領取獎勵：${quest.reward} 金幣！`;
+            
+            if (inputEl) inputEl.style.display = 'none';
+            if (btnCancel) btnCancel.style.display = 'none';
+            if (btnOk) {
+                btnOk.style.display = 'block';
+                btnOk.style.background = "#f5d6a9";
+                btnOk.innerText = '確定';
+                btnOk.onclick = () => {
+                    modal.style.display = 'none';
+                };
+            }
+            
+            modal.style.display = 'flex';
+        } else {
+            alert(`成功領取獎勵：${quest.reward} 金幣！`);
+        }
     }
 }

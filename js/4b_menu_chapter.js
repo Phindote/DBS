@@ -49,7 +49,7 @@ function resetMenu() {
     
     pendingSingleChapterKey = "";
     gameState.mixSelectedKeys = [];
-    gameState.isRandomSelection = false; // Reset random flag on menu reset
+    gameState.isRandomSelection = false;
     
     updateCoreButtonVisibility();
 }
@@ -90,7 +90,7 @@ function renderMixList() {
         const label = document.createElement("label");
         label.className = "mix-item";
         label.innerHTML = `
-            <input type="checkbox" value="${key}" onchange="checkMixCount()">
+            <input type="checkbox" value="${key}" onchange="playSFX('click'); checkMixCount()">
             <span>${item.title}</span>
         `;
         list.appendChild(label);
@@ -99,8 +99,18 @@ function renderMixList() {
 }
 
 function checkMixCount() {
-    const inputs = document.querySelectorAll("#mixChapterList input:checked");
-    gameState.mixSelectedKeys = Array.from(inputs).map(i => i.value);
+    const allInputs = document.querySelectorAll("#mixChapterList input");
+    const checkedInputs = [];
+    allInputs.forEach(input => {
+        if(input.checked) {
+            input.parentElement.classList.add("active");
+            checkedInputs.push(input);
+        } else {
+            input.parentElement.classList.remove("active");
+        }
+    });
+    
+    gameState.mixSelectedKeys = checkedInputs.map(i => i.value);
     document.getElementById("mixCount").innerText = "已選：" + gameState.mixSelectedKeys.length;
 }
 
@@ -117,6 +127,7 @@ function deselectAllMix() {
 }
 
 function randomSelectMix() {
+    playSFX('click');
     const countSelect = document.getElementById("mixRandomCount");
     const count = parseInt(countSelect.value);
     const db = window.questionsDB || {};
@@ -124,7 +135,6 @@ function randomSelectMix() {
     
     if (keys.length < count) return alert("篇章數量不足！");
     
-    // Reset selection first
     deselectAllMix();
     
     gameState.mixSelectedKeys = [];
@@ -135,11 +145,9 @@ function randomSelectMix() {
         }
     }
     
-    // Set flag for achievement tracking
     gameState.isRandomSelection = true;
     
     saveGame();
-    // Immediately start game for random mode to ensure flag is captured
     initGame('mix'); 
 }
 
@@ -176,7 +184,6 @@ function confirmMixMode() {
         gameState.mixSelectedKeys.push(i.value);
     });
     
-    // Manual confirmation resets random flag
     gameState.isRandomSelection = false;
     
     initGame('mix');

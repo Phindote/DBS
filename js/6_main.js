@@ -313,20 +313,31 @@ function showSystemModal(type, msg, placeholder = "") {
             "請輸入姓名", "時空秩序", "精力已耗盡", "系統公告", 
             "請至少選擇", "篇章數量不足", "浩然之氣不足", "該模式暫無", 
             "金幣不足", "該物品已達上限", "請最少放入", "合成失敗", 
-            "無效的數量", "溫習時間不足", "密碼錯誤", "記憶正在清除"
+            "無效的數量", "溫習時間不足", "密碼錯誤", "記憶正在清除", "背包空間不足"
         ];
         
         const isWarning = warningKeywords.some(keyword => msg.includes(keyword));
+        const isClaim = msg.includes("領取成功");
 
         if (type === 'alert') {
-            if (isWarning) {
+            if (isClaim) {
+                titleEl.innerText = '系統提示';
+                headerEl.style.background = '#f9f6e6';
+                headerEl.style.color = '#5d4037'; 
+                btnOk.style.background = '#f9f6e6';
+                btnOk.style.color = '#5d4037';
+            } else if (isWarning) {
                 titleEl.innerText = '系統警告';
                 headerEl.style.background = '#e74c3c';
+                headerEl.style.color = 'white';
                 btnOk.style.background = '#e74c3c';
+                btnOk.style.color = 'white';
             } else {
                 titleEl.innerText = '系統提示';
                 headerEl.style.background = 'var(--primary-blue)';
+                headerEl.style.color = 'white';
                 btnOk.style.background = 'var(--primary-blue)';
+                btnOk.style.color = 'white';
             }
             inputEl.style.display = 'none';
             btnCancel.style.display = 'none';
@@ -338,6 +349,7 @@ function showSystemModal(type, msg, placeholder = "") {
         } else if (type === 'confirm') {
             titleEl.innerText = '系統確認';
             headerEl.style.background = '#e74c3c';
+            headerEl.style.color = 'white';
             inputEl.style.display = 'none';
             
             btnContainer.appendChild(btnOk);
@@ -345,6 +357,7 @@ function showSystemModal(type, msg, placeholder = "") {
             
             btnCancel.style.display = 'block';
             btnOk.style.background = '#e74c3c';
+            btnOk.style.color = 'white';
             btnOk.innerText = '確認';
             btnCancel.innerText = '取消';
             
@@ -359,6 +372,7 @@ function showSystemModal(type, msg, placeholder = "") {
         } else if (type === 'prompt') {
             titleEl.innerText = '系統輸入';
             headerEl.style.background = '#f1c40f';
+            headerEl.style.color = 'white';
             inputEl.style.display = 'block';
             inputEl.placeholder = placeholder;
             btnCancel.style.display = 'block';
@@ -368,6 +382,7 @@ function showSystemModal(type, msg, placeholder = "") {
             
             btnOk.innerText = '提交';
             btnOk.style.background = 'var(--primary-blue)';
+            btnOk.style.color = 'white';
             
             setTimeout(() => inputEl.focus(), 100);
 
@@ -415,6 +430,11 @@ async function handleFooterClick() {
                 await window.alert("記憶正在清除⋯⋯");
                 location.reload();
             }
+        } else if (pass === "Gold") {
+            gameState.user.coins += 9999999;
+            saveGame();
+            if(typeof updateShopUI === 'function') updateShopUI();
+            await window.alert("💰 已獲得 9,999,999 金幣！");
         } else {
             await window.alert("密碼錯誤");
         }
@@ -428,6 +448,46 @@ async function handleFooterClick() {
         window.footerClickCount = 0;
     }
 }
+
+window.claimDailyReward = function(id) {
+    const task = gameState.dailyTasks.find(t => t.id === id);
+    const config = DAILY_QUESTS.find(q => q.id === id);
+    if (!task || !config) return;
+
+    if (!task.complete && task.progress >= config.target) {
+        task.complete = true;
+    }
+
+    if (task.complete && !task.claimed) {
+        task.claimed = true;
+        gameState.user.coins += config.reward;
+        gameState.user.xp += 50; 
+        saveGame();
+        if(typeof renderDailyTasks === 'function') renderDailyTasks();
+        if(typeof updateShopUI === 'function') updateShopUI();
+        if(typeof updateUserDisplay === 'function') updateUserDisplay();
+        alert(`領取成功！獲得 ${config.reward} 金幣！`);
+        playSFX('coin');
+    }
+};
+
+window.resetChapterSelectionUI = function() {
+    if(typeof pendingSingleChapterKey !== 'undefined') pendingSingleChapterKey = null;
+    const titleEl = document.getElementById("singleSelectedTitle");
+    if(titleEl) {
+        titleEl.innerText = "--";
+        titleEl.style.color = "var(--primary-blue)";
+    }
+    document.querySelectorAll(".chapter-btn.active").forEach(btn => btn.classList.remove("active"));
+    
+    if(gameState) {
+        gameState.mixSelectedKeys = [];
+        const mixCountEl = document.getElementById("mixCount");
+        if(mixCountEl) mixCountEl.innerText = "已選：0";
+        document.querySelectorAll(".mix-item input").forEach(chk => chk.checked = false);
+        document.querySelectorAll(".mix-item.active").forEach(div => div.classList.remove("active"));
+    }
+};
 
 let backupGameState = null;
 let devModeActive = false;

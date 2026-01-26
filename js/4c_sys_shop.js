@@ -184,10 +184,21 @@ function buyItem(itemId, price) {
     const targetItem = MASTER_ITEMS.find(i => i.id === itemId);
     if(!targetItem) return;
 
+    // 檢查背包空間
+    const existing = gameState.inventory.find(i => i.id === itemId);
+    
+    // 如果是新物品（背包內沒有），則需要檢查格數
+    if (!existing) {
+        const currentSlots = gameState.inventory.length;
+        const maxSlots = gameState.user.inventorySlots || 5;
+        if (currentSlots >= maxSlots) {
+            return alert("背包空間不足！請清理或擴充背包！");
+        }
+    }
+
     currentBuyItem = { ...targetItem, price: price };
     
     const maxAfford = Math.floor(gameState.user.coins / price);
-    const existing = gameState.inventory.find(i => i.id === itemId);
     const currentCount = existing ? existing.count : 0;
     const maxSpace = 99 - currentCount;
     const maxBuy = Math.min(maxAfford, maxSpace);

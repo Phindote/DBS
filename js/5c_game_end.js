@@ -225,6 +225,15 @@ function endGame() {
     }
     
     tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
+
+    // 修改此處：重置選單並跳轉
+    const btnContainer = document.querySelector("#screen-result > div[style*='display:flex']");
+    if(btnContainer) {
+        btnContainer.innerHTML = `
+            <button class="btn-main" style="background:var(--primary-red); flex:1; margin:0;" onclick="resetChapterSelectionUI(); backToChapterSelection()">繼續挑戰！</button>
+            <button class="btn-main" style="background:#7f8c8d; flex:1; margin:0;" onclick="backToMenuFromEnd()">返回主目錄</button>
+        `;
+    }
 }
 
 function backToMenuFromEnd() {
