@@ -177,7 +177,31 @@ function showDragonSeal() {
             if(isUnlocked && gameState.collectionDates[ach.id]) {
                 status += `\n時間：${getFormattedDate(gameState.collectionDates[ach.id])}`;
             }
-            alert(`【${ach.title}】\n\n條件：${ach.desc}\n狀態：${status}`);
+            
+            const modal = document.getElementById('system-modal');
+            const titleEl = document.getElementById('sys-modal-title');
+            const headerEl = document.getElementById('sys-modal-header');
+            const msgEl = document.getElementById('sys-modal-msg');
+            const inputEl = document.getElementById('sys-modal-input');
+            const btnOk = document.getElementById('sys-btn-ok');
+            const btnCancel = document.getElementById('sys-btn-cancel');
+
+            titleEl.innerText = ach.title;
+            headerEl.style.background = '#f1c40f';
+            msgEl.innerHTML = `條件：${ach.desc}<br>狀態：${status}`.replace(/\n/g, '<br>');
+            
+            modal.style.display = 'flex';
+            inputEl.style.display = 'none';
+            btnCancel.style.display = 'none';
+            
+            btnOk.style.display = 'block';
+            btnOk.style.background = '#f1c40f';
+            btnOk.innerText = '確定';
+            
+            btnOk.onclick = () => {
+                modal.style.display = 'none';
+                btnOk.onclick = null;
+            };
         };
         container.appendChild(card);
     });

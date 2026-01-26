@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     手速太快了！放慢一點！
                 </div>
                 <div style="display:flex; justify-content:center; align-items:center; padding-bottom:25px; width:100%;">
-                    <button class="btn-main" style="background:#e74c3c; color:white; margin:0; width:auto; padding:10px 40px; border-radius:50px; box-shadow:none; display:flex; justify-content:center; align-items:center;" onclick="document.getElementById('spamModal').style.display='none'">我知道了</button>
+                    <button class="btn-main" style="background:#e74c3c; color:white; margin:0; padding:10px 30px; border-radius:30px; box-shadow:none;" onclick="document.getElementById('spamModal').style.display='none'">我知道了</button>
                 </div>
             </div>
         `;
@@ -340,7 +340,8 @@ function showSystemModal(type, msg, placeholder = "") {
             headerEl.style.background = '#e74c3c';
             inputEl.style.display = 'none';
             
-            btnContainer.insertBefore(btnOk, btnCancel);
+            btnContainer.appendChild(btnOk);
+            btnContainer.appendChild(btnCancel);
             
             btnCancel.style.display = 'block';
             btnOk.style.background = '#e74c3c';
@@ -362,7 +363,8 @@ function showSystemModal(type, msg, placeholder = "") {
             inputEl.placeholder = placeholder;
             btnCancel.style.display = 'block';
             
-            btnContainer.insertBefore(btnCancel, btnOk);
+            btnContainer.appendChild(btnOk);
+            btnContainer.appendChild(btnCancel);
             
             btnOk.innerText = '提交';
             btnOk.style.background = 'var(--primary-blue)';

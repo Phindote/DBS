@@ -410,6 +410,7 @@ function checkAnswer(userAns, btnElement) {
 
 async function goHome() {
     if(await confirm("確定要逃跑嗎？這將視為戰敗！")) {
+         updateUserDisplay();
          resetMenu();
          switchScreen('screen-menu');
     }

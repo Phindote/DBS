@@ -196,3 +196,37 @@ function closeHelp() {
     document.getElementById("helpModal").style.display = "none";
     updateCoreButtonVisibility();
 }
+
+function backToChapterSelection() {
+    gameState.currentIndex = 0;
+    gameState.wrongCount = 0;
+    gameState.history = [];
+    
+    // 重置選擇狀態
+    if (pendingSingleChapterKey) {
+        pendingSingleChapterKey = null;
+        document.getElementById("singleSelectedTitle").innerText = "--";
+        const btns = document.querySelectorAll(".chapter-btn");
+        btns.forEach(b => b.classList.remove("active"));
+    }
+    
+    if (gameState.mixSelectedKeys && gameState.mixSelectedKeys.length > 0) {
+        gameState.mixSelectedKeys = [];
+        document.getElementById("mixCount").innerText = "已選：0";
+        const checkboxes = document.querySelectorAll(".mix-checkbox");
+        checkboxes.forEach(c => {
+            c.checked = false;
+            c.parentNode.classList.remove("active");
+        });
+    }
+
+    resetMenu();
+    switchScreen("screen-menu");
+    
+    // 如果是從單人模式回來，重新打開單人選單
+    if (gameState.mode === 'single') {
+        showSubMenu('single');
+    } else if (gameState.mode === 'mix') {
+        showSubMenu('mix');
+    }
+}
