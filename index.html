@@ -443,8 +443,8 @@
 <div class="modal-body" style="text-align:center;">
 <p>確定要進行熔煉嗎？<br>原材料將會消耗。</p>
 <div style="display:flex; justify-content:center; gap:10px;">
-<button class="btn-secondary" style="background:#8e44ad; color:white;" onclick="executeSmelt()">確定</button>
-<button class="btn-secondary" style="background:#95a5a6; color:white;" onclick="document.getElementById('smeltConfirmModal').style.display='none'">取消</button>
+<button class="btn-main" style="background:#8e44ad; flex:1; margin:0;" onclick="executeSmelt()">確定</button>
+<button class="btn-main" style="background:#95a5a6; flex:1; margin:0;" onclick="document.getElementById('smeltConfirmModal').style.display='none'">取消</button>
 </div>
 </div>
 </div>
@@ -481,8 +481,8 @@
 <input type="text" id="sys-modal-input" class="form-input" style="margin-top:15px; display:none; text-align:center;" autocomplete="off">
 </div>
 <div style="padding:15px; background:#f9f9f9; display:flex; gap:10px; justify-content:center;">
-<button id="sys-btn-cancel" class="btn-secondary" style="flex:1; display:none;">取消</button>
-<button id="sys-btn-ok" class="btn-main" style="margin:0; flex:1; font-size:1rem; padding:10px;">確定</button>
+<button id="sys-btn-ok" class="btn-main" style="margin:0; flex:1; width:50%;">確定</button>
+<button id="sys-btn-cancel" class="btn-main" style="margin:0; flex:1; width:50%; background:#95a5a6; display:none;">取消</button>
 </div>
 </div>
 </div>
