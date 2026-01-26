@@ -408,8 +408,8 @@ function checkAnswer(userAns, btnElement) {
     }
 }
 
-function goHome() {
-    if(confirm("確定要逃跑嗎？這將視為戰敗！")) {
+async function goHome() {
+    if(await confirm("確定要逃跑嗎？這將視為戰敗！")) {
          resetMenu();
          switchScreen('screen-menu');
     }

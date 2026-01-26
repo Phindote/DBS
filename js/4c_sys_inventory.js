@@ -193,9 +193,9 @@ function renderInventoryItem(container, item, realIndex) {
     container.appendChild(card);
 }
 
-function buyInventorySlot() {
+async function buyInventorySlot() {
     const cost = 50;
-    if (confirm(`是否花費 ${cost} 金幣擴充 1 個背包欄位？`)) {
+    if (await confirm(`是否花費 ${cost} 金幣擴充 1 個背包欄位？`)) {
         if (gameState.user.coins < cost) {
             alert("金幣不足！");
             return;

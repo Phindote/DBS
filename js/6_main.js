@@ -293,10 +293,14 @@ function showSystemModal(type, msg, placeholder = "") {
         const inputEl = document.getElementById('sys-modal-input');
         const btnOk = document.getElementById('sys-btn-ok');
         const btnCancel = document.getElementById('sys-btn-cancel');
+        const btnContainer = btnOk.parentNode;
 
         msgEl.innerHTML = msg.replace(/\n/g, '<br>');
         modal.style.display = 'flex';
         inputEl.value = '';
+        
+        btnOk.style.display = 'block';
+        btnCancel.style.display = 'none';
 
         const cleanup = () => {
             btnOk.onclick = null;
@@ -304,10 +308,26 @@ function showSystemModal(type, msg, placeholder = "") {
             inputEl.onkeydown = null;
             modal.style.display = 'none';
         };
+        
+        const warningKeywords = [
+            "請輸入姓名", "時空秩序", "精力已耗盡", "系統公告", 
+            "請至少選擇", "篇章數量不足", "浩然之氣不足", "該模式暫無", 
+            "金幣不足", "該物品已達上限", "請最少放入", "合成失敗", 
+            "無效的數量", "溫習時間不足", "密碼錯誤", "記憶正在清除"
+        ];
+        
+        const isWarning = warningKeywords.some(keyword => msg.includes(keyword));
 
         if (type === 'alert') {
-            titleEl.innerText = '系統提示';
-            headerEl.style.background = 'var(--primary-blue)';
+            if (isWarning) {
+                titleEl.innerText = '系統警告';
+                headerEl.style.background = '#e74c3c';
+                btnOk.style.background = '#e74c3c';
+            } else {
+                titleEl.innerText = '系統提示';
+                headerEl.style.background = 'var(--primary-blue)';
+                btnOk.style.background = 'var(--primary-blue)';
+            }
             inputEl.style.display = 'none';
             btnCancel.style.display = 'none';
             btnOk.innerText = '確定';
@@ -319,8 +339,14 @@ function showSystemModal(type, msg, placeholder = "") {
             titleEl.innerText = '系統確認';
             headerEl.style.background = '#e74c3c';
             inputEl.style.display = 'none';
+            
+            btnContainer.insertBefore(btnOk, btnCancel);
+            
             btnCancel.style.display = 'block';
-            btnOk.innerText = '確定';
+            btnOk.style.background = '#e74c3c';
+            btnOk.innerText = '確認';
+            btnCancel.innerText = '取消';
+            
             btnOk.onclick = () => {
                 cleanup();
                 resolve(true);
@@ -335,7 +361,11 @@ function showSystemModal(type, msg, placeholder = "") {
             inputEl.style.display = 'block';
             inputEl.placeholder = placeholder;
             btnCancel.style.display = 'block';
+            
+            btnContainer.insertBefore(btnCancel, btnOk);
+            
             btnOk.innerText = '提交';
+            btnOk.style.background = 'var(--primary-blue)';
             
             setTimeout(() => inputEl.focus(), 100);
 
