@@ -409,7 +409,7 @@ function checkAnswer(userAns, btnElement) {
 }
 
 function goHome() {
-    if(confirm("確定要放棄當前戰鬥並返回主目錄嗎？")) {
+    if(confirm("確定要逃跑嗎？這將視為戰敗！")) {
          resetMenu();
          switchScreen('screen-menu');
     }

@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     
-    setInterval(() => {
+    setInterval(async () => {
         if(typeof triggerDrop === 'function') {
             triggerDrop('ON_PLAY_TIME_10MIN');
             
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gameState.dailyPlayTime = (gameState.dailyPlayTime || 0) + 1;
             if (gameState.dailyPlayTime >= 180) {
                 saveGame();
-                alert("【系統公告】\n\n勇者啊，你今日的修煉時間已達上限（180分鐘）。\n休息是為了走更長遠的路，請放下執念，明日再來！");
+                await window.alert("【系統公告】\n\n勇者啊，你今日的修煉時間已達上限（180分鐘）。\n休息是為了走更長遠的路，請放下執念，明日再來！");
                 location.reload();
             } else {
                 saveGame();
@@ -284,13 +284,90 @@ function initDraggableMenu() {
     });
 }
 
-function handleFooterClick() {
+function showSystemModal(type, msg, placeholder = "") {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('system-modal');
+        const titleEl = document.getElementById('sys-modal-title');
+        const headerEl = document.getElementById('sys-modal-header');
+        const msgEl = document.getElementById('sys-modal-msg');
+        const inputEl = document.getElementById('sys-modal-input');
+        const btnOk = document.getElementById('sys-btn-ok');
+        const btnCancel = document.getElementById('sys-btn-cancel');
+
+        msgEl.innerHTML = msg.replace(/\n/g, '<br>');
+        modal.style.display = 'flex';
+        inputEl.value = '';
+
+        const cleanup = () => {
+            btnOk.onclick = null;
+            btnCancel.onclick = null;
+            inputEl.onkeydown = null;
+            modal.style.display = 'none';
+        };
+
+        if (type === 'alert') {
+            titleEl.innerText = '系統提示';
+            headerEl.style.background = 'var(--primary-blue)';
+            inputEl.style.display = 'none';
+            btnCancel.style.display = 'none';
+            btnOk.innerText = '確定';
+            btnOk.onclick = () => {
+                cleanup();
+                resolve(true);
+            };
+        } else if (type === 'confirm') {
+            titleEl.innerText = '系統確認';
+            headerEl.style.background = '#e74c3c';
+            inputEl.style.display = 'none';
+            btnCancel.style.display = 'block';
+            btnOk.innerText = '確定';
+            btnOk.onclick = () => {
+                cleanup();
+                resolve(true);
+            };
+            btnCancel.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+        } else if (type === 'prompt') {
+            titleEl.innerText = '系統輸入';
+            headerEl.style.background = '#f1c40f';
+            inputEl.style.display = 'block';
+            inputEl.placeholder = placeholder;
+            btnCancel.style.display = 'block';
+            btnOk.innerText = '提交';
+            
+            setTimeout(() => inputEl.focus(), 100);
+
+            const submit = () => {
+                const val = inputEl.value;
+                cleanup();
+                resolve(val);
+            };
+
+            btnOk.onclick = submit;
+            btnCancel.onclick = () => {
+                cleanup();
+                resolve(null);
+            };
+            inputEl.onkeydown = (e) => {
+                if(e.key === 'Enter') submit();
+            };
+        }
+    });
+}
+
+window.alert = (msg) => showSystemModal('alert', msg);
+window.confirm = (msg) => showSystemModal('confirm', msg);
+window.prompt = (msg, placeholder) => showSystemModal('prompt', msg, placeholder);
+
+async function handleFooterClick() {
     if (!document.getElementById('screen-login').classList.contains('active')) return;
 
     if (!window.footerClickCount) window.footerClickCount = 0;
     window.footerClickCount++;
     if (window.footerClickCount === 5) {
-        const pass = prompt("請輸入開發者密碼：");
+        const pass = await window.prompt("請輸入開發者密碼：");
         
         if (pass === null) {
             window.footerClickCount = 0;
@@ -300,18 +377,20 @@ function handleFooterClick() {
         if (pass === "DBS_Chinese") {
             initGodMode();
         } else if (pass === "Clear") {
-            if(confirm("警告：此操作將回到重生的一刻！你確定嗎？")) {
+            const confirmed = await window.confirm("警告：此操作將回到重生的一刻！你確定嗎？");
+            if(confirmed) {
                 localStorage.removeItem("dbs_dragon_save_v3");
-                alert("記憶正在清除⋯⋯");
+                await window.alert("記憶正在清除⋯⋯");
                 location.reload();
             }
         } else {
-            alert("密碼錯誤");
+            await window.alert("密碼錯誤");
         }
         window.footerClickCount = 0;
     }
     if (window.godModeActive && window.footerClickCount === 3) {
-        if(confirm("是否關閉上帝模式並變回凡人？")) {
+        const confirmed = await window.confirm("是否關閉上帝模式並變回凡人？");
+        if(confirmed) {
             revertGodMode();
         }
         window.footerClickCount = 0;
@@ -321,7 +400,7 @@ function handleFooterClick() {
 let backupGameState = null;
 let devModeActive = false;
 
-function initGodMode() {
+async function initGodMode() {
     if(window.godModeActive) return;
     if(!backupGameState) {
         backupGameState = JSON.parse(JSON.stringify(gameState));
@@ -397,10 +476,10 @@ function initGodMode() {
 
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
-    alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，防作弊及防沉迷限制已解除，全物品及寵物已解鎖！");
+    await window.alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，防作弊及防沉迷限制已解除，全物品及寵物已解鎖！");
 }
 
-function revertGodMode() {
+async function revertGodMode() {
     if(backupGameState) {
         gameState = JSON.parse(JSON.stringify(backupGameState));
         devModeActive = false;
@@ -410,6 +489,6 @@ function revertGodMode() {
         updateUserDisplay();
         updateBars();
         if(typeof renderDailyTasks === 'function') renderDailyTasks();
-        alert("已還原至凡人狀態。");
+        await window.alert("已還原至凡人狀態。");
     }
 }

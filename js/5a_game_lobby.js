@@ -125,10 +125,3 @@ function confirmMixMode() {
     });
     initGame('mix');
 }
-
-function goHome() {
-    if(confirm("確定要逃跑嗎？這將視為戰敗！")) {
-        switchScreen("screen-menu");
-        updateUserDisplay(); 
-    }
-}
