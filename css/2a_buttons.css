@@ -183,7 +183,34 @@
     pointer-events: auto;
     -webkit-tap-highlight-color: transparent;
     outline: none;
+    border-radius: 50%;
 }
+#radialMainBtn:active {
+    background-color: rgba(0,0,0,0.1);
+}
+
+#floatingMainBtn {
+    width: 70px;
+    height: 70px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    border-radius: 50%;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.4));
+}
+#floatingMainBtn:active {
+    background-color: rgba(0,0,0,0.1);
+}
+#floatingMainBtn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
 #radialMainBtn img { width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2; }
 
 .stack-btn {
