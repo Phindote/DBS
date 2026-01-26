@@ -37,7 +37,6 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
     const lastTime = gameState.chapterLastPlayed && gameState.chapterLastPlayed[key];
     const timeStr = lastTime ? getFormattedDate(lastTime) : "尚未挑戰";
 
-    // 格式優化：換行顯示
     if (key === 'mix') {
         statsHTML = `
             <span class="stat-badge stat-jr">特殊挑戰</span>
@@ -114,7 +113,6 @@ function closeContentModal() {
         gameState.stats.totalStudyMins += minutes;
         gameState.stats.energyRecovered += earned;
         
-        // 檢查 ach_34 (剛好1分鐘)
         if (minutes === 1 && !gameState.unlockedAchievements.includes("ach_34")) {
             gameState.unlockedAchievements.push("ach_34");
             if(!gameState.collectionDates["ach_34"]) gameState.collectionDates["ach_34"] = new Date().getTime();
@@ -161,7 +159,7 @@ function showDragonSeal() {
         if(isUnlocked) {
             const date = gameState.collectionDates[ach.id];
             const dateStr = date ? getFormattedDate(date) : "舊有記錄";
-            // 格式優化：換行顯示
+
             dateHTML = `
             <span class="stat-badge stat-ach-date">
                 <div>獲得時間：</div>

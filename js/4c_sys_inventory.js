@@ -15,7 +15,8 @@ const RARITY_COLORS = {
 function renderShopSmelt() {
     const container = document.getElementById("shopContentArea");
     container.innerHTML = `
-        <div class="smelt-grid-container" id="smeltContainer" style="margin-top:10px;"></div>
+        <div style="width:100%; text-align:center; color:#888; font-size:0.6rem; margin-bottom:5px; white-space:nowrap;">※ 熔煉成功機率：普通 60% | 精良 70% | 稀有 80% | 史詩 90% | 傳說 100%</div>
+        <div class="smelt-grid-container" id="smeltContainer" style="margin-top:5px;"></div>
         <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
             <button class="btn-main" style="margin:0; background:#8e44ad; color:white;" onclick="showRecipes()">合成公式</button>
             <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
@@ -329,9 +330,24 @@ function executeSmelt() {
         if (item.recipe) {
             const recipeIds = [...item.recipe].sort();
             if (JSON.stringify(inputIds) === JSON.stringify(recipeIds)) {
-                resultItem = item;
-                isAsh = false;
-                if (item.type === 'pet') isPet = true;
+                
+                const successRates = {
+                    "T0": 1.0,
+                    "T1": 0.9,
+                    "T2": 0.8,
+                    "T3": 0.7,
+                    "T4": 0.6,
+                    "SP": 1.0
+                };
+                
+                const rate = successRates[item.rarity] !== undefined ? successRates[item.rarity] : 1.0;
+                
+                if (Math.random() <= rate) {
+                    resultItem = item;
+                    isAsh = false;
+                    if (item.type === 'pet') isPet = true;
+                }
+                
                 break;
             }
         }
@@ -344,7 +360,6 @@ function executeSmelt() {
     if (isPet) {
         if (!gameState.pets.includes(resultItem.id)) {
             gameState.pets.push(resultItem.id);
-            // Record unlock time
             if(!gameState.collectionDates) gameState.collectionDates = {};
             gameState.collectionDates[resultItem.id] = new Date().getTime();
             

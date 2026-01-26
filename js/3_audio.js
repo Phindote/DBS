@@ -44,6 +44,18 @@ let isMusicOn = true;
 let isSFXEnabled = true;
 let currentBGM = null;
 
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        if (currentBGM) {
+            currentBGM.pause();
+        }
+    } else {
+        if (isMusicOn && currentBGM) {
+            currentBGM.play().catch(e => {});
+        }
+    }
+});
+
 function toggleMusic() {
     isMusicOn = !isMusicOn;
     const btn = document.getElementById('btnBGM');
