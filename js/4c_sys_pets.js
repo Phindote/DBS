@@ -57,7 +57,7 @@ function showPetDetail(pet, unlocked = true) {
 
     const imgSrc = unlocked ? `images/items/${pet.img}` : `images/items/pet_unknown.PNG`;
     const nameStr = unlocked ? pet.name : "未獲得";
-    const descStr = unlocked ? pet.desc : "???";
+    const descStr = unlocked ? pet.desc : "努力找尋你的靈獸伙伴吧！";
     
     let dateInfo = "";
     if(unlocked && gameState.collectionDates[pet.id]) {

@@ -188,9 +188,9 @@ function endGame() {
 
     let tipText = "超過一半題目曾經答錯或同一道題目答錯超過兩次，也算戰敗喔！";
     if (isPerfect) {
-        tipText = "努力保持這種水準，答案一擊即中就是完美！";
+        tipText = "努力保持這種水準，一擊即中就是完美！金幣獎勵也會翻倍喔！";
     } else if (!isFail) {
-        tipText = "假如曾經答錯，也不算完美喔！繼續加油！";
+        tipText = "假如曾經答錯，也不算完美喔！請繼續加油！";
     }
 
     const resultContainer = document.getElementById("screen-result");
@@ -226,7 +226,6 @@ function endGame() {
     
     tableContainer.parentNode.insertBefore(tipDiv, tableContainer.nextSibling);
 
-    // 修改此處：重置選單並跳轉
     const btnContainer = document.querySelector("#screen-result > div[style*='display:flex']");
     if(btnContainer) {
         btnContainer.innerHTML = `

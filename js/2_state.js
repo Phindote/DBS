@@ -6,7 +6,7 @@ let gameState = {
     stats: {
         totalCorrect: 0, srCorrect: 0, consecutivePerfect: 0,
         mixWinCount: 0, mixWinCount5: 0, mixWinCount10: 0, mixWinCount16: 0, mixPerfect16: 0, randomWinCount: 0,
-        totalStudyMins: 0, energyRecovered: 0, totalPlayTime: 0, tryCount: 0, wrongCountTotal: 0,
+        totalStudyMins: 0, energyRecovered: 0, totalPlayTime: 0, tryCount: 0, wrongCountTotal: 0, totalClicks: 0,
         perfectHistory: [], perfectChapterIds: [], perfectFullHpChapterIds: [], lastPerfectChapter: ""
     },
     inventory: [],
@@ -91,7 +91,7 @@ function applyGameData(parsed) {
     gameState.stats = parsed.stats || {};
     ['totalCorrect', 'srCorrect', 'consecutivePerfect', 'mixWinCount', 'mixWinCount5',
      'mixWinCount10', 'mixWinCount16', 'mixPerfect16', 'randomWinCount', 'totalStudyMins',
-     'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal'].forEach(key => {
+     'energyRecovered', 'totalPlayTime', 'tryCount', 'wrongCountTotal', 'totalClicks'].forEach(key => {
         if (typeof gameState.stats[key] === 'undefined') gameState.stats[key] = 0;
     });
 

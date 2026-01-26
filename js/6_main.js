@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
         spamModal.style.zIndex = "99999";
         spamModal.innerHTML = `
             <div class="modal-content" style="max-width:300px; text-align:center;">
-                <div class="modal-header" style="background:#e74c3c; color:white; justify-content:center;">⚠️ 警告</div>
+                <div class="modal-header" style="background:#e74c3c; color:white; justify-content:center;">⚠️ 系統警告</div>
                 <div class="modal-body" style="padding:20px; font-weight:bold; font-size:1.1rem; color:#2c3e50;">
                     手速太快了！放慢一點！
                 </div>
@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
             gameState.dailyPlayTime = (gameState.dailyPlayTime || 0) + 1;
             if (gameState.dailyPlayTime >= 180) {
                 saveGame();
-                await window.alert("【系統公告】\n\n勇者啊，你今日的修煉時間已達上限（180分鐘）。\n休息是為了走更長遠的路，請放下執念，明日再來！");
+                await window.alert("【系統公告】\n\n勇者啊，你今日的修煉時間已達上限（180分鐘）。\n休息是為了走更長遠的路，明日再來吧！");
                 location.reload();
             } else {
                 saveGame();
@@ -99,6 +99,52 @@ let clickSpamTimer = null;
 document.addEventListener('click', (e) => {
     const spamModal = document.getElementById("spamModal");
     if(spamModal && spamModal.style.display === "flex") return;
+    
+    if (gameState && gameState.stats) {
+        gameState.stats.totalClicks = (gameState.stats.totalClicks || 0) + 1;
+        if (gameState.stats.totalClicks === 10001 && !gameState.pets.includes('pet_002')) {
+            gameState.pets.push('pet_002');
+            gameState.collectionDates['pet_002'] = new Date().getTime();
+            saveGame();
+            
+            const modal = document.getElementById('system-modal');
+            if (modal) {
+                const titleEl = document.getElementById('sys-modal-title');
+                const headerEl = document.getElementById('sys-modal-header');
+                const msgEl = document.getElementById('sys-modal-msg');
+                const btnOk = document.getElementById('sys-btn-ok');
+                const btnCancel = document.getElementById('sys-btn-cancel');
+                const inputEl = document.getElementById('sys-modal-input');
+
+                if (titleEl) titleEl.innerText = "特殊獎勵";
+                if (headerEl) {
+                    headerEl.style.background = "#8e44ad";
+                    headerEl.style.color = "white";
+                }
+                if (msgEl) {
+                    msgEl.innerHTML = `
+                        <div style="font-weight:bold; color:#2c3e50; margin-bottom:10px;">青鳥</div>
+                        <img src="images/items/pet_002.PNG" style="width:100px; height:100px; object-fit:contain; margin:10px 0;" onerror="this.src='images/ui/icon_core.PNG'">
+                        <div style="font-size:0.9rem; color:#8e44ad; margin-top:5px;">這是你點擊 10,001 次的獎勵！</div>
+                    `;
+                }
+                
+                if (inputEl) inputEl.style.display = 'none';
+                if (btnCancel) btnCancel.style.display = 'none';
+                if (btnOk) {
+                    btnOk.style.display = 'block';
+                    btnOk.style.background = "#8e44ad";
+                    btnOk.style.color = "white";
+                    btnOk.innerText = '收下';
+                    btnOk.onclick = () => {
+                        modal.style.display = 'none';
+                    };
+                }
+                modal.style.display = 'flex';
+                playSFX('success');
+            }
+        }
+    }
 
     clickSpamCount++;
     clearTimeout(clickSpamTimer);
@@ -322,10 +368,10 @@ function showSystemModal(type, msg, placeholder = "") {
         if (type === 'alert') {
             if (isClaim) {
                 titleEl.innerText = '系統提示';
-                headerEl.style.background = '#f9f6e6';
-                headerEl.style.color = '#5d4037'; 
-                btnOk.style.background = '#f9f6e6';
-                btnOk.style.color = '#5d4037';
+                headerEl.style.background = '#ffd700';
+                headerEl.style.color = '#ffffff'; 
+                btnOk.style.background = '#ffd700';
+                btnOk.style.color = '#ffffff';
             } else if (isWarning) {
                 titleEl.innerText = '系統警告';
                 headerEl.style.background = '#e74c3c';
@@ -414,7 +460,7 @@ async function handleFooterClick() {
     if (!window.footerClickCount) window.footerClickCount = 0;
     window.footerClickCount++;
     if (window.footerClickCount === 5) {
-        const pass = await window.prompt("請輸入開發者密碼：");
+        const pass = await window.prompt("請輸入異世界密鑰：");
         
         if (pass === null) {
             window.footerClickCount = 0;
@@ -441,7 +487,7 @@ async function handleFooterClick() {
         window.footerClickCount = 0;
     }
     if (window.godModeActive && window.footerClickCount === 3) {
-        const confirmed = await window.confirm("是否關閉上帝模式並變回凡人？");
+        const confirmed = await window.confirm("是否關閉超級模式並變回凡人？");
         if(confirmed) {
             revertGodMode();
         }
@@ -568,7 +614,7 @@ async function initGodMode() {
 
     updateLevel();
     if(typeof renderDailyTasks === 'function') renderDailyTasks();
-    await window.alert("⚡ 上帝模式已啟動 ⚡\n所有能力、金幣已全滿，防作弊及防沉迷限制已解除，全物品及寵物已解鎖！");
+    await window.alert("⚡ 超級模式已啟動 ⚡");
 }
 
 async function revertGodMode() {

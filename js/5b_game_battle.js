@@ -367,7 +367,7 @@ function checkAnswer(userAns, btnElement) {
         }
 
         if (gameState.currentAttempts >= 3) {
-            document.getElementById("msgBox").innerText = "多次嘗試失敗... 跳過此題";
+            document.getElementById("msgBox").innerText = "多次嘗試失敗⋯⋯跳過此題";
             document.getElementById("msgBox").style.color = "var(--primary-red)";
             
             if (gameState.difficulty === 'junior' && btnElement) {

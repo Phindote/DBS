@@ -1,7 +1,7 @@
 let currentSmeltSlotIndex = -1;
 let currentSmeltFilter = 'all';
 let currentRecipePage = 0;
-const RECIPE_RARITY_ORDER = ["T4", "T3", "T2", "T1", "T0"];
+const RECIPE_RARITY_ORDER = ["T4", "T3", "T2", "T1", "T0", "PET"];
 
 const RARITY_COLORS = {
     'T4': '#333333',
@@ -9,7 +9,8 @@ const RARITY_COLORS = {
     'T2': '#3498db',
     'T1': '#8e44ad',
     'T0': '#f1c40f',
-    'SP': '#f1c40f'
+    'SP': '#f1c40f',
+    'PET': '#ff954f'
 };
 
 function renderShopSmelt() {
@@ -400,15 +401,23 @@ function renderRecipePage() {
     body.scrollTop = 0;
     body.innerHTML = "";
     
-    const rarity = RECIPE_RARITY_ORDER[currentRecipePage];
-    const items = MASTER_ITEMS.filter(i => i.rarity === rarity && i.recipe);
+    const key = RECIPE_RARITY_ORDER[currentRecipePage];
+    let items = [];
+    let displayTitle = "";
+    let displayColor = RARITY_COLORS[key] || '#333';
+
+    if (key === 'PET') {
+        items = MASTER_ITEMS.filter(i => i.type === 'pet' && i.recipe);
+        displayTitle = "【龍魄靈獸】";
+    } else {
+        items = MASTER_ITEMS.filter(i => i.rarity === key && i.recipe);
+        displayTitle = RARITY_MAP[key];
+    }
     
     const pageTitle = document.createElement("div");
     
-    const rarityColor = RARITY_COLORS[rarity] || '#333';
-    
-    pageTitle.style.cssText = `text-align:center; font-size:1.5rem; color:${rarityColor}; margin:10px 0 20px 0; font-weight:bold;`;
-    pageTitle.innerText = RARITY_MAP[rarity];
+    pageTitle.style.cssText = `text-align:center; font-size:1.5rem; color:${displayColor}; margin:10px 0 20px 0; font-weight:bold;`;
+    pageTitle.innerText = displayTitle;
     body.appendChild(pageTitle);
 
     if (items.length === 0) {

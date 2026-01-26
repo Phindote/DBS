@@ -76,7 +76,6 @@ function updateCoreButtonVisibility() {
 }
 
 function switchScreen(id) {
-    // 1. 切換畫面顯示狀態
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const target = document.getElementById(id);
     if(target) target.classList.add('active');
@@ -84,22 +83,18 @@ function switchScreen(id) {
     if (id === 'screen-menu') {
         smeltSlots = [null, null, null, null];
     }
-
-    // 2. 更新按鈕顯示
     updateCoreButtonVisibility();
 
-    // 3. 特殊畫面處理 (不干涉音樂)
     if (id === 'screen-game') {
         if(typeof resizeCanvas === 'function') resizeCanvas();
         updateBars();
-        return; // 戰鬥音樂由 initGame 控制，這裡直接返回
+        return; 
     }
     
     if (id === 'screen-result') {
-        return; // 結算音樂由 endGame 控制，這裡直接返回，避免覆蓋
+        return; 
     }
 
-    // 4. 一般畫面音樂切換邏輯 (確保 playMusic 存在才執行)
     if (typeof playMusic === 'function') {
         if (id === 'screen-daily') playMusic('bgm_daily');
         else if (id === 'screen-shop') playMusic('bgm_store');
@@ -109,7 +104,7 @@ function switchScreen(id) {
         else if (id === 'screen-pokedex') playMusic('bgm_pokedex');
         else if (id === 'screen-achievements') playMusic('bgm_achievements');
         else {
-            // 其他所有畫面 (Menu, Login, Difficulty, SubMenu) 都播放主題曲
+            
             playMusic('theme');
         }
     }
