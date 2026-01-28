@@ -21,7 +21,8 @@
     margin-bottom: 8px;
     font-weight: bold;
     color: var(--primary-blue);
-    text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    -webkit-text-stroke: 1px white;
+    paint-order: stroke fill;
     font-size: 1.1rem;
 }
 .form-input {
@@ -219,16 +220,18 @@ select.form-input {
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 110%; height: 110%;
+    width: 120%;
+    height: 120%;
     border-radius: 50%;
-    background: rgba(52, 152, 219, 0.2);
+    background: rgba(231, 76, 60, 0.2);
     z-index: 1;
-    animation: softPulse 3s infinite;
+    animation: softPulse 2s infinite;
+    pointer-events: none;
 }
 @keyframes softPulse {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
-    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.1; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
+    50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.2; }
+    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.6; }
 }
 
 .stack-item {
@@ -337,10 +340,9 @@ select.form-input {
     justify-content: center;
 }
 
-/* 修正龍圖片遮擋：增加上方內距 */
 #screen-game .boss-area {
     margin-top: auto;
-    padding-top: 50px; /* 強制向下推，解決遮擋 */
+    padding-top: 50px; 
     overflow: visible;
     z-index: 10;
 }
@@ -385,7 +387,7 @@ select.form-input {
     font-size: 0.55rem;
     font-weight: bold;
     line-height: 26px;
-    color: white; /* 預設白色 */
+    color: white; 
     box-sizing: border-box;
 }
 .q-stat-seg {
@@ -397,7 +399,6 @@ select.form-input {
     align-items: center;
     justify-content: center;
 }
-/* 顏色修正 */
 .q-stat-blue { background: #3498db; border-right: 1px solid rgba(255,255,255,0.2); }
 .q-stat-yellow { background: #f1c40f; color: white; border-right: 1px solid rgba(255,255,255,0.2); }
 .q-stat-red { background: #e74c3c; border-right: 1px solid rgba(255,255,255,0.2); }
@@ -443,7 +444,6 @@ select.form-input {
     text-align: left;
     line-height: 1.3;
 }
-/* 新增：金幣上限警告框 */
 .stat-coin-limit {
     background: #fadbd8;
     color: #c0392b;

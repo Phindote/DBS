@@ -189,8 +189,6 @@
     text-align: center;
     display: none;
     animation: fadeIn 0.3s ease;
-    -webkit-text-stroke: 1px white;
-    paint-order: stroke fill;
 }
 #screen-game {
     display: none;
@@ -528,7 +526,7 @@
     -webkit-text-stroke: 2px white;
     paint-order: stroke fill;
 }
-.sub-menu h3, #singleConfirmArea, #mixCount {
+.sub-menu h3, #singleConfirmArea p, #mixCount {
     -webkit-text-stroke: 1px white;
     paint-order: stroke fill;
 }
