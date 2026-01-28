@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_liuguo"] === 'undefined') {
 }
 
 window.questionsDB["p_liuguo"].title = "《六國論》";
-window.questionsDB["p_liuguo"].img = "dragon_13.jpg";
+window.questionsDB["p_liuguo"].img = "dragon_13.WEBP";
 window.questionsDB["p_liuguo"].content = `六國論 蘇洵
   
  	六國破滅，非兵不利，戰不善，弊在賂秦。賂秦而力虧，破滅之道也。或曰：「六國互喪，率賂秦耶？」曰：「不賂者以賂者喪。」蓋失強援，不能獨完，故曰「弊在賂秦」也。

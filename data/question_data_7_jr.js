@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_lunren"] === 'undefined') {
 }
 
 window.questionsDB["p_lunren"].title = "《論仁、論孝、論君子》";
-window.questionsDB["p_lunren"].img = "dragon_7.jpg";
+window.questionsDB["p_lunren"].img = "dragon_7.WEBP";
 window.questionsDB["p_lunren"].content = `論仁、論孝、論君子 論語
 【論仁】
 （一）子曰：「不仁者，不可以久處約，不可以長處樂。仁者安仁，知者利仁。」(《里仁》第四) 

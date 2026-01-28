@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_fish"] === 'undefined') {
 }
 
 window.questionsDB["p_fish"].title = "《魚我所欲也》";
-window.questionsDB["p_fish"].img = "dragon_8.jpg";
+window.questionsDB["p_fish"].img = "dragon_8.WEBP";
 window.questionsDB["p_fish"].content = `魚我所欲也 孟子
  
 孟子曰：「魚，我所欲也，熊掌，亦我所欲也；二者不可得兼，舍魚而取熊掌者也。生亦我所欲也，義亦我所欲也；二者不可得兼，舍生而取義者也。生亦我所欲，所欲有甚於生者，故不為苟得也；死亦我所惡，所惡有甚於死者，故患有所不辟也。如使人之所欲莫甚於生，則凡可以得生者，何不用也？使人之所惡莫甚於死者，則凡可以辟患者，何不為也？由是則生而有不用也，由是則可以辟患而有不為也，是故所欲有甚於生者，所惡有甚於死者。非獨賢者有是心也，人皆有之，賢者能勿喪耳。

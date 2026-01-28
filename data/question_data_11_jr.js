@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_yueyang"] === 'undefined') {
 }
 
 window.questionsDB["p_yueyang"].title = "《岳陽樓記》";
-window.questionsDB["p_yueyang"].img = "dragon_11.jpg";
+window.questionsDB["p_yueyang"].img = "dragon_11.WEBP";
 window.questionsDB["p_yueyang"].content = `岳陽樓記 范仲淹
   
  	慶曆四年春，滕子京謫守巴陵郡。越明年，政通人和，百廢具興。乃重修岳陽樓，增其舊制，刻唐賢、今人詩賦於其上；屬予作文以記之。

@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_chushi"] === 'undefined') {
 }
 
 window.questionsDB["p_chushi"].title = "《出師表》";
-window.questionsDB["p_chushi"].img = "dragon_14.jpg";
+window.questionsDB["p_chushi"].img = "dragon_14.WEBP";
 window.questionsDB["p_chushi"].content = `出師表  諸葛亮
 
 	先帝創業未半，而中道崩殂；今天下三分，益州疲弊，此誠危急存亡之秋也﹗然侍衞之臣，不懈於內；忠志之士，忘身於外者，蓋追先帝之殊遇，欲報之於陛下也。

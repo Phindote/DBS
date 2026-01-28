@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_denglou"] === 'undefined') {
 }
 
 window.questionsDB["p_denglou"].title = "《登樓》";
-window.questionsDB["p_denglou"].img = "dragon_2.jpg";
+window.questionsDB["p_denglou"].img = "dragon_2.WEBP";
 window.questionsDB["p_denglou"].content = `登樓 杜甫
  
 花近高樓傷客心，萬方多難此登臨。

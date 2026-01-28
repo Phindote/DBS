@@ -6,13 +6,12 @@ if (typeof window.questionsDB === 'undefined') {
     window.questionsDB = {};
 }
 
-// 注意：這裡將 key 改為 p_yuexia 以符合內容，圖片設為 dragon_1.jpg 代表第1關
 if (typeof window.questionsDB["p_yuexia"] === 'undefined') {
     window.questionsDB["p_yuexia"] = {};
 }
 
 window.questionsDB["p_yuexia"].title = "《月下獨酌》";
-window.questionsDB["p_yuexia"].img = "dragon_1.jpg"; 
+window.questionsDB["p_yuexia"].img = "dragon_1.WEBP"; 
 window.questionsDB["p_yuexia"].content = `月下獨酌 (其一) 李白
  
 花間一壺酒，獨酌無相親。

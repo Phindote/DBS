@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_quanxue"] === 'undefined') {
 }
 
 window.questionsDB["p_quanxue"].title = "《勸學》";
-window.questionsDB["p_quanxue"].img = "dragon_9.jpg";
+window.questionsDB["p_quanxue"].img = "dragon_9.WEBP";
 window.questionsDB["p_quanxue"].content = `勸學（節錄） 荀子
 
 君子曰：學不可以已。青，取之於藍，而青於藍；冰，水為之，而寒於水。木直中繩，輮以為輪，其曲中規；雖有槁暴、不復挺者，輮使之然也。故木受繩則直，金就礪則利，君子博學而日參省乎己，則知明而行無過矣。

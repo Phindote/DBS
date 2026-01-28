@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_qingyu"] === 'undefined') {
 }
 
 window.questionsDB["p_qingyu"].title = "《青玉案·元夕》";
-window.questionsDB["p_qingyu"].img = "dragon_6.jpg";
+window.questionsDB["p_qingyu"].img = "dragon_6.WEBP";
 window.questionsDB["p_qingyu"].content = `青玉案·元夕 辛棄疾
 
 東風夜放花千樹，更吹落，星如雨。

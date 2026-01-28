@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_shanju"] === 'undefined') {
 }
 
 window.questionsDB["p_shanju"].title = "《山居秋暝》";
-window.questionsDB["p_shanju"].img = "dragon_3.jpg";
+window.questionsDB["p_shanju"].img = "dragon_3.WEBP";
 window.questionsDB["p_shanju"].content = `山居秋暝  王維
 
 空山新雨後，天氣晚來秋。

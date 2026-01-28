@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_xiaoyao"] === 'undefined') {
 }
 
 window.questionsDB["p_xiaoyao"].title = "《逍遙遊》";
-window.questionsDB["p_xiaoyao"].img = "dragon_16.jpg";
+window.questionsDB["p_xiaoyao"].img = "dragon_16.WEBP";
 window.questionsDB["p_xiaoyao"].content = `逍遙遊 (節錄)   莊子
   
 	惠子謂莊子曰：「魏王貽我大瓠之種，我樹之成而實五石。以盛水漿，其堅不能自舉也。剖之以為瓢，則瓠落無所容。非不呺然大也，吾為其無用而掊之。」莊子曰：「夫子固拙於用大矣！宋人有善為不龜手之藥者，世世以洴澼絖為事。客聞之，請買其方百金。聚族而謀曰：『我世世為洴澼絖，不過數金；今一朝而鬻技百金，請與之。』客得之，以說吳王。越有難，吳王使之將，冬與越人水戰，大敗越人，裂地而封之。能不龜手一也；或以封，或不免於洴澼絖，則所用之異也。今子有五石之瓠，何不慮以為大樽而浮於江湖，而憂其瓠落無所容，則夫子猶有蓬之心也夫！」

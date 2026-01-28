@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_lianpo"] === 'undefined') {
 }
 
 window.questionsDB["p_lianpo"].title = "《廉頗藺相如列傳》";
-window.questionsDB["p_lianpo"].img = "dragon_15.jpg";
+window.questionsDB["p_lianpo"].img = "dragon_15.WEBP";
 window.questionsDB["p_lianpo"].content = `廉頗藺相如列傳（節錄）	司馬遷
 
 廉頗者，趙之良將也。趙惠文王十六年，廉頗為趙將伐齊，大破之，取陽晉，拜為上卿，以勇氣聞於諸侯。藺相如者，趙人也，為趙宦者令繆賢舍人。

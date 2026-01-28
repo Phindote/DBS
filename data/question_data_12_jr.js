@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_xishan"] === 'undefined') {
 }
 
 window.questionsDB["p_xishan"].title = "《始得西山宴遊記》";
-window.questionsDB["p_xishan"].img = "dragon_12.jpg";
+window.questionsDB["p_xishan"].img = "dragon_12.WEBP";
 window.questionsDB["p_xishan"].content = `始得西山宴遊記 柳宗元
  
  	自余為僇人，居是州，恒惴慄。其隙也，則施施而行，漫漫而遊。日與其徒上高山，入深林，窮迴溪，幽泉怪石，無遠不到。到則披草而坐，傾壺而醉。醉則更相枕以臥，臥而夢。意有所極，夢亦同趣。覺而起，起而歸。以為凡是州之山有異態者，皆我有也，而未始知西山之怪特。

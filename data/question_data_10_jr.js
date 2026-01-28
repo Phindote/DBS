@@ -11,7 +11,7 @@ if (typeof window.questionsDB["p_shishuo"] === 'undefined') {
 }
 
 window.questionsDB["p_shishuo"].title = "《師說》";
-window.questionsDB["p_shishuo"].img = "dragon_10.jpg";
+window.questionsDB["p_shishuo"].img = "dragon_10.WEBP";
 window.questionsDB["p_shishuo"].content = `師說  韓愈
 
  	古之學者必有師。師者，所以傳道、受業、解惑也。人非生而知之者，孰能無惑？惑而不從師，其為惑也終不解矣。

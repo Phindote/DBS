@@ -7,7 +7,7 @@ if (typeof window.questionsDB["p_shengsheng"] === 'undefined') {
 }
 
 window.questionsDB["p_shengsheng"].title = "《聲聲慢‧秋情》";
-window.questionsDB["p_shengsheng"].img = "dragon_5.jpg";
+window.questionsDB["p_shengsheng"].img = "dragon_5.WEBP";
 window.questionsDB["p_shengsheng"].content = `聲聲慢 秋情	李清照 
 
 尋尋覓覓，冷冷清清，悽悽慘慘戚戚。乍煖還寒時候，最難將息。三杯兩盞淡酒，怎敵他晚來風急！雁過也，正傷心，卻是舊時相識。　　滿地黃花堆積，憔悴損，如今有誰堪摘﹖守著窗兒，獨自怎生得黑！梧桐更兼細雨，到黃昏、點點滴滴。這次第，怎一箇愁字了得！`;
