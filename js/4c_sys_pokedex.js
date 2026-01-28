@@ -6,30 +6,23 @@ function stopTTS() {
     }
 }
 
-// 新增：智能選擇最佳廣東話聲音
 function getBestCantoneseVoice() {
     const voices = window.speechSynthesis.getVoices();
-    
-    // 優先順序列表：這是目前各大系統中最好聽的廣東話引擎
-    // Sin-Ji (Apple), Tracy (Windows), HiuGaai (Android/Google)
     const preferredNames = [
-        "Sin-Ji", "Sinji",          // iOS / macOS (非常準確)
-        "Tracy", "Microsoft Tracy", // Windows (很準確)
-        "HiuGaai", "Hiu Gaai",      // Android (Google 引擎)
+        "Sin-Ji", "Sinji",
+        "Tracy", "Microsoft Tracy",
+        "HiuGaai", "Hiu Gaai",
         "Google 粵語", "Google Cantonese"
     ];
 
-    // 1. 嘗試完全匹配優先名單
     for (let name of preferredNames) {
         const voice = voices.find(v => v.name.includes(name));
         if (voice) return voice;
     }
 
-    // 2. 如果找不到，找任何標記為 zh-HK (香港) 的聲音
     const hkVoice = voices.find(v => v.lang === 'zh-HK');
     if (hkVoice) return hkVoice;
 
-    // 3. 再沒有，找 zh-TW (有時候系統會 fallback)
     return voices.find(v => v.lang === 'zh-TW');
 }
 
@@ -38,7 +31,6 @@ function playCantoneseTTS(text) {
     stopTTS();
     
     if ('speechSynthesis' in window) {
-        // 確保聲音列表已加載 (Chrome有時需要這個機制)
         let voices = window.speechSynthesis.getVoices();
         
         const speak = () => {
@@ -47,12 +39,11 @@ function playCantoneseTTS(text) {
 
             if (bestVoice) {
                 utterance.voice = bestVoice;
-                utterance.lang = bestVoice.lang; // 跟隨聲音的語言設定
+                utterance.lang = bestVoice.lang;
             } else {
-                utterance.lang = 'zh-HK'; // 強制設定
+                utterance.lang = 'zh-HK';
             }
 
-            // 稍微調慢語速，讓古文聽起來更清楚
             utterance.rate = 0.85; 
             utterance.pitch = 1.0;
             
@@ -98,7 +89,7 @@ function showPokedex() {
 function createPokedexCard(container, title, img, unlocked, key, jrData, srData) {
     const card = document.createElement("div");
     card.className = "pokedex-card" + (unlocked ? " unlocked" : "");
-    const imgSrc = unlocked ? "images/dragons/" + img : "images/dragons/dragon_unknown.jpg";
+    const imgSrc = unlocked ? "images/dragons/" + img.replace(/\.webp$/i, '.jpg') : "images/dragons/dragon_unknown.jpg";
     let statsHTML = "";
     
     const lastTime = gameState.chapterLastPlayed && gameState.chapterLastPlayed[key];
@@ -156,7 +147,6 @@ function showChapterContent(key) {
     }, 1000);
 
     if (item.content) {
-        // 延遲一點點播放，確保彈窗動畫完成後才開始讀
         setTimeout(() => {
             playCantoneseTTS(item.content);
         }, 500);
