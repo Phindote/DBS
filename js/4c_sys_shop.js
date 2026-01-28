@@ -184,10 +184,8 @@ function buyItem(itemId, price) {
     const targetItem = MASTER_ITEMS.find(i => i.id === itemId);
     if(!targetItem) return;
 
-    // 檢查背包空間
     const existing = gameState.inventory.find(i => i.id === itemId);
     
-    // 如果是新物品（背包內沒有），則需要檢查格數
     if (!existing) {
         const currentSlots = gameState.inventory.length;
         const maxSlots = gameState.user.inventorySlots || 5;
@@ -269,11 +267,11 @@ function renderShopGacha() {
         <div class="gacha-container">
             <div id="gachaEgg" class="css-golden-egg"></div>
             <div id="gachaFlash" class="gacha-flash"></div>
-            <div style="text-align:center; color:var(--primary-blue); font-weight:bold; margin-bottom:10px;">
+            <div style="text-align:center; color:var(--primary-blue); font-weight:bold; margin-bottom:10px; -webkit-text-stroke: 1px white; paint-order: stroke fill;">
                 龍蛋祈願
             </div>
             <button class="btn-main" style="background:#f1c40f; color:white; margin-bottom:5px;" onclick="playGacha()">立即祈願</button>
-            <div style="font-size:0.8rem; color:#999; text-align:center;">花費 ${GACHA_CONFIG.COST} 金幣</div>
+            <div style="font-size:0.8rem; color:#999; text-align:center; -webkit-text-stroke: 1px white; paint-order: stroke fill; font-weight: bold;">花費 ${GACHA_CONFIG.COST} 金幣</div>
         </div>
     `;
 }
