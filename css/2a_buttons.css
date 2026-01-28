@@ -273,6 +273,8 @@
     border-bottom: 3px solid transparent;
     -webkit-tap-highlight-color: transparent;
     outline: none;
+    -webkit-text-stroke: 1px white;
+    paint-order: stroke fill;
 }
 .tab-btn.active {
     color: var(--primary-blue);
