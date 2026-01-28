@@ -1,5 +1,5 @@
 .profile-card {
-    background: #f8f9fa;
+    background: rgba(248, 249, 250, 0.5);
     border: 2px solid var(--primary-blue);
     border-radius: 12px;
     padding: 15px 20px;
@@ -21,7 +21,7 @@
     border: none;
     background: transparent;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.8s;
     -webkit-tap-highlight-color: transparent;
 }
 .profile-logo:hover { transform: scale(1.05); }
@@ -43,7 +43,6 @@
     align-items: center;
 }
 .profile-row strong { color: var(--primary-blue); }
-
 .pokedex-card, .shop-card {
     background: #fff;
     border: none;
@@ -90,7 +89,6 @@
 .stat-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
 .stat-jr { color: #2980b9; background: #eaf6ff; }
 .stat-sr { color: #c0392b; background: #f9ebea; }
-
 .task-row {
     background: linear-gradient(90deg, #fdfdfd, #f4f6f7);
     border-left: 5px solid #95a5a6;
@@ -127,7 +125,6 @@
     color: #e67e22;
     margin-top: 2px;
 }
-
 .inv-count-badge {
     position: absolute;
     bottom: 5px;
@@ -139,14 +136,12 @@
     font-size: 0.8rem;
     font-weight: bold;
 }
-
 .recipe-row {
     padding: 10px;
     border-bottom: 1px solid #eee;
     font-size: 0.95rem;
     color: #333;
 }
-
 .coin-capsule {
     display: flex;
     align-items: center;
@@ -165,7 +160,6 @@
     object-fit: contain;
     margin-right: 6px;
 }
-
 @media (hover: hover) {
     .pokedex-card:hover, .shop-card:hover { transform: translateY(-5px); z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
 }

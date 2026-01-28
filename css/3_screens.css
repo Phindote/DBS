@@ -74,6 +74,39 @@
     font-size: 2rem;
     margin-bottom: 20px;
 }
+#screen-menu {
+    background: url('../images/bg/bg_menu.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-difficulty {
+    justify-content: center;
+    background: url('../images/bg/bg_difficulty.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-daily {
+    background: url('../images/bg/bg_daily.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-pokedex {
+    background: url('../images/bg/bg_pokedex.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-achievements {
+    background: url('../images/bg/bg_seal.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-shop {
+    background: url('../images/bg/bg_shop.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-inventory {
+    background: url('../images/bg/bg_inventory.jpg') no-repeat center center;
+    background-size: cover;
+}
+#screen-pet {
+    background: url('../images/bg/bg_pet.jpg') no-repeat center center;
+    background-size: cover;
+}
 .menu-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -87,7 +120,7 @@
     box-sizing: border-box;
 }
 .menu-btn {
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(240, 240, 240, 0.5));
     border: 3px solid var(--primary-blue);
     border-radius: 15px;
     padding: 10px;
@@ -116,7 +149,7 @@
 .menu-btn:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 51, 153, 0.15);
-    background: linear-gradient(145deg, #ffffff, #e6f0ff);
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.6), rgba(230, 240, 255, 0.6));
 }
 .sub-menu {
     width: 100%;
@@ -130,7 +163,13 @@
     overflow-y: auto;
     overflow-x: hidden;
 }
-#singleChapterList, #mixChapterList, #shopContainer, #pokedexContainer, #sealContainer, #inventoryContainer, #dailyContainer, #smeltContainer, #petContainer {
+#singleChapterList, #mixChapterList {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    align-content: start;
+}
+#shopContainer, #pokedexContainer, #sealContainer, #inventoryContainer, #dailyContainer, #smeltContainer, #petContainer {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
@@ -149,9 +188,6 @@
     text-align: center;
     display: none;
     animation: fadeIn 0.3s ease;
-}
-#screen-difficulty {
-    justify-content: center;
 }
 #screen-game {
     display: none;
@@ -730,10 +766,4 @@
 .result-tip-bubble::before {
     content: '💡';
     margin-right: 4px;
-}
-#singleChapterList, #mixChapterList {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    align-content: start;
 }
