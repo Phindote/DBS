@@ -30,19 +30,35 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .profile-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1rem;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .profile-row:first-child span {
     font-size: 1.3rem; 
     display: flex;
     align-items: center;
 }
-.profile-row strong { color: var(--primary-blue); }
+.profile-row strong { 
+    color: var(--primary-blue); 
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
+
+.clickable-underline {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+    text-decoration: underline;
+    text-decoration-color: var(--primary-blue) !important;
+}
+
 .pokedex-card, .shop-card {
     background: #fff;
     border: none;
@@ -83,8 +99,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
-.shop-price { color: #d35400; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
+.shop-price { 
+    color: #d35400; 
+    font-weight: bold; 
+    font-size: 0.9rem; 
+    margin-bottom: 5px;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 .pokedex-stats { display: flex; flex-direction: column; gap: 2px; width: 100%; }
 .stat-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
 .stat-jr { color: #2980b9; background: #eaf6ff; }
@@ -119,11 +144,15 @@
     font-size: 1rem;
     color: #2c3e50;
     font-weight: bold;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .task-reward-info {
     font-size: 0.85rem;
     color: #e67e22;
     margin-top: 2px;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .inv-count-badge {
     position: absolute;
@@ -141,6 +170,8 @@
     border-bottom: 1px solid #eee;
     font-size: 0.95rem;
     color: #333;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .coin-capsule {
     display: flex;

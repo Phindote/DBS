@@ -1,3 +1,7 @@
+h2, h3 {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 .screen {
     display: none;
     padding: 20px;
@@ -62,6 +66,10 @@
     width: auto;
     z-index: 2;
 }
+#loadingText {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 #screen-login {
     justify-content: center;
     background: url('../images/bg/login_bg.jpg') no-repeat center center;
@@ -74,6 +82,10 @@
     paint-order: stroke fill;
     font-size: 2rem;
     margin-bottom: 20px;
+}
+.input-group label {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 #screen-menu {
     background: url('../images/bg/bg_menu.jpg') no-repeat center center;
@@ -139,6 +151,8 @@
     width: 100%;
     position: relative;
     overflow: hidden;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .menu-btn-icon {
     width: 85%;
@@ -200,6 +214,12 @@
 #screen-game.active {
     display: flex;
 }
+.battle-hud {
+}
+.battle-hud-left {
+}
+.battle-hud-right {
+}
 .boss-area {
     width: 100%;
     height: 250px;
@@ -243,6 +263,7 @@
     padding: 0;
     margin-bottom: 2px;
     box-sizing: border-box;
+    /* Removed stroke from container to avoid thickening white text */
 }
 .question-box {
     background: #fff;
@@ -257,6 +278,8 @@
     transition: border-color 0.2s, background 0.2s, transform 0.1s;
     margin-bottom: 5px;
     margin-top: 5px;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .question-box .btn-main {
     margin-top: 0 !important;
@@ -266,8 +289,21 @@
 .crack-stage-3 { border-color: #d35400; border-style: double; border-width: 4px; transform: rotate(1deg); }
 .crack-stage-4 { border-color: #c0392b; border-style: groove; border-width: 5px; transform: rotate(-2deg); background: #fff0f0; }
 .crack-stage-5 { border-color: #ff0000; border-style: ridge; border-width: 6px; transform: rotate(2deg); background: #ffe6e6; }
-.poem-line { font-size: 1.3rem; margin-bottom: 10px; font-family: 'Kaiti', 'STKaiti', serif; }
-.target-word { color: var(--primary-red); font-weight: bold; font-size: 1.4rem; margin: 0 5px; }
+.poem-line { 
+    font-size: 1.3rem; 
+    margin-bottom: 10px; 
+    font-family: 'Kaiti', 'STKaiti', serif; 
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
+.target-word { 
+    color: var(--primary-red); 
+    font-weight: bold; 
+    font-size: 1.4rem; 
+    margin: 0 5px; 
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 #answerInput {
     width: 90%;
     padding: 10px;
@@ -277,6 +313,8 @@
     text-align: center;
     transition: all 0.3s;
     margin-bottom: 8px;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 #inputAreaSenior {
     margin-top: 5px;
@@ -291,12 +329,22 @@
     cursor: pointer;
     font-size: 1.1rem;
     transition: all 0.2s;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 @media (hover: hover) {
     .mc-btn:hover:not(:disabled) { background: var(--primary-blue); color: white; }
 }
 .mc-btn:disabled { background: #e0e0e0; color: #aaa; border-color: #ccc; cursor: not-allowed; transform: none; }
-.error-msg { color: var(--primary-red); margin-top: 5px; font-weight: bold; min-height: 20px; font-size: 0.9rem; }
+.error-msg { 
+    color: var(--primary-red); 
+    margin-top: 5px; 
+    font-weight: bold; 
+    min-height: 20px; 
+    font-size: 0.9rem;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 .game-footer-btn { margin-bottom: auto; margin-top: 15px; width: 100%; text-align: center; padding-top: 0; flex-shrink: 0; }
 #resultImageContainer {
     width: 100%;
@@ -320,6 +368,8 @@
     margin-bottom: 10px;
     position: relative;
     z-index: 10;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .result-table {
     width: 100%;
@@ -330,8 +380,22 @@
 }
 .result-table th, .result-table td { padding: 10px; border-bottom: 1px solid #ddd; }
 .result-table th { background-color: var(--primary-blue); color: white; }
-.res-wrong { color: var(--primary-red); font-weight: bold; }
-.res-correct { color: var(--hp-green); font-weight: bold; }
+.result-table td {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
+.res-wrong { 
+    color: var(--primary-red); 
+    font-weight: bold; 
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
+.res-correct { 
+    color: var(--hp-green); 
+    font-weight: bold; 
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+}
 #contentModal, #helpModal, #titlesModal, .modal-backdrop {
     display: none;
     position: fixed;
@@ -399,6 +463,8 @@
     font-size: 1.05rem;
     color: #333;
     font-family: 'Kaiti', 'STKaiti', 'BiauKai', serif;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .modal-body p { margin-bottom: 10px; }
 .modal-body ul { margin-bottom: 10px; padding-left: 20px; }
@@ -500,12 +566,16 @@
     font-size: 0.85rem;
     color: #888;
     font-weight: bold;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .node-name {
     flex: 1;
     font-size: 1.1rem;
     color: #2c3e50;
     font-weight: bold;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .node-status {
     font-size: 1.5rem;
@@ -535,6 +605,8 @@
     margin-bottom: 5px;
     color: var(--primary-red);
     font-weight: bold;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 #floatingMenuContainer {
     position: absolute;
@@ -708,6 +780,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-text-stroke: 0 !important;
+}
+.q-stat-seg span {
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
+    font-weight: bold;
 }
 .q-stat-blue { background: #3498db; border-right: 1px solid rgba(255,255,255,0.2); }
 .q-stat-yellow { background: #f1c40f; color: white; border-right: 1px solid rgba(255,255,255,0.2); }
@@ -772,6 +850,8 @@
     position: relative;
     animation: fadeIn 0.5s ease;
     line-height: 1.3;
+    -webkit-text-stroke: 0.8px white;
+    paint-order: stroke fill;
 }
 .result-tip-bubble::before {
     content: '💡';
