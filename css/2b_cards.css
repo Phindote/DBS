@@ -125,6 +125,7 @@
     width: 100%;
     box-sizing: border-box;
     transition: all 0.3s ease;
+    opacity: 0.9;
 }
 .task-row:hover {
     transform: translateX(2px);
