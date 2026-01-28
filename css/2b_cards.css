@@ -51,16 +51,14 @@
     -webkit-text-stroke: 0.8px white;
     paint-order: stroke fill;
 }
-
 .clickable-underline {
     -webkit-text-stroke: 0.8px white;
     paint-order: stroke fill;
     text-decoration: underline;
     text-decoration-color: var(--primary-blue) !important;
 }
-
 .pokedex-card, .shop-card {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.6);
     border: none;
     border-radius: 12px;
     padding: 10px;
