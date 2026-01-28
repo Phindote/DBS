@@ -83,13 +83,13 @@ function showPokedex() {
         createPokedexCard(container, item.title, item.img, isMastered, key, jrData, srData);
     });
     const isMixMastered = gameState.masteredChapters.includes('mix');
-    createPokedexCard(container, "《混合試煉》", "dragon_mix.jpg", isMixMastered, "mix", null, null);
+    createPokedexCard(container, "《混合試煉》", "dragon_mix.PNG", isMixMastered, "mix", null, null);
 }
 
 function createPokedexCard(container, title, img, unlocked, key, jrData, srData) {
     const card = document.createElement("div");
     card.className = "pokedex-card" + (unlocked ? " unlocked" : "");
-    const imgSrc = unlocked ? "images/dragons/" + img.replace(/\.webp$/i, '.jpg') : "images/dragons/dragon_unknown.jpg";
+    const imgSrc = unlocked ? "images/dragons/" + img.replace(/\.webp$/i, '.PNG') : "images/dragons/dragon_unknown.PNG";
     let statsHTML = "";
     
     const lastTime = gameState.chapterLastPlayed && gameState.chapterLastPlayed[key];
@@ -116,7 +116,7 @@ function createPokedexCard(container, title, img, unlocked, key, jrData, srData)
         `;
     }
     card.innerHTML = `
-    <img src="${imgSrc}" class="pokedex-img" alt="Dragon" onerror="this.src='images/dragons/dragon_unknown.jpg'">
+    <img src="${imgSrc}" class="pokedex-img" alt="Dragon" onerror="this.src='images/dragons/dragon_unknown.PNG'">
     <div class="pokedex-title">${title}</div>
     ${statsHTML}
     `;

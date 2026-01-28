@@ -95,7 +95,7 @@ function initGame(modeOrDifficulty) {
     gameState.user.hp = 100;
     
     if (mode === 'single') {
-        gameState.currentDragon = (db[pendingSingleChapterKey] && db[pendingSingleChapterKey].img) ? db[pendingSingleChapterKey].img : "dragon_unknown.jpg";
+        gameState.currentDragon = (db[pendingSingleChapterKey] && db[pendingSingleChapterKey].img) ? db[pendingSingleChapterKey].img : "dragon_unknown.PNG";
     } else {
         gameState.currentDragon = "dragon_mix.WEBP";
     }
