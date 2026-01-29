@@ -219,7 +219,7 @@ function showItemDetail(index) {
     const body = document.getElementById("detailModalBody");
     
     if(item.type === 'fragment') {
-        title.innerText = "碎片";
+        title.innerText = "素材";
     } else {
         title.innerText = "成品";
     }
