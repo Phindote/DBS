@@ -234,8 +234,8 @@ h2, h3 {
     min-height: 180px;
 }
 .boss-img {
-    height: 50vh;
-    width: 50vh;
+    height: 30vh;
+    width: 30vh;
     max-width: 100%;
     object-fit: contain;
     animation: float 3s ease-in-out infinite;
