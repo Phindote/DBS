@@ -198,7 +198,7 @@ h2, h3 {
     box-sizing: border-box;
 }
 #dailyContainer {
-    flex: 0 1 auto;
+    flex: 1; /* Changed for consistency with 2d_layout */
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
@@ -670,7 +670,7 @@ h2, h3 {
     width: 40px;
     height: 40px;
     border: none;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.75); /* Updated Opacity */
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -734,7 +734,7 @@ h2, h3 {
     width: 40px;
     height: 40px;
     border: none;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.75);
     border-radius: 50%;
     cursor: pointer;
     display: flex;

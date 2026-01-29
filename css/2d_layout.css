@@ -477,3 +477,22 @@ select.form-input {
     content: '💡';
     margin-right: 4px;
 }
+
+/* New: Daily Container Flex Fix */
+#dailyContainer {
+    flex: 1; /* Changed from 0 1 auto to 1 */
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: none;
+    padding: 10px 5px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    max-height: 85vh;
+}
+
+/* New: Sub-menu H3 Centering */
+.sub-menu h3 {
+    text-align: center;
+}
