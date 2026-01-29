@@ -186,7 +186,7 @@ h2, h3 {
     gap: 10px;
     align-content: start;
 }
-#shopContainer, #pokedexContainer, #sealContainer, #inventoryContainer, #smeltContainer, #petContainer {
+#shopContainer, #pokedexContainer, #sealContainer, #inventoryContainer, #smeltContainer, #petContainer, #dailyContainer {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
@@ -196,18 +196,6 @@ h2, h3 {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-}
-#dailyContainer {
-    flex: 1; /* Changed for consistency with 2d_layout */
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: none;
-    padding: 10px 5px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    max-height: 85vh;
 }
 #singleConfirmArea {
     margin-top: 15px;
@@ -670,7 +658,7 @@ h2, h3 {
     width: 40px;
     height: 40px;
     border: none;
-    background-color: rgba(255, 255, 255, 0.75); /* Updated Opacity */
+    background-color: rgba(255, 255, 255, 0.75);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
