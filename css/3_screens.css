@@ -215,6 +215,8 @@ h2, h3 {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.2);
+    background-blend-mode: overlay; 
 }
 #screen-game.active {
     display: flex;
@@ -234,8 +236,8 @@ h2, h3 {
     min-height: 180px;
 }
 .boss-img {
-    height: 30vh;
-    width: 30vh;
+    height: 35vh;
+    width: 50vh;
     max-width: 100%;
     object-fit: contain;
     animation: float 3s ease-in-out infinite;
@@ -256,6 +258,7 @@ h2, h3 {
     z-index: 15;
     flex-shrink: 0;
 }
+
 .battle-chapter-name {
     margin-top: 0;
     margin-bottom: 10px;
