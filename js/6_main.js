@@ -189,22 +189,33 @@ document.addEventListener('click', (e) => {
 
 function preloadAssets(callback) {
     let loadedCount = 0;
+    let isFinished = false; // 防止重複觸發完成邏輯
     const totalAssets = ASSETS_TO_LOAD.length + Object.keys(audioFiles).length;
     const updateProgress = () => {
         loadedCount++;
-        const percent = Math.floor((loadedCount / totalAssets) * 100);
-        document.getElementById('loadingBar').style.width = percent + '%';
-        document.getElementById('loadingText').innerText = percent + '%';
-        if (loadedCount >= totalAssets) {
+        // 修復：強制將百分比上限鎖定為 100%，解決超過 100% 的顯示 Bug
+        const percent = Math.min(100, Math.floor((loadedCount / totalAssets) * 100));
+        
+        const bar = document.getElementById('loadingBar');
+        const txt = document.getElementById('loadingText');
+        if(bar) bar.style.width = percent + '%';
+        if(txt) txt.innerText = percent + '%';
+        
+        if (loadedCount >= totalAssets && !isFinished) {
+            isFinished = true;
             setTimeout(() => {
-                document.getElementById('screen-loading').classList.remove('active');
+                const loadingScreen = document.getElementById('screen-loading');
+                if(loadingScreen) loadingScreen.classList.remove('active');
                 
-                document.getElementById('screen-login').classList.add('active');
+                const loginScreen = document.getElementById('screen-login');
+                if(loginScreen) loginScreen.classList.add('active');
+                
                 if (gameState.user.name) {
-                    document.getElementById("inputName").value = gameState.user.name;
+                    const inputName = document.getElementById("inputName");
+                    if(inputName) inputName.value = gameState.user.name;
                     
                     const cls = gameState.user.class;
-                    if (cls.length >= 2) {
+                    if (cls && cls.length >= 2) {
                         let grade, letter;
                         if (!isNaN(cls.substring(0, 2))) {
                             grade = cls.substring(0, 2);
@@ -221,7 +232,7 @@ function preloadAssets(callback) {
                     }
                 }
                 
-                callback();
+                if(callback) callback();
             }, 500);
         }
     };
