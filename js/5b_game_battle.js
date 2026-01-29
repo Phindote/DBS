@@ -102,10 +102,6 @@ function initGame(modeOrDifficulty) {
     
     const bossImg = document.getElementById("bossImage");
     if(bossImg) bossImg.src = "images/dragons/" + gameState.currentDragon;
-
-    bossImg.style.transform = "scale(2.5)";
-
-bossImg.style.transformOrigin = "center bottom"; 
     
     let titleText = "未知篇章";
     if(mode === 'single' && db[pendingSingleChapterKey]) titleText = db[pendingSingleChapterKey].title;
