@@ -310,6 +310,21 @@ function initSmelt() {
 function executeSmelt() {
     document.getElementById("smeltConfirmModal").style.display = "none";
     
+    // 修復：幽靈物品檢查，確認所有材料真的存在
+    for (let i = 0; i < smeltSlots.length; i++) {
+        const slotItem = smeltSlots[i];
+        if (slotItem) {
+            const existing = gameState.inventory.find(inv => inv.id === slotItem.id && inv.count > 0);
+            if (!existing) {
+                alert("背包中已無此素材（可能已被出售），無法進行熔煉！");
+                smeltSlots = [null, null, null, null];
+                renderShop();
+                updateCoreButtonVisibility();
+                return;
+            }
+        }
+    }
+
     const inputIds = smeltSlots.filter(s => s !== null).map(s => s.id).sort();
     
     smeltSlots.forEach(slotItem => {

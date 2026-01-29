@@ -71,6 +71,11 @@ function claimDropReward() {
             const maxSlots = gameState.user.inventorySlots || 5;
             if (currentSlots >= maxSlots) {
                 alert("背包空間不足！請清理或擴充背包！");
+                // 修改：即使空間不足，也必須關閉視窗，否則用戶會卡死
+                document.getElementById("dropModal").style.display = 'none';
+                pendingDropItem = null;
+                pendingDropCount = 0;
+                updateCoreButtonVisibility();
                 return;
             }
         }
@@ -271,7 +276,20 @@ function confirmBuy() {
     if (!currentBuyItem) return;
     
     const slider = document.getElementById("buySlider");
-    const count = parseInt(slider.value);
+    let count = parseInt(slider.value);
+    
+    // 修復：檢查非法數值，防止刷錢
+    if (isNaN(count) || count < 1) {
+        return alert("無效的購買數量！");
+    }
+
+    const existing = gameState.inventory.find(i => i.id === currentBuyItem.id);
+    const currentCount = existing ? existing.count : 0;
+    // 修復：檢查購買後是否超過堆疊上限
+    if (currentCount + count > 99) {
+        return alert("購買後將超過堆疊上限 (99)！");
+    }
+
     const totalPrice = count * currentBuyItem.price;
 
     if (gameState.user.coins < totalPrice) {
@@ -279,7 +297,6 @@ function confirmBuy() {
     }
 
     gameState.user.coins -= totalPrice;
-    const existing = gameState.inventory.find(i => i.id === currentBuyItem.id);
     
     if (existing) {
         existing.count += count;
@@ -316,6 +333,7 @@ function playGacha() {
         return alert("金幣不足！");
     }
 
+    // 檢查背包空間，避免祈願後無法獲得物品
     const rand = Math.random();
     let rarity = 'T4';
     if (rand < GACHA_CONFIG.RATES.T0) rarity = 'T0';
