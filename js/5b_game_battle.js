@@ -102,6 +102,10 @@ function initGame(modeOrDifficulty) {
     
     const bossImg = document.getElementById("bossImage");
     if(bossImg) bossImg.src = "images/dragons/" + gameState.currentDragon;
+
+    bossImg.style.transform = "scale(2.5)";
+
+bossImg.style.transformOrigin = "center bottom"; 
     
     let titleText = "未知篇章";
     if(mode === 'single' && db[pendingSingleChapterKey]) titleText = db[pendingSingleChapterKey].title;
@@ -109,6 +113,33 @@ function initGame(modeOrDifficulty) {
 
     document.getElementById("battleChapterText").innerText = `${titleText} (${difficulty === 'junior' ? '初階' : '高階'})`;
     
+    let bgFile = 'bg_dragon_mix.jpg';
+
+    if (mode === 'single') {
+        switch (pendingSingleChapterKey) {
+            case 'p_yuexia': bgFile = 'bg_dragon_1.jpg'; break;
+            case 'p_denglou': bgFile = 'bg_dragon_2.jpg'; break;
+            case 'p_shanju': bgFile = 'bg_dragon_3.jpg'; break;
+            case 'p_niannu': bgFile = 'bg_dragon_4.jpg'; break;
+            case 'p_shengsheng': bgFile = 'bg_dragon_5.jpg'; break;
+            case 'p_qingyu': bgFile = 'bg_dragon_6.jpg'; break;
+            case 'p_lunren': bgFile = 'bg_dragon_7.jpg'; break;
+            case 'p_fish': bgFile = 'bg_dragon_8.jpg'; break;
+            case 'p_quanxue': bgFile = 'bg_dragon_9.jpg'; break;
+            case 'p_shishuo': bgFile = 'bg_dragon_10.jpg'; break;
+            case 'p_yueyang': bgFile = 'bg_dragon_11.jpg'; break;
+            case 'p_xishan': bgFile = 'bg_dragon_12.jpg'; break;
+            case 'p_liuguo': bgFile = 'bg_dragon_13.jpg'; break;
+            case 'p_chushi': bgFile = 'bg_dragon_14.jpg'; break;
+            case 'p_lianpo': bgFile = 'bg_dragon_15.jpg'; break;
+            case 'p_xiaoyao': bgFile = 'bg_dragon_16.jpg'; break;
+            default: bgFile = 'bg_dragon_mix.jpg'; break;
+        }
+    }
+
+    document.getElementById('screen-game').style.backgroundImage = "url('images/bg/" + bgFile + "')";
+    document.getElementById('screen-result').style.backgroundImage = "url('images/bg/" + bgFile + "')";
+
     playMusic(difficulty === 'junior' ? 'bgm_battle_jr' : 'bgm_battle_sr');
     switchScreen("screen-game");
     updateBars();
