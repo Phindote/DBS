@@ -387,10 +387,12 @@ h2, h3 {
     z-index: 10;
     -webkit-text-stroke: 0.8px white;
     paint-order: stroke fill;
+    text-align: center;
 }
 #endStatsRow {
     -webkit-text-stroke: 0.8px white;
     paint-order: stroke fill;
+    text-align: center;
 }
 .result-table {
     width: 100%;
