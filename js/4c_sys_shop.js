@@ -2,6 +2,8 @@ let currentShopTab = 'buy';
 let currentShopBuyFilter = 'all';
 let isGachaAnimating = false;
 let currentBuyItem = null;
+let pendingDropItem = null;
+let pendingDropCount = 0;
 
 const ITEM_RARITY_COLORS = {
     'T4': '#333333',
@@ -42,20 +44,52 @@ function triggerDrop(scenario) {
     let count = 1;
     if (itemTemplate.type === 'coin') {
         count = itemTemplate.value;
-        gameState.user.coins = Math.min(gameState.user.coins + count, GAME_CONFIG.MAX_COINS);
     } else {
-        const existing = gameState.inventory.find(i => i.id === itemTemplate.id);
-        if (existing) {
-            if (existing.count >= 99) return;
-            existing.count = Math.min(existing.count + 1, 99);
-        } else {
-            gameState.inventory.push({ ...itemTemplate, count: 1 });
-        }
+        count = 1;
     }
     
+    pendingDropItem = itemTemplate;
+    pendingDropCount = count;
+    
+    showDropModal(itemTemplate, count);
+}
+
+function claimDropReward() {
+    if (!pendingDropItem) {
+        document.getElementById("dropModal").style.display = 'none';
+        updateCoreButtonVisibility();
+        return;
+    }
+
+    if (pendingDropItem.type === 'coin') {
+        gameState.user.coins = Math.min(gameState.user.coins + pendingDropCount, GAME_CONFIG.MAX_COINS);
+    } else {
+        const existing = gameState.inventory.find(i => i.id === pendingDropItem.id);
+        
+        if (!existing) {
+            const currentSlots = gameState.inventory.length;
+            const maxSlots = gameState.user.inventorySlots || 5;
+            if (currentSlots >= maxSlots) {
+                alert("背包空間不足！請清理或擴充背包！");
+                return;
+            }
+        }
+
+        if (existing) {
+            existing.count = Math.min(existing.count + 1, 99);
+        } else {
+            gameState.inventory.push({ ...pendingDropItem, count: 1 });
+        }
+    }
+
     saveGame();
     updateShopUI();
-    showDropModal(itemTemplate, count);
+    
+    pendingDropItem = null;
+    pendingDropCount = 0;
+    
+    document.getElementById("dropModal").style.display = 'none';
+    updateCoreButtonVisibility();
 }
 
 function showDropModal(item, count) {
@@ -281,6 +315,25 @@ function playGacha() {
     if (gameState.user.coins < GACHA_CONFIG.COST) {
         return alert("金幣不足！");
     }
+
+    const rand = Math.random();
+    let rarity = 'T4';
+    if (rand < GACHA_CONFIG.RATES.T0) rarity = 'T0';
+    else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1)) rarity = 'T1';
+    else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2)) rarity = 'T2';
+    else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2 + GACHA_CONFIG.RATES.T3)) rarity = 'T3';
+    
+    const pool = DROP_ITEMS_POOL[rarity];
+    const item = pool[Math.floor(Math.random() * pool.length)];
+
+    const existing = gameState.inventory.find(i => i.id === item.id);
+    if (!existing) {
+        const currentSlots = gameState.inventory.length;
+        const maxSlots = gameState.user.inventorySlots || 5;
+        if (currentSlots >= maxSlots) {
+            return alert("背包空間不足！請清理或擴充背包！");
+        }
+    }
     
     isGachaAnimating = true;
     gameState.user.coins -= GACHA_CONFIG.COST;
@@ -300,17 +353,6 @@ function playGacha() {
         flash.classList.add("active");
         playSFX('correct');
         
-        const rand = Math.random();
-        let rarity = 'T4';
-        if (rand < GACHA_CONFIG.RATES.T0) rarity = 'T0';
-        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1)) rarity = 'T1';
-        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2)) rarity = 'T2';
-        else if (rand < (GACHA_CONFIG.RATES.T0 + GACHA_CONFIG.RATES.T1 + GACHA_CONFIG.RATES.T2 + GACHA_CONFIG.RATES.T3)) rarity = 'T3';
-        
-        const pool = DROP_ITEMS_POOL[rarity];
-        const item = pool[Math.floor(Math.random() * pool.length)];
-        
-        const existing = gameState.inventory.find(i => i.id === item.id);
         if (existing) {
             if (existing.count < 99) existing.count++;
         } else {
