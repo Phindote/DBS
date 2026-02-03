@@ -79,66 +79,43 @@ select.form-input {
     padding: 5px;
     box-sizing: border-box;
 }
-
-.pokedex-card, .shop-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-sizing: border-box;
-}
-.pokedex-img, .shop-img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    width: 60%;
-    height: 60%;
-    object-fit: contain;
-    margin: 0;
-}
-.pokedex-title, .shop-title {
-    position: absolute;
-    bottom: 22px;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    margin: 0;
-    font-size: 0.75rem;
-    line-height: 1.1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding: 0 2px;
-    box-sizing: border-box;
-    z-index: 2;
-}
-.inv-count-badge {
-    position: absolute;
-    bottom: 5px;
-    right: 50%;
-    transform: translateX(50%);
-    font-size: 0.7rem;
-    padding: 1px 6px;
-    background: rgba(0,0,0,0.05);
-    color: #333;
-    border-radius: 10px;
-    margin: 0;
-}
-.shop-price {
-    position: absolute;
-    bottom: 5px;
-    width: 100%;
-    text-align: center;
-    margin: 0;
-    z-index: 2;
-}
 .inventory-grid-compact .pokedex-card {
     padding: 5px;
     aspect-ratio: 1 / 1;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
     min-height: 0;
+}
+.inventory-grid-compact .pokedex-img {
+    height: 50%;
+    width: 50%;
+    margin-bottom: 4px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.inventory-grid-compact .pokedex-title {
+    font-size: 0.75rem;
+    min-height: auto;
+    line-height: 1.1;
+    margin-bottom: 2px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+}
+.inventory-grid-compact .inv-count-badge {
+    position: static;
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    background: rgba(0,0,0,0.05);
+    color: #333;
+    border-radius: 10px;
+    margin-top: auto;
 }
 .inventory-grid-compact .btn-inv-delete {
     width: 20px;
