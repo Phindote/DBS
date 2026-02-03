@@ -20,6 +20,12 @@ const HELP_CONTENT = `
 
     <div style="height: 1px; background: linear-gradient(90deg, transparent, var(--primary-blue), transparent); opacity: 0.4; margin: 25px 0;"></div>
 
+    <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">資源與修煉❤️‍🔥</h3>
+    <p>修煉之道，貴在持之以恆。完成每日指定的修行，可領取豐厚金幣，用以購買珍貴的素材或成品，亦可向龍蛋祈願，有機會獲得傳說級的稀有寶物。</p>
+    <p>各種寶物可在商店中透過特定的熔煉公式合成，更可解鎖並召喚強大的靈獸，牠們是伴你登峰造極的夥伴。</p>
+
+    <div style="height: 1px; background: linear-gradient(90deg, transparent, var(--primary-blue), transparent); opacity: 0.4; margin: 25px 0;"></div>
+
     <h3 style="color:var(--primary-blue); margin:10px 0 5px 0;">榮譽與印記🏆</h3>
     <p>並非所有的勝利都值得銘記，唯有那些毫髮無傷的完美通關，方能解開惡龍圖鑑上的封印。圖鑑中更有記載著古文真意，是你溫習並回復浩然之氣的場所。而你在此間的逗留，無論是等級的提升或是戰鬥的勝利，皆會被記錄在龍印寶典之中。當你的實力達到一定條件，龍印自會為你點亮，那是強者的證明。</p>
 
