@@ -16,9 +16,10 @@ const RARITY_COLORS = {
 function renderShopSmelt() {
     const container = document.getElementById("shopContentArea");
     container.innerHTML = `
-        <div style="width:100%; text-align:center; color:#888; font-size:0.6rem; margin-bottom:5px; white-space:nowrap; -webkit-text-stroke: 1px white; paint-order: stroke fill; font-weight: bold;">※ 熔煉成功機率：普通 60% | 精良 70% | 稀有 80% | 史詩 90% | 傳說 100%</div>
+        <div style="width:100%; text-align:center; color:#666; font-size:0.9rem; margin-bottom:10px; white-space:nowrap; -webkit-text-stroke: 1px white; paint-order: stroke fill; font-weight: bold;">請從背包中選擇2-4項物品合成</div>
         <div class="smelt-grid-container" id="smeltContainer" style="margin-top:5px;"></div>
-        <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
+        <div style="width:100%; text-align:center; color:#888; font-size:0.6rem; margin-top:15px; white-space:nowrap; -webkit-text-stroke: 1px white; paint-order: stroke fill; font-weight: bold;">※ 熔煉成功機率：普通 60% | 精良 70% | 稀有 80% | 史詩 90% | 傳說 100%</div>
+        <div style="display:flex; gap:10px; margin-top:5px; justify-content:center;">
             <button class="btn-main" style="margin:0; background:#8e44ad; color:white;" onclick="showRecipes()">合成公式</button>
             <button class="btn-main" style="margin:0;" onclick="initSmelt()">開始合成</button>
         </div>
@@ -310,7 +311,6 @@ function initSmelt() {
 function executeSmelt() {
     document.getElementById("smeltConfirmModal").style.display = "none";
     
-    // 修復：幽靈物品檢查，確認所有材料真的存在
     for (let i = 0; i < smeltSlots.length; i++) {
         const slotItem = smeltSlots[i];
         if (slotItem) {
