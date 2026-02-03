@@ -230,7 +230,7 @@ function showItemDetail(index) {
     header.style.background = rarityColor;
 
     body.innerHTML = `
-        <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px;" onerror="this.src='images/ui/icon_core.PNG'">
+        <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px ${rarityColor});" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:var(--primary-blue); margin-bottom: 5px;">${item.name}</div>
         <div style="font-size:0.9rem; color:${rarityColor}; margin-bottom:10px; font-weight:bold;">${RARITY_MAP[item.rarity]}</div>
         <div style="color:#555; text-align:left; background:#f9f9f9; padding:10px; border-radius:8px;">${item.desc}</div>
@@ -379,9 +379,9 @@ function executeSmelt() {
             if(!gameState.collectionDates) gameState.collectionDates = {};
             gameState.collectionDates[resultItem.id] = new Date().getTime();
             
-            showSmeltResult(resultItem, "解鎖新龍魄靈獸！");
+            showSmeltResult(resultItem, `合成成功！解鎖新龍魄靈獸：${resultItem.name}`);
         } else {
-            showSmeltResult(resultItem, "重複獲得 (轉為金幣)");
+            showSmeltResult(resultItem, `合成成功！但你已經擁有 ${resultItem.name}，獲得 5000 金幣補償。`);
             gameState.user.coins += 5000;
         }
     } else {
@@ -392,15 +392,38 @@ function executeSmelt() {
             gameState.inventory.push({ ...resultItem, count: 1 });
         }
         if (isAsh) {
-            showSmeltResult(resultItem, "合成失敗");
+            showSmeltResult(resultItem, "合成失敗！獲得：灰燼殘渣");
         } else {
-            showSmeltResult(resultItem, "合成成功");
+            showSmeltResult(resultItem, `合成成功！獲得：${resultItem.name}`);
         }
     }
 
     saveGame();
     smeltSlots = [null, null, null, null];
     renderShop();
+    updateCoreButtonVisibility();
+}
+
+function showSmeltResult(item, message) {
+    const modal = document.getElementById("detailModal");
+    const header = document.getElementById("detailModalHeader");
+    const title = document.getElementById("detailModalTitle");
+    const body = document.getElementById("detailModalBody");
+
+    title.innerText = "合成結果";
+    
+    const rarityColor = (item && item.rarity && RARITY_COLORS[item.rarity]) ? RARITY_COLORS[item.rarity] : '#2c3e50';
+    header.style.background = rarityColor;
+    header.style.color = "white";
+
+    body.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;">
+            <img src="images/items/${item.img}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 20px ${rarityColor});" onerror="this.src='images/ui/icon_core.PNG'">
+            <div style="font-size:1.1rem; font-weight:bold; color:var(--primary-blue); text-align:center; line-height:1.5;">${message}</div>
+        </div>
+    `;
+
+    modal.style.display = "flex";
     updateCoreButtonVisibility();
 }
 
@@ -473,26 +496,4 @@ function nextRecipePage() {
 function prevRecipePage() {
     currentRecipePage = (currentRecipePage - 1 + RECIPE_RARITY_ORDER.length) % RECIPE_RARITY_ORDER.length;
     renderRecipePage();
-}
-
-function showSmeltResult(item, title) {
-    const modal = document.getElementById("dropModal");
-    const body = document.getElementById("dropModalBody");
-    const imgSrc = "images/items/" + item.img;
-    const color = RARITY_COLORS[item.rarity] || "#333";
-    
-    body.innerHTML = `
-        <img src="${imgSrc}" style="width:100px; height:100px; object-fit:contain; margin-bottom:10px;" onerror="this.src='images/ui/icon_core.PNG'">
-        <div style="font-size:1.1rem; font-weight:bold; color:${color}; margin-bottom:5px;">${title}</div>
-        <div style="font-size:0.9rem; color:#666;">${item.name}</div>
-    `;
-    
-    const btn = modal.querySelector(".btn-main");
-    if(btn) {
-        btn.innerText = "確定";
-        btn.onclick = function() { modal.style.display = "none"; };
-    }
-    
-    modal.style.display = "flex";
-    updateCoreButtonVisibility();
 }

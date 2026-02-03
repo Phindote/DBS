@@ -71,7 +71,6 @@ function claimDropReward() {
             const maxSlots = gameState.user.inventorySlots || 5;
             if (currentSlots >= maxSlots) {
                 alert("背包空間不足！請清理或擴充背包！");
-                // 修改：即使空間不足，也必須關閉視窗，否則用戶會卡死
                 document.getElementById("dropModal").style.display = 'none';
                 pendingDropItem = null;
                 pendingDropCount = 0;
@@ -113,7 +112,7 @@ function showDropModal(item, count) {
     }
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(46, 204, 113, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px ${rarityColor});" onerror="this.src='images/ui/icon_core.PNG'">
         ${textHTML}
     `;
     const btn = modal.querySelector(".btn-main");
@@ -136,7 +135,7 @@ function showGachaModal(item) {
     const rarityColor = ITEM_RARITY_COLORS[item.rarity] || '#333';
 
     body.innerHTML = `
-        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px rgba(241, 196, 15, 0.6));" onerror="this.src='images/ui/icon_core.PNG'">
+        <img src="${imgSrc}" style="width:120px; height:120px; object-fit:contain; margin-bottom:15px; filter: drop-shadow(0 0 15px ${rarityColor});" onerror="this.src='images/ui/icon_core.PNG'">
         <div style="font-size:1.2rem; font-weight:bold; color:black; margin-bottom: 5px;">${item.name} x1 <span style="font-size:0.9rem; color:${rarityColor};">${rarityText}</span></div>
         <div style="font-size:1.6rem; font-weight:bold; color:#f1c40f; margin-top: 15px;">恭喜獲得！</div>
     `;
@@ -278,14 +277,12 @@ function confirmBuy() {
     const slider = document.getElementById("buySlider");
     let count = parseInt(slider.value);
     
-    // 修復：檢查非法數值，防止刷錢
     if (isNaN(count) || count < 1) {
         return alert("無效的購買數量！");
     }
 
     const existing = gameState.inventory.find(i => i.id === currentBuyItem.id);
     const currentCount = existing ? existing.count : 0;
-    // 修復：檢查購買後是否超過堆疊上限
     if (currentCount + count > 99) {
         return alert("購買後將超過堆疊上限 (99)！");
     }
@@ -333,7 +330,6 @@ function playGacha() {
         return alert("金幣不足！");
     }
 
-    // 檢查背包空間，避免祈願後無法獲得物品
     const rand = Math.random();
     let rarity = 'T4';
     if (rand < GACHA_CONFIG.RATES.T0) rarity = 'T0';
