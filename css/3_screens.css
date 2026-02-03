@@ -100,26 +100,38 @@ h2, h3 {
     background: url('../images/bg/bg_daily.jpg') no-repeat center center;
     background-size: cover;
     justify-content: center;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 #screen-pokedex {
     background: url('../images/bg/bg_pokedex.jpg') no-repeat center center;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 #screen-achievements {
     background: url('../images/bg/bg_seal.jpg') no-repeat center center;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 #screen-shop {
     background: url('../images/bg/bg_shop.jpg') no-repeat center center;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 #screen-inventory {
     background: url('../images/bg/bg_inventory.jpg') no-repeat center center;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 #screen-pet {
     background: url('../images/bg/bg_pet.jpg') no-repeat center center;
     background-size: cover;
+    background-color: rgba(255, 255, 255, 0.4);
+    background-blend-mode: overlay;
 }
 .menu-layout {
     display: grid;
@@ -877,6 +889,6 @@ h2, h3 {
     paint-order: stroke fill;
 }
 .result-tip-bubble::before {
-    content: '💡';
+    content: 'ðŸ’¡';
     margin-right: 4px;
 }
