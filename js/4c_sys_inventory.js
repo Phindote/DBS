@@ -379,9 +379,9 @@ function executeSmelt() {
             if(!gameState.collectionDates) gameState.collectionDates = {};
             gameState.collectionDates[resultItem.id] = new Date().getTime();
             
-            alert(`合成成功！解鎖新龍魄靈獸：${resultItem.name}`);
+            showSmeltResult(resultItem, "解鎖新龍魄靈獸！");
         } else {
-            alert(`合成成功！但你已經擁有 ${resultItem.name}，獲得 5000 金幣補償。`);
+            showSmeltResult(resultItem, "重複獲得 (轉為金幣)");
             gameState.user.coins += 5000;
         }
     } else {
@@ -392,9 +392,9 @@ function executeSmelt() {
             gameState.inventory.push({ ...resultItem, count: 1 });
         }
         if (isAsh) {
-            alert("合成失敗！獲得：灰燼殘渣");
+            showSmeltResult(resultItem, "合成失敗");
         } else {
-            alert(`合成成功！獲得：${resultItem.name}`);
+            showSmeltResult(resultItem, "合成成功");
         }
     }
 
@@ -473,4 +473,26 @@ function nextRecipePage() {
 function prevRecipePage() {
     currentRecipePage = (currentRecipePage - 1 + RECIPE_RARITY_ORDER.length) % RECIPE_RARITY_ORDER.length;
     renderRecipePage();
+}
+
+function showSmeltResult(item, title) {
+    const modal = document.getElementById("dropModal");
+    const body = document.getElementById("dropModalBody");
+    const imgSrc = "images/items/" + item.img;
+    const color = RARITY_COLORS[item.rarity] || "#333";
+    
+    body.innerHTML = `
+        <img src="${imgSrc}" style="width:100px; height:100px; object-fit:contain; margin-bottom:10px;" onerror="this.src='images/ui/icon_core.PNG'">
+        <div style="font-size:1.1rem; font-weight:bold; color:${color}; margin-bottom:5px;">${title}</div>
+        <div style="font-size:0.9rem; color:#666;">${item.name}</div>
+    `;
+    
+    const btn = modal.querySelector(".btn-main");
+    if(btn) {
+        btn.innerText = "確定";
+        btn.onclick = function() { modal.style.display = "none"; };
+    }
+    
+    modal.style.display = "flex";
+    updateCoreButtonVisibility();
 }
