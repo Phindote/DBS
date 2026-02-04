@@ -111,12 +111,12 @@ const MASTER_ITEMS = [
 {id: "pet_010", name: "元素靈狐", img: "pet_010.PNG", type: "pet", price: 0, desc: "尾巴燃燒著不同顏色的火焰。", recipe: ["f_032", "f_017", "p_010"]},
 {id: "pet_011", name: "皇家獅鷲", img: "pet_011.PNG", type: "pet", price: 0, desc: "獅身鷹首的威嚴生物。", recipe: ["p_047", "p_033", "f_017", "p_027"]},
 {id: "pet_012", name: "夢魘戰馬", img: "pet_012.PNG", type: "pet", price: 0, desc: "腳踏地獄之火的黑馬。", recipe: ["f_039", "p_040", "f_015", "p_007"]},
-{id: "pet_013", name: "秘銀魔像", img: "pet_013.PNG", type: "pet", price: 0, desc: "全身由秘銀構成的守護者。", recipe: ["p_031", "f_044", "p_002"]},
-{id: "pet_014", name: "森林妖精", img: "pet_014.PNG", type: "pet", price: 0, desc: "守護森林的小小精靈。", recipe: ["f_031", "f_038", "f_021"]},
+{id: "pet_013", name: "秘銀巨猩", img: "pet_013.PNG", type: "pet", price: 0, desc: "全身由秘銀構成的守護者。", recipe: ["p_031", "f_044", "p_002"]},
+{id: "pet_014", name: "森林夢蝶", img: "pet_014.PNG", type: "pet", price: 0, desc: "守護森林的小小精靈。", recipe: ["f_031", "f_038", "f_021"]},
 {id: "pet_015", name: "巨齒狂鯊", img: "pet_015.PNG", type: "pet", price: 0, desc: "海洋中的頂級掠食者。", recipe: ["p_046", "f_030", "p_002"]},
 {id: "pet_016", name: "全知貓頭鷹", img: "pet_016.PNG", type: "pet", price: 0, desc: "眼神充滿智慧，通曉古今。", recipe: ["p_032", "p_021", "f_007"]},
-{id: "pet_017", name: "晶紅龍王", img: "pet_017.PNG", type: "pet", price: 0, desc: "噴吐烈焰的巨龍之王。", recipe: ["p_045", "f_037", "f_047", "p_027"]},
-{id: "pet_018", name: "九頭海蛇", img: "pet_018.PNG", type: "pet", price: 0, desc: "擁有強大再生能力的怪獸。", recipe: ["p_046", "p_039", "f_048", "p_029"]},
+{id: "pet_017", name: "紅蓮蠻牛", img: "pet_017.PNG", type: "pet", price: 0, desc: "噴吐烈焰的巨牛。", recipe: ["p_045", "f_037", "f_047", "p_027"]},
+{id: "pet_018", name: "狂暴棱犀", img: "pet_018.PNG", type: "pet", price: 0, desc: "擁有強大再生能力的怪獸。", recipe: ["p_046", "p_039", "f_048", "p_029"]},
 {id: "pet_019", name: "涅槃鳳凰", img: "pet_019.PNG", type: "pet", price: 0, desc: "在灰燼中重生的神鳥。", recipe: ["p_041", "f_047", "f_043", "p_027"]},
 {id: "pet_020", name: "永恆守護者", img: "pet_020.PNG", type: "pet", price: 0, desc: "超越時間與空間的終極存在。", recipe: ["p_048", "p_049", "f_042", "f_038"]}
 ];
