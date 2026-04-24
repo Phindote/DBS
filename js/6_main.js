@@ -1,4 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const floatMenu = document.getElementById('floatingMenuContainer');
+    const screenObserver = new MutationObserver(() => {
+        const login = document.getElementById('screen-login');
+        const loading = document.getElementById('screen-loading');
+        if (floatMenu) {
+            if ((login && login.classList.contains('active')) || (loading && loading.classList.contains('active'))) {
+                floatMenu.style.display = 'none';
+            } else {
+                floatMenu.style.display = 'flex';
+            }
+        }
+    });
+    const config = { attributes: true, attributeFilter: ['class'] };
+    const loginEl = document.getElementById('screen-login');
+    const loadingEl = document.getElementById('screen-loading');
+    if (loginEl) screenObserver.observe(loginEl, config);
+    if (loadingEl) screenObserver.observe(loadingEl, config);
+
     loadGame();
     preloadAssets(() => {
         const backdrop = document.createElement("div");
@@ -189,11 +207,10 @@ document.addEventListener('click', (e) => {
 
 function preloadAssets(callback) {
     let loadedCount = 0;
-    let isFinished = false; // 防止重複觸發完成邏輯
+    let isFinished = false;
     const totalAssets = ASSETS_TO_LOAD.length + Object.keys(audioFiles).length;
     const updateProgress = () => {
         loadedCount++;
-        // 修復：強制將百分比上限鎖定為 100%，解決超過 100% 的顯示 Bug
         const percent = Math.min(100, Math.floor((loadedCount / totalAssets) * 100));
         
         const bar = document.getElementById('loadingBar');
