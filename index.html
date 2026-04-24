@@ -527,12 +527,22 @@
 <button class="btn-control-float" onclick="showHelp()">
 <img src="images/ui/btn_setting.PNG" alt="Setting">
 </button>
-<button class="btn-control-float" id="btnBGM" onclick="toggleMusic()">
+<div class="audio-slider-wrapper">
+<div class="volume-slider-container" id="bgmSliderContainer">
+<input type="range" min="0" max="1" step="0.01" value="1" class="vol-slider" id="bgmVolume" orient="vertical">
+</div>
+<button class="btn-control-float" id="btnBGM" onclick="toggleMusic(event)">
 <img src="images/ui/btn_music.PNG" alt="Music">
 </button>
-<button class="btn-control-float" id="btnSFX" onclick="toggleSFX()">
+</div>
+<div class="audio-slider-wrapper">
+<div class="volume-slider-container" id="sfxSliderContainer">
+<input type="range" min="0" max="1" step="0.01" value="1" class="vol-slider" id="sfxVolume" orient="vertical">
+</div>
+<button class="btn-control-float" id="btnSFX" onclick="toggleSFX(event)">
 <img src="images/ui/btn_sound.PNG" alt="SFX">
 </button>
+</div>
 </div>
 <button id="floatingMainBtn">
 <img src="images/ui/btn_menu.PNG" alt="Menu" onerror="this.src='images/ui/btn_setting.PNG'">
